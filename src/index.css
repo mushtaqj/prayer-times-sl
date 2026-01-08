@@ -1,0 +1,105 @@
+@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-heading: "Archivo Black", sans-serif;
+  --font-body: "Space Grotesk", sans-serif;
+
+  --color-primary: #7C3AED;
+  --color-primary-foreground: #FFFFFF;
+  --color-secondary: #A78BFA;
+  --color-secondary-foreground: #1E1B4B;
+  --color-background: #FAF5FF;
+  --color-foreground: #1E1B4B;
+  --color-muted: #E9D5FF;
+  --color-muted-foreground: #6B21A8;
+  --color-accent: #C4B5FD;
+  --color-accent-foreground: #1E1B4B;
+  --color-destructive: #EF4444;
+  --color-border: #1E1B4B;
+  --color-card: #FFFFFF;
+  --color-card-foreground: #1E1B4B;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+}
+
+:root {
+  --primary: #7C3AED;
+  --primary-foreground: #FFFFFF;
+  --secondary: #A78BFA;
+  --secondary-foreground: #1E1B4B;
+  --background: #FAF5FF;
+  --foreground: #1E1B4B;
+  --muted: #E9D5FF;
+  --muted-foreground: #6B21A8;
+  --accent: #C4B5FD;
+  --accent-foreground: #1E1B4B;
+  --destructive: #EF4444;
+  --border: #1E1B4B;
+  --card: #FFFFFF;
+  --card-foreground: #1E1B4B;
+}
+
+.dark {
+  --primary: #A78BFA;
+  --primary-foreground: #1E1B4B;
+  --secondary: #7C3AED;
+  --secondary-foreground: #FFFFFF;
+  --background: #1E1B4B;
+  --foreground: #FAF5FF;
+  --muted: #3730A3;
+  --muted-foreground: #C4B5FD;
+  --accent: #4C1D95;
+  --accent-foreground: #FAF5FF;
+  --border: #A78BFA;
+  --card: #2E1065;
+  --card-foreground: #FAF5FF;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-body), "Space Grotesk", system-ui, sans-serif;
+  background-color: var(--background);
+  color: var(--foreground);
+  min-height: 100vh;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading), "Archivo Black", sans-serif;
+}
+
+.retro-shadow {
+  box-shadow: 4px 4px 0px 0px var(--foreground);
+}
+
+.retro-shadow-sm {
+  box-shadow: 2px 2px 0px 0px var(--foreground);
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--muted);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--secondary);
+}
