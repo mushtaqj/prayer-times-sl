@@ -146,8 +146,8 @@ function App() {
 
           {/* Footer */}
           <footer className="text-center text-sm text-muted-foreground py-6 border-t border-border/50 bg-card/30">
-            <p>Prayer times for Colombo, Gampaha & Kalutara Districts</p>
-            <p className="mt-1 font-heading text-primary/80">Zone 01 - Sri Lanka</p>
+            <p>Prayer times for {locationName} District</p>
+            <p className="mt-1 font-heading text-primary/80">Sri Lanka</p>
           </footer>
         </main>
       </div>
