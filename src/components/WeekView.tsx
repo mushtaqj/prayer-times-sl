@@ -1,7 +1,7 @@
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
-import { PrayerRow } from '@/components/PrayerRow'
+
 import { cn } from '@/lib/utils'
 import type { PrayerTime } from '@/hooks/usePrayerTimes'
 
@@ -24,13 +24,15 @@ export function WeekView({ prayers, location }: WeekViewProps) {
   })
 
   return (
-    <Card>
-      <CardContent className="p-4">
-        <div className="flex items-center justify-between mb-4">
-          <p className="text-sm text-muted-foreground">{todayDateString}</p>
-          <p className="text-sm text-muted-foreground">{location}</p>
+    <Card className="border-border/50 bg-card/40 backdrop-blur-sm shadow-sm transition-all hover:bg-card/50">
+      <CardContent className="p-0">
+        <div className="flex items-center justify-between p-4 border-b border-border/50 bg-muted/30">
+          <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">{todayDateString}</p>
+          <div className="flex items-center gap-1.5 text-sm text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+            <span className="font-medium">{location}</span>
+          </div>
         </div>
-        <div className="space-y-6">
+        <div className="p-4 space-y-6">
           {prayers.map((prayer, index) => {
             const date = new Date(prayer.date)
             date.setHours(0, 0, 0, 0)
@@ -42,34 +44,30 @@ export function WeekView({ prayers, location }: WeekViewProps) {
             })
 
             return (
-              <div key={index}>
+              <div key={index} className={cn("rounded-xl transition-all", isToday && "bg-primary/5 -mx-2 px-2 py-2 border border-primary/10")}>
                 {/* Day Header */}
                 <div className={cn(
                   "flex items-center gap-3 mb-3",
-                  isToday && "text-primary"
+                  isToday ? "text-primary" : "text-muted-foreground"
                 )}>
-                  <Separator className="flex-1" />
+                  <Separator className={cn("flex-1", isToday ? "bg-primary/20" : "bg-border")} />
                   <div className="flex items-center gap-2 px-2">
-                    <span className="font-semibold">{dayName}</span>
-                    <span className="text-muted-foreground text-sm">{dateStr}</span>
+                    <span className={cn("font-bold text-lg font-heading", isToday && "text-primary")}>{dayName}</span>
+                    <span className="text-xs uppercase tracking-wider opacity-70 mt-1">{dateStr}</span>
                     {isToday && (
-                      <Badge variant="default" className="text-xs">Today</Badge>
+                      <Badge variant="default" className="text-[10px] h-5 ml-1 bg-primary shadow-sm hover:bg-primary">Today</Badge>
                     )}
                   </div>
-                  <Separator className="flex-1" />
+                  <Separator className={cn("flex-1", isToday ? "bg-primary/20" : "bg-border")} />
                 </div>
 
                 {/* Prayer Times */}
-                <div className={cn(
-                  "rounded-lg",
-                  isToday && "bg-primary/5 p-2 -mx-2"
-                )}>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                   {prayerKeys.map((key) => (
-                    <PrayerRow
-                      key={key}
-                      name={key.charAt(0).toUpperCase() + key.slice(1)}
-                      time={prayer[key]}
-                    />
+                    <div key={key} className="flex flex-col items-center p-2 rounded-lg bg-background/50 border border-border/50 shadow-sm hover:border-primary/30 transition-colors">
+                      <span className="text-xs text-muted-foreground uppercase tracking-wider mb-1">{key}</span>
+                      <span className="font-medium font-heading text-lg">{prayer[key]}</span>
+                    </div>
                   ))}
                 </div>
               </div>

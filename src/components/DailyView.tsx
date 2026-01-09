@@ -1,5 +1,5 @@
 import { Card, CardContent } from '@/components/ui/card'
-import { Separator } from '@/components/ui/separator'
+
 import { NextPrayerBanner } from '@/components/NextPrayerBanner'
 import { PrayerRow } from '@/components/PrayerRow'
 import type { PrayerTime } from '@/hooks/usePrayerTimes'
@@ -54,14 +54,15 @@ export function DailyView({ prayers, nextPrayer, alarms, onToggleAlarm, location
       )}
 
       {/* Prayer List */}
-      <Card>
-        <CardContent className="p-4">
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-sm text-muted-foreground">{dateString}</p>
-            <p className="text-sm text-muted-foreground">{location}</p>
+      <Card className="border-border/50 bg-card/40 backdrop-blur-sm shadow-sm">
+        <CardContent className="p-0">
+          <div className="flex items-center justify-between p-4 border-b border-border/50 bg-muted/30">
+            <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">{dateString}</p>
+            <div className="flex items-center gap-1.5 text-sm text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+              <span className="font-medium">{location}</span>
+            </div>
           </div>
-          <Separator className="mb-2" />
-          <div className="divide-y divide-border">
+          <div className="divide-y divide-border/50 p-2">
             {prayerInfo.map(({ key, label }) => (
               <PrayerRow
                 key={key}

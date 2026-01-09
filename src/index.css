@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
 
 @theme inline {
@@ -22,51 +22,72 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --radius: 0.5rem;
+  --radius: 0.75rem;
+
+  --font-heading: 'Playfair Display', serif;
+  --font-sans: 'Outfit', system-ui, sans-serif;
 }
 
 :root {
-  --background: hsl(0 0% 100%);
-  --foreground: hsl(240 10% 3.9%);
+  /* Emerald & Gold Theme - Light */
+  --background: hsl(45 29% 97%); /* Warm parchment/sand */
+  --foreground: hsl(155 40% 15%); /* Deep jungle green text */
+
   --card: hsl(0 0% 100%);
-  --card-foreground: hsl(240 10% 3.9%);
+  --card-foreground: hsl(155 40% 15%);
+
   --popover: hsl(0 0% 100%);
-  --popover-foreground: hsl(240 10% 3.9%);
-  --primary: hsl(142.1 76.2% 36.3%);
-  --primary-foreground: hsl(0 0% 100%);
-  --secondary: hsl(240 4.8% 95.9%);
-  --secondary-foreground: hsl(240 5.9% 10%);
-  --muted: hsl(240 4.8% 95.9%);
-  --muted-foreground: hsl(240 3.8% 46.1%);
-  --accent: hsl(240 4.8% 95.9%);
-  --accent-foreground: hsl(240 5.9% 10%);
+  --popover-foreground: hsl(155 40% 15%);
+
+  --primary: hsl(155 50% 30%); /* Elegant Emerald */
+  --primary-foreground: hsl(45 30% 90%);
+
+  --secondary: hsl(45 30% 90%); /* Light Gold/Beige */
+  --secondary-foreground: hsl(155 50% 30%);
+
+  --muted: hsl(155 20% 94%);
+  --muted-foreground: hsl(155 20% 45%);
+
+  --accent: hsl(45 50% 85%); /* Gold accent */
+  --accent-foreground: hsl(155 50% 20%);
+
   --destructive: hsl(0 84.2% 60.2%);
   --destructive-foreground: hsl(0 0% 98%);
-  --border: hsl(240 5.9% 90%);
-  --input: hsl(240 5.9% 90%);
-  --ring: hsl(142.1 76.2% 36.3%);
+
+  --border: hsl(155 20% 90%);
+  --input: hsl(155 20% 90%);
+  --ring: hsl(155 50% 30%);
 }
 
 .dark {
-  --background: hsl(240 10% 3.9%);
-  --foreground: hsl(0 0% 98%);
-  --card: hsl(240 10% 6%);
-  --card-foreground: hsl(0 0% 98%);
-  --popover: hsl(240 10% 3.9%);
-  --popover-foreground: hsl(0 0% 98%);
-  --primary: hsl(142.1 70.6% 45.3%);
-  --primary-foreground: hsl(144.9 80.4% 10%);
-  --secondary: hsl(240 3.7% 15.9%);
-  --secondary-foreground: hsl(0 0% 98%);
-  --muted: hsl(240 3.7% 15.9%);
-  --muted-foreground: hsl(240 5% 64.9%);
-  --accent: hsl(240 3.7% 15.9%);
-  --accent-foreground: hsl(0 0% 98%);
+  /* Emerald & Gold Theme - Dark */
+  --background: hsl(155 50% 10%); /* Very deep green/black */
+  --foreground: hsl(45 20% 90%); /* Off-white/goldish text */
+
+  --card: hsl(155 45% 13%);
+  --card-foreground: hsl(45 20% 90%);
+
+  --popover: hsl(155 45% 13%);
+  --popover-foreground: hsl(45 20% 90%);
+
+  --primary: hsl(155 40% 50%); /* Bright Emerald */
+  --primary-foreground: hsl(155 50% 10%);
+
+  --secondary: hsl(155 30% 20%);
+  --secondary-foreground: hsl(45 20% 90%);
+
+  --muted: hsl(155 30% 20%);
+  --muted-foreground: hsl(155 20% 65%);
+
+  --accent: hsl(45 70% 50%); /* Rich Gold */
+  --accent-foreground: hsl(155 50% 10%);
+
   --destructive: hsl(0 62.8% 30.6%);
   --destructive-foreground: hsl(0 0% 98%);
-  --border: hsl(240 3.7% 15.9%);
-  --input: hsl(240 3.7% 15.9%);
-  --ring: hsl(142.4 71.8% 29.2%);
+
+  --border: hsl(155 30% 20%);
+  --input: hsl(155 30% 20%);
+  --ring: hsl(155 40% 50%);
 }
 
 * {
@@ -76,5 +97,12 @@
 body {
   background-color: var(--background);
   color: var(--foreground);
-  font-family: "Noto Sans", system-ui, sans-serif;
+  font-family: var(--font-sans);
+  background-image: 
+    radial-gradient(at 100% 0%, hsla(45, 70%, 70%, 0.05) 0px, transparent 50%),
+    radial-gradient(at 0% 0%, hsla(155, 60%, 60%, 0.05) 0px, transparent 50%);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
 }

@@ -66,8 +66,8 @@ function App() {
   const locationName = districts.find(d => d.id === selectedDistrict)?.name || 'Colombo'
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <div className="max-w-2xl mx-auto">
+    <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
+      <div className="max-w-md md:max-w-4xl mx-auto min-h-screen flex flex-col shadow-2xl shadow-black/5 bg-card/30 border-x border-border/50">
         <Header
           districts={districts}
           selectedDistrict={selectedDistrict}
@@ -76,70 +76,78 @@ function App() {
           onThemeToggle={toggleTheme}
         />
 
-        {/* Sticky View Switcher */}
-        <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm px-4 py-3 border-b border-border">
-          <ViewSwitcher value={view} onChange={setView} />
-        </div>
+        <main className="flex-1 flex flex-col relative">
+          {/* Sticky View Switcher - Positioned below header */}
+          <div className="sticky top-[69px] z-10 bg-background/95 backdrop-blur-md px-4 py-3 border-b border-border/50 supports-[backdrop-filter]:bg-background/60">
+            <ViewSwitcher value={view} onChange={setView} />
+          </div>
 
-        <main className="px-4 pb-8 space-y-4 pt-4">
-          {/* Notification Banner */}
-          {!hasPermission && (
-            <Card className="bg-secondary border-none">
-              <CardContent className="p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <Bell className="w-5 h-5 text-primary" />
-                  <span className="text-sm font-medium">Enable notifications for prayer alerts</span>
-                </div>
-                <Button size="sm" onClick={handleEnableNotifications}>
-                  Enable
-                </Button>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* PWA Install Banner */}
-          {showInstallBanner && (
-            <Card className="bg-secondary border-none">
-              <CardContent className="p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <Download className="w-5 h-5 text-primary" />
-                  <span className="text-sm font-medium">Install app for offline access</span>
-                </div>
-                <div className="flex gap-2">
-                  <Button size="sm" variant="ghost" onClick={() => setShowInstallBanner(false)}>
-                    Later
+          <div className="p-4 space-y-6 flex-1">
+            {/* Notification Banner */}
+            {!hasPermission && (
+              <Card className="bg-secondary/50 border-accent/20 backdrop-blur-sm">
+                <CardContent className="p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-full bg-primary/10">
+                      <Bell className="w-5 h-5 text-primary" />
+                    </div>
+                    <span className="text-sm font-medium">Enable notifications for prayer alerts</span>
+                  </div>
+                  <Button size="sm" onClick={handleEnableNotifications} className="bg-primary text-primary-foreground hover:bg-primary/90">
+                    Enable
                   </Button>
-                  <Button size="sm" onClick={handleInstall}>
-                    Install
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          )}
+                </CardContent>
+              </Card>
+            )}
 
-          {/* Conditional View Rendering */}
-          {view === 'today' && (
-            <DailyView
-              prayers={todayPrayers}
-              nextPrayer={nextPrayer}
-              alarms={alarms}
-              onToggleAlarm={toggleAlarm}
-              location={locationName}
-            />
-          )}
+            {/* PWA Install Banner */}
+            {showInstallBanner && (
+              <Card className="bg-secondary/50 border-accent/20 backdrop-blur-sm">
+                <CardContent className="p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-full bg-primary/10">
+                      <Download className="w-5 h-5 text-primary" />
+                    </div>
+                    <span className="text-sm font-medium">Install app for offline access</span>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button size="sm" variant="ghost" onClick={() => setShowInstallBanner(false)}>
+                      Later
+                    </Button>
+                    <Button size="sm" onClick={handleInstall} className="bg-primary text-primary-foreground hover:bg-primary/90">
+                      Install
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
-          {view === 'week' && (
-            <WeekView prayers={weekPrayers} location={locationName} />
-          )}
+            {/* Conditional View Rendering */}
+            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+              {view === 'today' && (
+                <DailyView
+                  prayers={todayPrayers}
+                  nextPrayer={nextPrayer}
+                  alarms={alarms}
+                  onToggleAlarm={toggleAlarm}
+                  location={locationName}
+                />
+              )}
 
-          {view === 'month' && (
-            <MonthView getMonthPrayers={getMonthPrayers} location={locationName} />
-          )}
+              {view === 'week' && (
+                <WeekView prayers={weekPrayers} location={locationName} />
+              )}
+
+              {view === 'month' && (
+                <MonthView getMonthPrayers={getMonthPrayers} location={locationName} />
+              )}
+            </div>
+          </div>
 
           {/* Footer */}
-          <footer className="text-center text-sm text-muted-foreground py-4">
+          <footer className="text-center text-sm text-muted-foreground py-6 border-t border-border/50 bg-card/30">
             <p>Prayer times for Colombo, Gampaha & Kalutara Districts</p>
-            <p className="mt-1">Zone 01 - Sri Lanka</p>
+            <p className="mt-1 font-heading text-primary/80">Zone 01 - Sri Lanka</p>
           </footer>
         </main>
       </div>

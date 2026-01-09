@@ -18,7 +18,7 @@ import {
 } from '@/components/ui/sheet'
 import { Separator } from '@/components/ui/separator'
 import { PrayerRow } from '@/components/PrayerRow'
-import { ChevronLeft, ChevronRight, ChevronRight as ChevronIcon } from 'lucide-react'
+import { ChevronLeft, ChevronRight, ChevronRight as ChevronIcon, MapPin } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { PrayerTime } from '@/hooks/usePrayerTimes'
 
@@ -60,22 +60,25 @@ export function MonthView({ getMonthPrayers, location }: MonthViewProps) {
 
   return (
     <>
-      <Card>
-        <CardHeader className="pb-4">
+      <Card className="border-none shadow-none bg-transparent">
+        <CardHeader className="pb-6 px-0">
           <div className="flex items-center justify-between mb-2">
-            <p className="text-sm text-muted-foreground">{todayDateString}</p>
-            <p className="text-sm text-muted-foreground">{location}</p>
+            <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">{todayDateString}</p>
+            <div className="flex items-center gap-1.5 text-sm text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+              <MapPin className="w-3 h-3" />
+              <span className="font-medium">{location}</span>
+            </div>
           </div>
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-lg">Monthly Schedule</CardTitle>
-            <div className="flex items-center gap-2">
-              <Button variant="outline" size="icon" className="h-8 w-8" onClick={prevMonth}>
+          <div className="flex items-center justify-between gap-4">
+            <CardTitle className="text-2xl font-heading text-primary">Monthly Schedule</CardTitle>
+            <div className="flex items-center gap-1 bg-muted/50 p-1 rounded-lg border border-border/50">
+              <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-background rounded-md" onClick={prevMonth}>
                 <ChevronLeft className="w-4 h-4" />
               </Button>
-              <span className="w-24 text-center font-semibold text-sm">
+              <span className="w-24 text-center font-bold text-sm text-foreground">
                 {monthNames[selectedMonth - 1]}
               </span>
-              <Button variant="outline" size="icon" className="h-8 w-8" onClick={nextMonth}>
+              <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-background rounded-md" onClick={nextMonth}>
                 <ChevronRight className="w-4 h-4" />
               </Button>
             </div>
@@ -83,48 +86,54 @@ export function MonthView({ getMonthPrayers, location }: MonthViewProps) {
         </CardHeader>
         <CardContent className="p-0">
           {/* Desktop: Full Table */}
-          <div className="hidden md:block overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-24">Day</TableHead>
-                  <TableHead className="text-center">Fajr</TableHead>
-                  <TableHead className="text-center">Sunrise</TableHead>
-                  <TableHead className="text-center">Dhuhr</TableHead>
-                  <TableHead className="text-center">Asr</TableHead>
-                  <TableHead className="text-center">Maghrib</TableHead>
-                  <TableHead className="text-center">Isha</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {prayers.map((prayer) => {
-                  const isToday = isCurrentMonth && prayer.day === today.getDate()
-                  return (
-                    <TableRow
-                      key={prayer.day}
-                      className={cn(isToday && "bg-primary/10 font-medium")}
-                    >
-                      <TableCell className="font-medium">
-                        <div className="flex items-center gap-2">
-                          {prayer.day} {monthNames[selectedMonth - 1].slice(0, 3)}
-                          {isToday && <Badge variant="default" className="text-xs">Today</Badge>}
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-center text-sm">{prayer.fajr}</TableCell>
-                      <TableCell className="text-center text-sm">{prayer.sunrise}</TableCell>
-                      <TableCell className="text-center text-sm">{prayer.dhuhr}</TableCell>
-                      <TableCell className="text-center text-sm">{prayer.asr}</TableCell>
-                      <TableCell className="text-center text-sm">{prayer.maghrib}</TableCell>
-                      <TableCell className="text-center text-sm">{prayer.isha}</TableCell>
-                    </TableRow>
-                  )
-                })}
-              </TableBody>
-            </Table>
+          <div className="hidden md:block overflow-hidden rounded-xl border border-border/50 bg-card/40 backdrop-blur-sm shadow-sm hover:shadow-md transition-shadow">
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader className="bg-primary/5">
+                  <TableRow className="hover:bg-transparent border-border/50">
+                    <TableHead className="w-28 font-bold text-primary">Day</TableHead>
+                    <TableHead className="text-center font-semibold">Fajr</TableHead>
+                    <TableHead className="text-center font-semibold">Sunrise</TableHead>
+                    <TableHead className="text-center font-semibold">Dhuhr</TableHead>
+                    <TableHead className="text-center font-semibold">Asr</TableHead>
+                    <TableHead className="text-center font-semibold">Maghrib</TableHead>
+                    <TableHead className="text-center font-semibold">Isha</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {prayers.map((prayer) => {
+                    const isToday = isCurrentMonth && prayer.day === today.getDate()
+                    return (
+                      <TableRow
+                        key={prayer.day}
+                        className={cn(
+                          "border-border/50 transition-colors hover:bg-muted/50",
+                          isToday && "bg-primary/10 hover:bg-primary/15 font-medium"
+                        )}
+                      >
+                        <TableCell className="font-medium">
+                          <div className="flex items-center gap-2">
+                            <span className={cn(isToday && "text-primary font-bold")}>{prayer.day}</span>
+                            <span className="text-xs text-muted-foreground">{monthNames[selectedMonth - 1].slice(0, 3)}</span>
+                            {isToday && <Badge variant="default" className="text-[10px] h-5 ml-1 bg-primary hover:bg-primary">Today</Badge>}
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-center text-sm tabular-nums">{prayer.fajr}</TableCell>
+                        <TableCell className="text-center text-sm tabular-nums text-muted-foreground">{prayer.sunrise}</TableCell>
+                        <TableCell className="text-center text-sm tabular-nums">{prayer.dhuhr}</TableCell>
+                        <TableCell className="text-center text-sm tabular-nums">{prayer.asr}</TableCell>
+                        <TableCell className="text-center text-sm tabular-nums">{prayer.maghrib}</TableCell>
+                        <TableCell className="text-center text-sm tabular-nums">{prayer.isha}</TableCell>
+                      </TableRow>
+                    )
+                  })}
+                </TableBody>
+              </Table>
+            </div>
           </div>
 
           {/* Mobile: Simplified List */}
-          <div className="md:hidden divide-y divide-border">
+          <div className="md:hidden space-y-2">
             {prayers.map((prayer) => {
               const isToday = isCurrentMonth && prayer.day === today.getDate()
               return (
@@ -132,26 +141,28 @@ export function MonthView({ getMonthPrayers, location }: MonthViewProps) {
                   key={prayer.day}
                   onClick={() => handleDayClick(prayer)}
                   className={cn(
-                    "w-full flex items-center justify-between p-4 hover:bg-accent transition-colors text-left",
-                    isToday && "bg-primary/10"
+                    "w-full flex items-center justify-between p-4 rounded-xl border border-border/50 bg-card/40 backdrop-blur-sm transition-all text-left",
+                    isToday ? "bg-primary/10 border-primary/20 shadow-sm" : "hover:bg-accent/50"
                   )}
                 >
                   <div className="flex items-center gap-3">
                     <div className="flex flex-col">
-                      <span className="font-medium">
-                        {monthNames[selectedMonth - 1].slice(0, 3)} {prayer.day}
-                      </span>
-                      {isToday && (
-                        <Badge variant="default" className="text-xs w-fit mt-1">Today</Badge>
-                      )}
+                      <div className="flex items-center gap-2">
+                        <span className={cn("text-lg font-heading font-medium", isToday && "text-primary font-bold")}>
+                          {monthNames[selectedMonth - 1].slice(0, 3)} {prayer.day}
+                        </span>
+                        {isToday && (
+                          <Badge variant="default" className="text-[10px] h-5 bg-primary rounded-full px-2">Today</Badge>
+                        )}
+                      </div>
                     </div>
                   </div>
                   <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                    <div className="text-right">
-                      <span className="block">Fajr {prayer.fajr}</span>
-                      <span className="block">Maghrib {prayer.maghrib}</span>
+                    <div className="text-right space-y-0.5">
+                      <span className="block text-xs uppercase tracking-wider opacity-70">Fajr &bull; Maghrib</span>
+                      <span className="block font-medium text-foreground tabular-nums">{prayer.fajr} &bull; {prayer.maghrib}</span>
                     </div>
-                    <ChevronIcon className="w-4 h-4" />
+                    <ChevronIcon className="w-4 h-4 text-primary/50" />
                   </div>
                 </button>
               )

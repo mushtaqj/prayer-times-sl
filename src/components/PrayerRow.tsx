@@ -22,27 +22,29 @@ export function PrayerRow({
   return (
     <div
       className={cn(
-        "flex items-center justify-between py-4 px-2",
-        isNext && "bg-primary/10 -mx-2 px-4 rounded-lg"
+        "flex items-center justify-between py-4 px-3 rounded-xl transition-colors duration-300",
+        isNext
+          ? "bg-primary/10 border border-primary/20 shadow-sm"
+          : "hover:bg-muted/50 border border-transparent"
       )}
     >
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-4">
         <span className={cn(
-          "font-medium",
-          isNext && "text-primary font-semibold"
+          "font-medium text-base",
+          isNext ? "text-primary font-bold font-heading" : "text-muted-foreground"
         )}>
           {name}
         </span>
         {isNext && (
-          <span className="text-xs bg-primary text-primary-foreground px-2 py-0.5 rounded-full">
-            Next
+          <span className="text-[10px] font-bold uppercase tracking-wider bg-primary text-primary-foreground px-2 py-0.5 rounded-full shadow-sm">
+            Upcoming
           </span>
         )}
       </div>
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-4">
         <span className={cn(
-          "font-semibold tabular-nums",
-          isNext ? "text-primary text-lg" : "text-foreground"
+          "font-medium tabular-nums text-lg font-heading",
+          isNext ? "text-primary" : "text-foreground"
         )}>
           {time}
         </span>
@@ -51,13 +53,16 @@ export function PrayerRow({
             size="sm"
             pressed={alarmEnabled}
             onPressedChange={onToggleAlarm}
-            className="h-8 w-8 p-0"
+            className={cn(
+              "h-9 w-9 p-0 rounded-full data-[state=on]:bg-primary data-[state=on]:text-primary-foreground",
+              !alarmEnabled && "hover:bg-muted text-muted-foreground"
+            )}
             aria-label={`Toggle ${name} alarm`}
           >
             {alarmEnabled ? (
               <Bell className="h-4 w-4" />
             ) : (
-              <BellOff className="h-4 w-4 text-muted-foreground" />
+              <BellOff className="h-4 w-4 opacity-50" />
             )}
           </Toggle>
         )}

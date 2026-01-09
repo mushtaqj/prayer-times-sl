@@ -14,23 +14,23 @@ export function ViewSwitcher({ value, onChange }: ViewSwitcherProps) {
       value={value}
       onValueChange={(val) => val && onChange(val as ViewType)}
       variant="outline"
-      className="w-full grid grid-cols-3"
+      className="w-full grid grid-cols-3 p-1 bg-muted rounded-xl gap-1 border-none shadow-inner"
     >
       <ToggleGroupItem
         value="today"
-        className="flex-1 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
+        className="flex-1 rounded-lg data-[state=on]:bg-background data-[state=on]:text-foreground data-[state=on]:shadow-sm transition-all duration-300 capitalize border-none hover:bg-background/50 data-[state=on]:font-semibold"
       >
         Today
       </ToggleGroupItem>
       <ToggleGroupItem
         value="week"
-        className="flex-1 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
+        className="flex-1 rounded-lg data-[state=on]:bg-background data-[state=on]:text-foreground data-[state=on]:shadow-sm transition-all duration-300 capitalize border-none hover:bg-background/50 data-[state=on]:font-semibold"
       >
         Week
       </ToggleGroupItem>
       <ToggleGroupItem
         value="month"
-        className="flex-1 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
+        className="flex-1 rounded-lg data-[state=on]:bg-background data-[state=on]:text-foreground data-[state=on]:shadow-sm transition-all duration-300 capitalize border-none hover:bg-background/50 data-[state=on]:font-semibold"
       >
         Month
       </ToggleGroupItem>

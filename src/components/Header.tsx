@@ -29,8 +29,8 @@ export function Header({ districts, selectedDistrict, onDistrictChange, isDark, 
   }
 
   return (
-    <header className="flex items-center justify-between gap-4 p-4 border-b border-border">
-      <h1 className="text-lg font-bold text-foreground">Prayer Times</h1>
+    <header className="flex items-center justify-between gap-4 p-4 border-b border-border bg-background/80 backdrop-blur-md sticky top-0 z-20">
+      <h1 className="text-2xl font-bold text-primary font-heading tracking-wide">Prayer Times</h1>
 
       <div className="flex items-center gap-2">
         <Button
@@ -38,18 +38,18 @@ export function Header({ districts, selectedDistrict, onDistrictChange, isDark, 
           size="icon"
           onClick={handleDetectLocation}
           disabled={isDetecting}
-          className="h-9 w-9"
+          className="h-9 w-9 text-muted-foreground hover:text-primary transition-colors"
           title="Detect location"
         >
           {isDetecting ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
+            <Loader2 className="w-5 h-5 animate-spin" />
           ) : (
-            <MapPin className="w-4 h-4" />
+            <MapPin className="w-5 h-5" />
           )}
         </Button>
 
         <Select value={selectedDistrict} onValueChange={onDistrictChange}>
-          <SelectTrigger className="w-32 h-9">
+          <SelectTrigger className="w-32 h-9 border-muted bg-card/50 backdrop-blur-sm">
             <SelectValue placeholder="District" />
           </SelectTrigger>
           <SelectContent>
@@ -61,8 +61,8 @@ export function Header({ districts, selectedDistrict, onDistrictChange, isDark, 
           </SelectContent>
         </Select>
 
-        <Button variant="ghost" size="icon" onClick={onThemeToggle} className="h-9 w-9">
-          {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+        <Button variant="ghost" size="icon" onClick={onThemeToggle} className="h-9 w-9 text-muted-foreground hover:text-primary transition-colors">
+          {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
         </Button>
       </div>
     </header>
