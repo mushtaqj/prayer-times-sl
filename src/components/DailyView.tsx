@@ -2,6 +2,8 @@ import { Card, CardContent } from '@/components/ui/card'
 
 import { NextPrayerBanner } from '@/components/NextPrayerBanner'
 import { PrayerRow } from '@/components/PrayerRow'
+import { HijriDateDisplay } from '@/components/HijriDateDisplay'
+import { gregorianToHijri } from '@/hooks/useHijriCalendar'
 import type { PrayerTime } from '@/hooks/usePrayerTimes'
 import type { PrayerName } from '@/hooks/useAlarms'
 
@@ -42,6 +44,7 @@ export function DailyView({ prayers, nextPrayer, alarms, onToggleAlarm, location
     month: 'long',
     day: 'numeric',
   })
+  const hijriToday = gregorianToHijri(today)
 
   return (
     <div className="space-y-4">
@@ -56,11 +59,15 @@ export function DailyView({ prayers, nextPrayer, alarms, onToggleAlarm, location
       {/* Prayer List */}
       <Card className="border-border/50 bg-card/40 backdrop-blur-sm shadow-sm">
         <CardContent className="p-0">
-          <div className="flex items-center justify-between p-4 border-b border-border/50 bg-muted/30">
-            <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">{dateString}</p>
-            <div className="flex items-center gap-1.5 text-sm text-primary bg-primary/10 px-2 py-0.5 rounded-full">
-              <span className="font-medium">{location}</span>
+          <div className="p-4 border-b border-border/50 bg-muted/30 space-y-2">
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">{dateString}</p>
+              <div className="flex items-center gap-1.5 text-sm text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+                <span className="font-medium">{location}</span>
+              </div>
             </div>
+            {/* Hijri Date */}
+            <HijriDateDisplay hijriDate={hijriToday} showMoonPhase={true} showEvents={true} />
           </div>
           <div className="divide-y divide-border/50 p-2">
             {prayerInfo.map(({ key, label }) => (

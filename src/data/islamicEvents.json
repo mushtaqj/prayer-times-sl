@@ -1,0 +1,225 @@
+{
+  "metadata": {
+    "description": "Important Islamic dates and events",
+    "source": "Traditional Islamic calendar",
+    "lastUpdated": "2025-01-10"
+  },
+  "events": [
+    {
+      "id": "new-year",
+      "name": "Islamic New Year",
+      "nameArabic": "رأس السنة الهجرية",
+      "hijriMonth": 1,
+      "hijriDay": 1,
+      "type": "holy",
+      "isFastingDay": false,
+      "description": "Beginning of the new Hijri year"
+    },
+    {
+      "id": "ashura",
+      "name": "Day of Ashura",
+      "nameArabic": "يوم عاشوراء",
+      "hijriMonth": 1,
+      "hijriDay": 10,
+      "type": "holy",
+      "isFastingDay": true,
+      "fastingType": "recommended",
+      "description": "Day of fasting commemorating various significant events"
+    },
+    {
+      "id": "tasu-a",
+      "name": "Tasu'a",
+      "nameArabic": "تاسوعاء",
+      "hijriMonth": 1,
+      "hijriDay": 9,
+      "type": "holy",
+      "isFastingDay": true,
+      "fastingType": "recommended",
+      "description": "Day before Ashura, recommended to fast with Ashura"
+    },
+    {
+      "id": "mawlid",
+      "name": "Mawlid al-Nabi",
+      "nameArabic": "المولد النبوي",
+      "hijriMonth": 3,
+      "hijriDay": 12,
+      "type": "holy",
+      "isFastingDay": false,
+      "description": "Birthday of Prophet Muhammad (PBUH)"
+    },
+    {
+      "id": "isra-miraj",
+      "name": "Isra and Mi'raj",
+      "nameArabic": "الإسراء والمعراج",
+      "hijriMonth": 7,
+      "hijriDay": 27,
+      "type": "holy",
+      "isFastingDay": true,
+      "fastingType": "recommended",
+      "description": "Night journey of Prophet Muhammad (PBUH)"
+    },
+    {
+      "id": "shab-e-barat",
+      "name": "Shab e Barat",
+      "nameArabic": "ليلة البراءة",
+      "hijriMonth": 8,
+      "hijriDay": 15,
+      "type": "holy",
+      "isFastingDay": true,
+      "fastingType": "recommended",
+      "description": "Night of forgiveness and salvation"
+    },
+    {
+      "id": "ramadan-start",
+      "name": "Ramadan Begins",
+      "nameArabic": "بداية رمضان",
+      "hijriMonth": 9,
+      "hijriDay": 1,
+      "type": "holy",
+      "isFastingDay": true,
+      "fastingType": "obligatory",
+      "description": "First day of the blessed month of fasting"
+    },
+    {
+      "id": "laylat-al-qadr",
+      "name": "Laylat al-Qadr",
+      "nameArabic": "ليلة القدر",
+      "hijriMonth": 9,
+      "hijriDay": 27,
+      "type": "holy",
+      "isFastingDay": false,
+      "description": "Night of Power - better than a thousand months"
+    },
+    {
+      "id": "eid-al-fitr",
+      "name": "Eid al-Fitr",
+      "nameArabic": "عيد الفطر",
+      "hijriMonth": 10,
+      "hijriDay": 1,
+      "type": "eid",
+      "isFastingDay": false,
+      "fastingForbidden": true,
+      "description": "Festival marking the end of Ramadan"
+    },
+    {
+      "id": "arafah",
+      "name": "Day of Arafah",
+      "nameArabic": "يوم عرفة",
+      "hijriMonth": 12,
+      "hijriDay": 9,
+      "type": "holy",
+      "isFastingDay": true,
+      "fastingType": "recommended",
+      "description": "Day before Eid al-Adha, highly recommended fast for non-pilgrims"
+    },
+    {
+      "id": "eid-al-adha",
+      "name": "Eid al-Adha",
+      "nameArabic": "عيد الأضحى",
+      "hijriMonth": 12,
+      "hijriDay": 10,
+      "type": "eid",
+      "isFastingDay": false,
+      "fastingForbidden": true,
+      "description": "Festival of Sacrifice"
+    },
+    {
+      "id": "tashreeq-1",
+      "name": "Days of Tashreeq (Day 1)",
+      "nameArabic": "أيام التشريق",
+      "hijriMonth": 12,
+      "hijriDay": 11,
+      "type": "holy",
+      "isFastingDay": false,
+      "fastingForbidden": true,
+      "description": "Days of eating, drinking and remembrance of Allah"
+    },
+    {
+      "id": "tashreeq-2",
+      "name": "Days of Tashreeq (Day 2)",
+      "nameArabic": "أيام التشريق",
+      "hijriMonth": 12,
+      "hijriDay": 12,
+      "type": "holy",
+      "isFastingDay": false,
+      "fastingForbidden": true,
+      "description": "Days of eating, drinking and remembrance of Allah"
+    },
+    {
+      "id": "tashreeq-3",
+      "name": "Days of Tashreeq (Day 3)",
+      "nameArabic": "أيام التشريق",
+      "hijriMonth": 12,
+      "hijriDay": 13,
+      "type": "holy",
+      "isFastingDay": false,
+      "fastingForbidden": true,
+      "description": "Days of eating, drinking and remembrance of Allah"
+    }
+  ],
+  "recurringFasts": {
+    "weekly": [
+      {
+        "id": "monday-fast",
+        "name": "Monday Fast",
+        "nameArabic": "صوم الإثنين",
+        "dayOfWeek": 1,
+        "type": "sunnah",
+        "description": "Recommended weekly fast"
+      },
+      {
+        "id": "thursday-fast",
+        "name": "Thursday Fast",
+        "nameArabic": "صوم الخميس",
+        "dayOfWeek": 4,
+        "type": "sunnah",
+        "description": "Recommended weekly fast"
+      }
+    ],
+    "monthly": {
+      "ayyamAlBeed": {
+        "name": "Ayyam al-Beed (White Days)",
+        "nameArabic": "أيام البيض",
+        "days": [13, 14, 15],
+        "type": "sunnah",
+        "description": "13th, 14th, and 15th of each Hijri month - recommended monthly fasts"
+      }
+    },
+    "annual": [
+      {
+        "id": "shawwal-six",
+        "name": "Six Days of Shawwal",
+        "nameArabic": "ست من شوال",
+        "hijriMonth": 10,
+        "startDay": 2,
+        "duration": 6,
+        "type": "sunnah",
+        "description": "Six voluntary fasts after Eid al-Fitr"
+      },
+      {
+        "id": "dhul-hijjah-first-nine",
+        "name": "First Nine Days of Dhul Hijjah",
+        "nameArabic": "العشر الأوائل من ذي الحجة",
+        "hijriMonth": 12,
+        "startDay": 1,
+        "endDay": 9,
+        "type": "recommended",
+        "description": "Highly recommended fasts, especially Day of Arafah"
+      }
+    ]
+  },
+  "hijriMonths": [
+    { "number": 1, "name": "Muharram", "nameArabic": "محرم", "meaning": "Forbidden" },
+    { "number": 2, "name": "Safar", "nameArabic": "صفر", "meaning": "Void" },
+    { "number": 3, "name": "Rabi al-Awwal", "nameArabic": "ربيع الأول", "meaning": "First Spring" },
+    { "number": 4, "name": "Rabi al-Thani", "nameArabic": "ربيع الثاني", "meaning": "Second Spring" },
+    { "number": 5, "name": "Jumada al-Awwal", "nameArabic": "جمادى الأولى", "meaning": "First of Parched Land" },
+    { "number": 6, "name": "Jumada al-Akhirah", "nameArabic": "جمادى الآخرة", "meaning": "Last of Parched Land" },
+    { "number": 7, "name": "Rajab", "nameArabic": "رجب", "meaning": "Respect" },
+    { "number": 8, "name": "Shaban", "nameArabic": "شعبان", "meaning": "Scattered" },
+    { "number": 9, "name": "Ramadan", "nameArabic": "رمضان", "meaning": "Burning Heat" },
+    { "number": 10, "name": "Shawwal", "nameArabic": "شوال", "meaning": "Raised" },
+    { "number": 11, "name": "Dhul Qadah", "nameArabic": "ذو القعدة", "meaning": "The One of Truce" },
+    { "number": 12, "name": "Dhul Hijjah", "nameArabic": "ذو الحجة", "meaning": "The One of Pilgrimage" }
+  ]
+}

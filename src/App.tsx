@@ -3,6 +3,7 @@ import { Header } from '@/components/Header'
 import { DailyView } from '@/components/DailyView'
 import { WeekView } from '@/components/WeekView'
 import { MonthView } from '@/components/MonthView'
+import { HijriCalendarView } from '@/components/HijriCalendarView'
 import { ViewSwitcher, type ViewType } from '@/components/ViewSwitcher'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -140,6 +141,10 @@ function App() {
 
               {view === 'month' && (
                 <MonthView getMonthPrayers={getMonthPrayers} location={locationName} />
+              )}
+
+              {view === 'hijri' && (
+                <HijriCalendarView location={locationName} />
               )}
             </div>
           </div>
