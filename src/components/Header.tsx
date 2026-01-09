@@ -1,4 +1,4 @@
-import { Moon, Sun, MapPin } from 'lucide-react'
+import { Moon, Sun, MapPin, Loader2 } from 'lucide-react'
 import {
   Select,
   SelectContent,
@@ -7,6 +7,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
+import { useLocation } from '@/hooks/useLocation'
 import type { District } from '@/hooks/usePrayerTimes'
 
 interface HeaderProps {
@@ -18,34 +19,50 @@ interface HeaderProps {
 }
 
 export function Header({ districts, selectedDistrict, onDistrictChange, isDark, onThemeToggle }: HeaderProps) {
+  const { detectLocation, isDetecting } = useLocation()
+
+  const handleDetectLocation = async () => {
+    const district = await detectLocation()
+    if (district) {
+      onDistrictChange(district)
+    }
+  }
+
   return (
-    <header className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 md:p-6 border-b">
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-          <span className="text-xl">🕌</span>
-        </div>
-        <h1 className="text-xl md:text-2xl font-bold">Prayer Times</h1>
-      </div>
+    <header className="flex items-center justify-between gap-4 p-4 border-b border-border">
+      <h1 className="text-lg font-bold text-foreground">Prayer Times</h1>
 
-      <div className="flex items-center gap-3">
-        <div className="flex items-center gap-2">
-          <MapPin className="w-4 h-4 text-muted-foreground" />
-          <Select value={selectedDistrict} onValueChange={onDistrictChange}>
-            <SelectTrigger className="w-40">
-              <SelectValue placeholder="Select district" />
-            </SelectTrigger>
-            <SelectContent>
-              {districts.map(district => (
-                <SelectItem key={district.id} value={district.id}>
-                  {district.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+      <div className="flex items-center gap-2">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={handleDetectLocation}
+          disabled={isDetecting}
+          className="h-9 w-9"
+          title="Detect location"
+        >
+          {isDetecting ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            <MapPin className="w-4 h-4" />
+          )}
+        </Button>
 
-        <Button variant="outline" size="icon" onClick={onThemeToggle}>
-          {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+        <Select value={selectedDistrict} onValueChange={onDistrictChange}>
+          <SelectTrigger className="w-32 h-9">
+            <SelectValue placeholder="District" />
+          </SelectTrigger>
+          <SelectContent>
+            {districts.map(district => (
+              <SelectItem key={district.id} value={district.id}>
+                {district.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        <Button variant="ghost" size="icon" onClick={onThemeToggle} className="h-9 w-9">
+          {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
         </Button>
       </div>
     </header>

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 
 export type PrayerName = 'fajr' | 'sunrise' | 'dhuhr' | 'asr' | 'maghrib' | 'isha'
 
@@ -11,7 +11,16 @@ interface UseAlarmsReturn {
   toggleAlarm: (prayer: PrayerName) => void
   requestNotificationPermission: () => Promise<boolean>
   hasPermission: boolean
-  scheduleNotification: (prayer: PrayerName, time: string) => void
+  scheduleNotifications: (prayerTimes: Record<PrayerName, string>) => () => void
+}
+
+const prayerNames: Record<PrayerName, string> = {
+  fajr: 'Fajr',
+  sunrise: 'Sunrise',
+  dhuhr: 'Dhuhr',
+  asr: 'Asr',
+  maghrib: 'Maghrib',
+  isha: 'Isha',
 }
 
 export function useAlarms(): UseAlarmsReturn {
@@ -28,6 +37,7 @@ export function useAlarms(): UseAlarmsReturn {
   })
 
   const [hasPermission, setHasPermission] = useState(false)
+  const scheduledTimeouts = useRef<Map<PrayerName, ReturnType<typeof setTimeout>>>(new Map())
 
   useEffect(() => {
     if ('Notification' in window) {
@@ -39,12 +49,12 @@ export function useAlarms(): UseAlarmsReturn {
     localStorage.setItem('prayerAlarms', JSON.stringify(alarms))
   }, [alarms])
 
-  const toggleAlarm = (prayer: PrayerName) => {
+  const toggleAlarm = useCallback((prayer: PrayerName) => {
     setAlarms(prev => ({
       ...prev,
       [prayer]: !prev[prayer],
     }))
-  }
+  }, [])
 
   const requestNotificationPermission = async (): Promise<boolean> => {
     if (!('Notification' in window)) {
@@ -67,18 +77,7 @@ export function useAlarms(): UseAlarmsReturn {
     return false
   }
 
-  const scheduleNotification = useCallback((prayer: PrayerName, time: string) => {
-    if (!hasPermission || !alarms[prayer]) return
-
-    const prayerNames: Record<PrayerName, string> = {
-      fajr: 'Fajr',
-      sunrise: 'Sunrise',
-      dhuhr: 'Dhuhr',
-      asr: 'Asr',
-      maghrib: 'Maghrib',
-      isha: 'Isha',
-    }
-
+  const parseTime = (time: string): Date => {
     const now = new Date()
     const [timePart, period] = time.split(' ')
     const [hours, minutes] = timePart.split(':').map(Number)
@@ -89,25 +88,70 @@ export function useAlarms(): UseAlarmsReturn {
 
     const targetTime = new Date(now)
     targetTime.setHours(targetHours, minutes, 0, 0)
+    return targetTime
+  }
 
-    const diff = targetTime.getTime() - now.getTime()
+  const scheduleNotifications = useCallback((prayerTimes: Record<PrayerName, string>) => {
+    // Clear any existing scheduled notifications
+    scheduledTimeouts.current.forEach((timeout) => {
+      clearTimeout(timeout)
+    })
+    scheduledTimeouts.current.clear()
 
-    if (diff > 0 && diff < 24 * 60 * 60 * 1000) {
-      setTimeout(() => {
-        new Notification(`${prayerNames[prayer]} Prayer Time`, {
-          body: `It's time for ${prayerNames[prayer]} prayer (${time})`,
-          icon: '/pwa-192x192.png',
-          tag: prayer,
-        })
-      }, diff)
+    if (!hasPermission) {
+      return () => {}
+    }
+
+    const now = new Date()
+    const prayers: PrayerName[] = ['fajr', 'sunrise', 'dhuhr', 'asr', 'maghrib', 'isha']
+
+    prayers.forEach((prayer) => {
+      if (!alarms[prayer]) return
+
+      const time = prayerTimes[prayer]
+      if (!time) return
+
+      const targetTime = parseTime(time)
+      const diff = targetTime.getTime() - now.getTime()
+
+      // Only schedule if the prayer time is in the future (within the next 24 hours)
+      if (diff > 0) {
+        const timeout = setTimeout(() => {
+          new Notification(`${prayerNames[prayer]} Prayer Time`, {
+            body: `It's time for ${prayerNames[prayer]} prayer (${time})`,
+            icon: '/pwa-192x192.png',
+            tag: prayer,
+          })
+          scheduledTimeouts.current.delete(prayer)
+        }, diff)
+
+        scheduledTimeouts.current.set(prayer, timeout)
+      }
+    })
+
+    // Return cleanup function
+    return () => {
+      scheduledTimeouts.current.forEach((timeout) => {
+        clearTimeout(timeout)
+      })
+      scheduledTimeouts.current.clear()
     }
   }, [hasPermission, alarms])
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      scheduledTimeouts.current.forEach((timeout) => {
+        clearTimeout(timeout)
+      })
+    }
+  }, [])
 
   return {
     alarms,
     toggleAlarm,
     requestNotificationPermission,
     hasPermission,
-    scheduleNotification,
+    scheduleNotifications,
   }
 }

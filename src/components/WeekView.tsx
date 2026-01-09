@@ -1,77 +1,80 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { Separator } from '@/components/ui/separator'
+import { PrayerRow } from '@/components/PrayerRow'
 import { cn } from '@/lib/utils'
 import type { PrayerTime } from '@/hooks/usePrayerTimes'
 
 interface WeekViewProps {
   prayers: (PrayerTime & { date: Date })[]
+  location: string
 }
 
-export function WeekView({ prayers }: WeekViewProps) {
+const prayerKeys = ['fajr', 'sunrise', 'dhuhr', 'asr', 'maghrib', 'isha'] as const
+
+export function WeekView({ prayers, location }: WeekViewProps) {
   const today = new Date()
   today.setHours(0, 0, 0, 0)
 
+  const todayDateString = today.toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  })
+
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>This Week</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="overflow-x-auto -mx-6 px-6">
-          <div className="flex gap-3 min-w-max pb-2">
-            {prayers.map((prayer, index) => {
-              const date = new Date(prayer.date)
-              date.setHours(0, 0, 0, 0)
-              const isToday = date.getTime() === today.getTime()
-              const dayName = prayer.date.toLocaleDateString('en-US', { weekday: 'short' })
-              const dayNum = prayer.date.getDate()
-              const month = prayer.date.toLocaleDateString('en-US', { month: 'short' })
+      <CardContent className="p-4">
+        <div className="flex items-center justify-between mb-4">
+          <p className="text-sm text-muted-foreground">{todayDateString}</p>
+          <p className="text-sm text-muted-foreground">{location}</p>
+        </div>
+        <div className="space-y-6">
+          {prayers.map((prayer, index) => {
+            const date = new Date(prayer.date)
+            date.setHours(0, 0, 0, 0)
+            const isToday = date.getTime() === today.getTime()
+            const dayName = prayer.date.toLocaleDateString('en-US', { weekday: 'long' })
+            const dateStr = prayer.date.toLocaleDateString('en-US', {
+              month: 'short',
+              day: 'numeric',
+            })
 
-              return (
-                <div
-                  key={index}
-                  className={cn(
-                    "flex-shrink-0 w-28 p-3 rounded-lg border transition-all",
-                    isToday
-                      ? "bg-primary text-primary-foreground border-primary shadow-lg"
-                      : "bg-card border-border hover:bg-accent"
-                  )}
-                >
-                  <div className="flex flex-col items-center gap-2">
-                    <div className="text-center">
-                      <div className="font-bold">{dayName}</div>
-                      <div className="text-xs opacity-80">{month} {dayNum}</div>
-                    </div>
+            return (
+              <div key={index}>
+                {/* Day Header */}
+                <div className={cn(
+                  "flex items-center gap-3 mb-3",
+                  isToday && "text-primary"
+                )}>
+                  <Separator className="flex-1" />
+                  <div className="flex items-center gap-2 px-2">
+                    <span className="font-semibold">{dayName}</span>
+                    <span className="text-muted-foreground text-sm">{dateStr}</span>
                     {isToday && (
-                      <Badge variant="secondary" className="text-xs">Today</Badge>
+                      <Badge variant="default" className="text-xs">Today</Badge>
                     )}
-                    <div className="w-full space-y-1 text-xs">
-                      <div className="flex justify-between">
-                        <span className="opacity-70">Fajr</span>
-                        <span className="font-semibold">{prayer.fajr.split(' ')[0]}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="opacity-70">Dhuhr</span>
-                        <span className="font-semibold">{prayer.dhuhr.split(' ')[0]}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="opacity-70">Asr</span>
-                        <span className="font-semibold">{prayer.asr.split(' ')[0]}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="opacity-70">Maghrib</span>
-                        <span className="font-semibold">{prayer.maghrib.split(' ')[0]}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="opacity-70">Isha</span>
-                        <span className="font-semibold">{prayer.isha.split(' ')[0]}</span>
-                      </div>
-                    </div>
                   </div>
+                  <Separator className="flex-1" />
                 </div>
-              )
-            })}
-          </div>
+
+                {/* Prayer Times */}
+                <div className={cn(
+                  "rounded-lg",
+                  isToday && "bg-primary/5 p-2 -mx-2"
+                )}>
+                  {prayerKeys.map((key) => (
+                    <PrayerRow
+                      key={key}
+                      name={key.charAt(0).toUpperCase() + key.slice(1)}
+                      time={prayer[key]}
+                    />
+                  ))}
+                </div>
+              </div>
+            )
+          })}
         </div>
       </CardContent>
     </Card>
