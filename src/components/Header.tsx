@@ -1,6 +1,12 @@
 import { Moon, Sun, MapPin } from 'lucide-react'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/retroui/Select'
-import { Button } from '@/components/retroui/Button'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Button } from '@/components/ui/button'
 import type { District } from '@/hooks/usePrayerTimes'
 
 interface HeaderProps {
@@ -13,9 +19,9 @@ interface HeaderProps {
 
 export function Header({ districts, selectedDistrict, onDistrictChange, isDark, onThemeToggle }: HeaderProps) {
   return (
-    <header className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 md:p-6">
+    <header className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 md:p-6 border-b">
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 bg-[var(--primary)] rounded-xl border-2 border-[var(--foreground)] flex items-center justify-center shadow-[2px_2px_0px_0px_var(--foreground)]">
+        <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
           <span className="text-xl">🕌</span>
         </div>
         <h1 className="text-xl md:text-2xl font-bold">Prayer Times</h1>
@@ -23,7 +29,7 @@ export function Header({ districts, selectedDistrict, onDistrictChange, isDark, 
 
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-2">
-          <MapPin className="w-4 h-4 text-[var(--muted-foreground)]" />
+          <MapPin className="w-4 h-4 text-muted-foreground" />
           <Select value={selectedDistrict} onValueChange={onDistrictChange}>
             <SelectTrigger className="w-40">
               <SelectValue placeholder="Select district" />

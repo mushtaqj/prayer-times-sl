@@ -1,9 +1,10 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/retroui/Card'
-import { Badge } from '@/components/retroui/Badge'
-import { Toggle } from '@/components/retroui/Toggle'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Toggle } from '@/components/ui/toggle'
 import { Bell, BellOff } from 'lucide-react'
 import type { PrayerTime } from '@/hooks/usePrayerTimes'
 import type { PrayerName } from '@/hooks/useAlarms'
+import { cn } from '@/lib/utils'
 
 interface TodayCardProps {
   prayers: PrayerTime | null
@@ -24,9 +25,9 @@ const prayerInfo: { key: PrayerName; label: string; icon: string }[] = [
 export function TodayCard({ prayers, nextPrayer, alarms, onToggleAlarm }: TodayCardProps) {
   if (!prayers) {
     return (
-      <Card className="w-full">
+      <Card>
         <CardContent className="p-6">
-          <p className="text-center text-[var(--muted-foreground)]">
+          <p className="text-center text-muted-foreground">
             Prayer times not available for this date.
           </p>
         </CardContent>
@@ -43,11 +44,11 @@ export function TodayCard({ prayers, nextPrayer, alarms, onToggleAlarm }: TodayC
   })
 
   return (
-    <Card className="w-full">
+    <Card>
       <CardHeader className="pb-2">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <CardTitle>Today's Prayer Times</CardTitle>
-          <Badge variant="primary" className="w-fit">{dateString}</Badge>
+          <Badge variant="default">{dateString}</Badge>
         </div>
       </CardHeader>
       <CardContent>
@@ -59,11 +60,12 @@ export function TodayCard({ prayers, nextPrayer, alarms, onToggleAlarm }: TodayC
             return (
               <div
                 key={key}
-                className={`relative p-3 rounded-xl border-2 border-[var(--foreground)] transition-all ${
+                className={cn(
+                  "relative p-4 rounded-lg border transition-all",
                   isNext
-                    ? 'bg-[var(--primary)] text-[var(--primary-foreground)] shadow-[4px_4px_0px_0px_var(--foreground)]'
-                    : 'bg-[var(--card)]'
-                }`}
+                    ? "bg-primary text-primary-foreground border-primary shadow-lg"
+                    : "bg-card border-border hover:bg-accent"
+                )}
               >
                 {isNext && (
                   <Badge variant="secondary" className="absolute -top-2 -right-2 text-xs">
@@ -73,14 +75,17 @@ export function TodayCard({ prayers, nextPrayer, alarms, onToggleAlarm }: TodayC
                 <div className="flex flex-col items-center gap-1">
                   <span className="text-2xl">{icon}</span>
                   <span className="font-semibold text-sm">{label}</span>
-                  <span className={`text-lg font-bold ${isNext ? '' : 'text-[var(--primary)]'}`}>
+                  <span className={cn(
+                    "text-lg font-bold",
+                    isNext ? "" : "text-primary"
+                  )}>
                     {time}
                   </span>
                   <Toggle
                     size="sm"
                     pressed={alarms[key]}
                     onPressedChange={() => onToggleAlarm(key)}
-                    className={`mt-1 ${isNext ? 'border-[var(--primary-foreground)]' : ''}`}
+                    className="mt-1"
                   >
                     {alarms[key] ? (
                       <Bell className="w-3 h-3" />

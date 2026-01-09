@@ -1,5 +1,6 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/retroui/Card'
-import { Badge } from '@/components/retroui/Badge'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { cn } from '@/lib/utils'
 import type { PrayerTime } from '@/hooks/usePrayerTimes'
 
 interface WeekViewProps {
@@ -11,12 +12,12 @@ export function WeekView({ prayers }: WeekViewProps) {
   today.setHours(0, 0, 0, 0)
 
   return (
-    <Card className="w-full">
+    <Card>
       <CardHeader>
         <CardTitle>This Week</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="overflow-x-auto -mx-4 md:-mx-6 px-4 md:px-6">
+        <div className="overflow-x-auto -mx-6 px-6">
           <div className="flex gap-3 min-w-max pb-2">
             {prayers.map((prayer, index) => {
               const date = new Date(prayer.date)
@@ -29,39 +30,40 @@ export function WeekView({ prayers }: WeekViewProps) {
               return (
                 <div
                   key={index}
-                  className={`flex-shrink-0 w-28 p-3 rounded-xl border-2 border-[var(--foreground)] transition-all ${
+                  className={cn(
+                    "flex-shrink-0 w-28 p-3 rounded-lg border transition-all",
                     isToday
-                      ? 'bg-[var(--primary)] text-[var(--primary-foreground)] shadow-[4px_4px_0px_0px_var(--foreground)]'
-                      : 'bg-[var(--card)]'
-                  }`}
+                      ? "bg-primary text-primary-foreground border-primary shadow-lg"
+                      : "bg-card border-border hover:bg-accent"
+                  )}
                 >
                   <div className="flex flex-col items-center gap-2">
                     <div className="text-center">
                       <div className="font-bold">{dayName}</div>
-                      <div className="text-xs">{month} {dayNum}</div>
+                      <div className="text-xs opacity-80">{month} {dayNum}</div>
                     </div>
                     {isToday && (
                       <Badge variant="secondary" className="text-xs">Today</Badge>
                     )}
                     <div className="w-full space-y-1 text-xs">
                       <div className="flex justify-between">
-                        <span>Fajr</span>
+                        <span className="opacity-70">Fajr</span>
                         <span className="font-semibold">{prayer.fajr.split(' ')[0]}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span>Dhuhr</span>
+                        <span className="opacity-70">Dhuhr</span>
                         <span className="font-semibold">{prayer.dhuhr.split(' ')[0]}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span>Asr</span>
+                        <span className="opacity-70">Asr</span>
                         <span className="font-semibold">{prayer.asr.split(' ')[0]}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span>Maghrib</span>
+                        <span className="opacity-70">Maghrib</span>
                         <span className="font-semibold">{prayer.maghrib.split(' ')[0]}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span>Isha</span>
+                        <span className="opacity-70">Isha</span>
                         <span className="font-semibold">{prayer.isha.split(' ')[0]}</span>
                       </div>
                     </div>

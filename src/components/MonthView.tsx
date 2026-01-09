@@ -1,7 +1,17 @@
 import { useState } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/retroui/Card'
-import { Button } from '@/components/retroui/Button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { cn } from '@/lib/utils'
 import type { PrayerTime } from '@/hooks/usePrayerTimes'
 
 interface MonthViewProps {
@@ -23,7 +33,7 @@ export function MonthView({ getMonthPrayers }: MonthViewProps) {
   const nextMonth = () => setSelectedMonth(m => m === 12 ? 1 : m + 1)
 
   return (
-    <Card className="w-full">
+    <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle>Monthly Schedule</CardTitle>
@@ -41,46 +51,44 @@ export function MonthView({ getMonthPrayers }: MonthViewProps) {
         </div>
       </CardHeader>
       <CardContent>
-        <div className="overflow-x-auto -mx-4 md:-mx-6">
-          <table className="w-full min-w-[640px]">
-            <thead>
-              <tr className="bg-[var(--primary)] text-[var(--primary-foreground)]">
-                <th className="px-3 py-2 text-left text-sm font-bold border-2 border-[var(--foreground)]">Day</th>
-                <th className="px-3 py-2 text-center text-sm font-bold border-2 border-[var(--foreground)]">Fajr</th>
-                <th className="px-3 py-2 text-center text-sm font-bold border-2 border-[var(--foreground)]">Sunrise</th>
-                <th className="px-3 py-2 text-center text-sm font-bold border-2 border-[var(--foreground)]">Dhuhr</th>
-                <th className="px-3 py-2 text-center text-sm font-bold border-2 border-[var(--foreground)]">Asr</th>
-                <th className="px-3 py-2 text-center text-sm font-bold border-2 border-[var(--foreground)]">Maghrib</th>
-                <th className="px-3 py-2 text-center text-sm font-bold border-2 border-[var(--foreground)]">Isha</th>
-              </tr>
-            </thead>
-            <tbody>
+        <div className="overflow-x-auto -mx-6">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-24">Day</TableHead>
+                <TableHead className="text-center">Fajr</TableHead>
+                <TableHead className="text-center">Sunrise</TableHead>
+                <TableHead className="text-center">Dhuhr</TableHead>
+                <TableHead className="text-center">Asr</TableHead>
+                <TableHead className="text-center">Maghrib</TableHead>
+                <TableHead className="text-center">Isha</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {prayers.map((prayer) => {
                 const isToday = isCurrentMonth && prayer.day === today.getDate()
                 return (
-                  <tr
+                  <TableRow
                     key={prayer.day}
-                    className={`transition-colors ${
-                      isToday
-                        ? 'bg-[var(--secondary)] font-bold'
-                        : 'hover:bg-[var(--muted)]'
-                    }`}
+                    className={cn(isToday && "bg-primary/10 font-medium")}
                   >
-                    <td className="px-3 py-2 text-sm border-2 border-[var(--foreground)]">
-                      {prayer.day} {monthNames[selectedMonth - 1].slice(0, 3)}
-                      {isToday && <span className="ml-2 text-xs bg-[var(--primary)] text-[var(--primary-foreground)] px-2 py-0.5 rounded-lg">Today</span>}
-                    </td>
-                    <td className="px-3 py-2 text-sm text-center border-2 border-[var(--foreground)]">{prayer.fajr}</td>
-                    <td className="px-3 py-2 text-sm text-center border-2 border-[var(--foreground)]">{prayer.sunrise}</td>
-                    <td className="px-3 py-2 text-sm text-center border-2 border-[var(--foreground)]">{prayer.dhuhr}</td>
-                    <td className="px-3 py-2 text-sm text-center border-2 border-[var(--foreground)]">{prayer.asr}</td>
-                    <td className="px-3 py-2 text-sm text-center border-2 border-[var(--foreground)]">{prayer.maghrib}</td>
-                    <td className="px-3 py-2 text-sm text-center border-2 border-[var(--foreground)]">{prayer.isha}</td>
-                  </tr>
+                    <TableCell className="font-medium">
+                      <div className="flex items-center gap-2">
+                        {prayer.day} {monthNames[selectedMonth - 1].slice(0, 3)}
+                        {isToday && <Badge variant="default" className="text-xs">Today</Badge>}
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-center">{prayer.fajr}</TableCell>
+                    <TableCell className="text-center">{prayer.sunrise}</TableCell>
+                    <TableCell className="text-center">{prayer.dhuhr}</TableCell>
+                    <TableCell className="text-center">{prayer.asr}</TableCell>
+                    <TableCell className="text-center">{prayer.maghrib}</TableCell>
+                    <TableCell className="text-center">{prayer.isha}</TableCell>
+                  </TableRow>
                 )
               })}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
       </CardContent>
     </Card>

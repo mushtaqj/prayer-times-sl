@@ -3,8 +3,8 @@ import { Header } from '@/components/Header'
 import { TodayCard } from '@/components/TodayCard'
 import { WeekView } from '@/components/WeekView'
 import { MonthView } from '@/components/MonthView'
-import { Button } from '@/components/retroui/Button'
-import { Card, CardContent } from '@/components/retroui/Card'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
 import { useTheme } from '@/hooks/useTheme'
 import { useAlarms } from '@/hooks/useAlarms'
 import { usePrayerTimes } from '@/hooks/usePrayerTimes'
@@ -65,7 +65,7 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)]">
+    <div className="min-h-screen bg-background text-foreground">
       <div className="max-w-6xl mx-auto">
         <Header
           districts={districts}
@@ -75,10 +75,10 @@ function App() {
           onThemeToggle={toggleTheme}
         />
 
-        <main className="px-4 md:px-6 pb-8 space-y-6">
+        <main className="px-4 md:px-6 pb-8 space-y-6 pt-6">
           {/* Notification Banner */}
           {!hasPermission && (
-            <Card className="bg-[var(--secondary)]">
+            <Card className="bg-secondary">
               <CardContent className="p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
                   <Bell className="w-5 h-5" />
@@ -93,7 +93,7 @@ function App() {
 
           {/* PWA Install Banner */}
           {showInstallBanner && (
-            <Card className="bg-[var(--accent)]">
+            <Card className="bg-accent">
               <CardContent className="p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
                   <Download className="w-5 h-5" />
@@ -126,7 +126,7 @@ function App() {
           <MonthView getMonthPrayers={getMonthPrayers} />
 
           {/* Footer */}
-          <footer className="text-center text-sm text-[var(--muted-foreground)] py-4">
+          <footer className="text-center text-sm text-muted-foreground py-4">
             <p>Prayer times for Colombo, Gampaha & Kalutara Districts</p>
             <p className="mt-1">Zone 01 - Sri Lanka</p>
           </footer>
