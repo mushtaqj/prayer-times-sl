@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Header, type MainSection } from '@/components/Header'
+import { MobileNav } from '@/components/MobileNav'
 import { LandingPage } from '@/components/LandingPage'
 import { DailyView } from '@/components/DailyView'
 import { WeekView } from '@/components/WeekView'
@@ -85,6 +86,17 @@ function App() {
           />
         )}
 
+        {/* Mobile Navigation - bottom tabs + hamburger menu */}
+        <MobileNav
+          districts={districts}
+          selectedDistrict={selectedDistrict}
+          onDistrictChange={setSelectedDistrict}
+          isDark={isDark}
+          onThemeToggle={toggleTheme}
+          mainSection={mainSection}
+          onSectionChange={setMainSection}
+        />
+
         <main className="flex-1 flex flex-col relative">
           {/* Home / Landing Page */}
           {mainSection === 'home' && (
@@ -104,11 +116,11 @@ function App() {
           {mainSection === 'prayer' && (
             <>
               {/* Sticky View Switcher - Only for Prayer Times */}
-              <div className="sticky top-[60px] z-30 bg-background/95 backdrop-blur-md px-4 py-3 border-b border-border/50 supports-[backdrop-filter]:bg-background/60 shadow-sm">
+              <div className="sticky top-12 sm:top-[60px] z-30 bg-background/95 backdrop-blur-md px-4 py-3 border-b border-border/50 supports-[backdrop-filter]:bg-background/60 shadow-sm">
                 <ViewSwitcher value={prayerView} onChange={setPrayerView} />
               </div>
 
-              <div className="p-4 space-y-6 flex-1">
+              <div className="p-4 pb-20 sm:pb-4 space-y-6 flex-1">
                 {/* Notification Banner */}
                 {!hasPermission && (
                   <Card className="bg-secondary/50 border-accent/20 backdrop-blur-sm">
@@ -174,7 +186,7 @@ function App() {
 
           {/* Hijri Calendar Section */}
           {mainSection === 'hijri' && (
-            <div className="p-4 flex-1 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="p-4 pb-20 sm:pb-4 flex-1 animate-in fade-in slide-in-from-bottom-4 duration-500">
               <HijriCalendarView location={locationName} />
             </div>
           )}
