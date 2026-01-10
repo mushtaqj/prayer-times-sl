@@ -154,17 +154,21 @@ export function useHijriCalendar() {
   // Check if we can navigate to previous month
   const canGoPrevious = useMemo(() => {
     if (currentHijriMonth === 1) {
-      return months.some(m => m.hijriYear === currentHijriYear - 1)
+      // Check if Dhul Hijjah of previous year exists
+      return months.some(m => m.hijriYear === currentHijriYear - 1 && m.hijriMonth === 12)
     }
-    return true
+    // Check if previous month of current year exists
+    return months.some(m => m.hijriYear === currentHijriYear && m.hijriMonth === currentHijriMonth - 1)
   }, [currentHijriMonth, currentHijriYear, months])
 
   // Check if we can navigate to next month
   const canGoNext = useMemo(() => {
     if (currentHijriMonth === 12) {
-      return months.some(m => m.hijriYear === currentHijriYear + 1)
+      // Check if Muharram of next year exists
+      return months.some(m => m.hijriYear === currentHijriYear + 1 && m.hijriMonth === 1)
     }
-    return true
+    // Check if next month of current year exists
+    return months.some(m => m.hijriYear === currentHijriYear && m.hijriMonth === currentHijriMonth + 1)
   }, [currentHijriMonth, currentHijriYear, months])
 
   // Get available years range

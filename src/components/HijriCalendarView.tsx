@@ -189,9 +189,16 @@ export function HijriCalendarView({ location }: HijriCalendarViewProps) {
             </Button>
 
             <div className="text-center flex-1">
-              <h2 className="text-xl font-bold text-foreground">
-                {currentMonthData.monthName} {currentHijriYear}
-              </h2>
+              <div className="flex items-center justify-center gap-2">
+                <h2 className="text-xl font-bold text-foreground">
+                  {currentMonthData.monthName} {currentHijriYear}
+                </h2>
+                {isCurrentMonth && (
+                  <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-primary/20 text-primary font-medium">
+                    Current
+                  </span>
+                )}
+              </div>
               <p className="text-sm text-muted-foreground">{gregorianRange}</p>
               {monthInfo && (
                 <p className="text-xs text-muted-foreground/70 mt-0.5">
