@@ -485,7 +485,10 @@ export function HijriCalendarView({ location }: HijriCalendarViewProps) {
 
                 // Determine if this day should be clickable
                 // isFriday is already defined above based on column index
-                const isClickable = dayEvents.length > 0 || fastingInfo.isFasting || fastingInfo.type === 'forbidden' || isFriday
+                // Exclude regular Ramadan days from being clickable (only special events, not just fasting)
+                const isRegularRamadanDay = currentHijriMonth === 9 && dayEvents.length === 0 && fastingInfo.reason === 'Ramadan'
+                const hasSpecialFasting = fastingInfo.isFasting && fastingInfo.reason !== 'Ramadan' // Ashura, Arafah, etc.
+                const isClickable = (dayEvents.length > 0 || hasSpecialFasting || fastingInfo.type === 'forbidden' || isFriday) && !isRegularRamadanDay
 
                 const handleDayClick = () => {
                   if (!isClickable) return
@@ -494,13 +497,17 @@ export function HijriCalendarView({ location }: HijriCalendarViewProps) {
                   const dayName = day.gregorianDate.toLocaleDateString('en-US', { weekday: 'long' })
                   let content = `# ${dayName}, ${currentMonthData.monthName} ${day.hijriDay}\n\n`
 
-                  // Add events
+                  // Add events WITH their full details
                   if (dayEvents.length > 0) {
-                    content += `## Special Events\n`
                     dayEvents.forEach(e => {
-                      content += `- **${e.name}**\n`
+                      if (e.details) {
+                        // Use the full virtues content
+                        content += e.details + `\n\n`
+                      } else {
+                        content += `## ${e.name}\n`
+                        content += `*${e.type}*\n\n`
+                      }
                     })
-                    content += `\n`
                   }
 
                   // Add Friday info - use full content from virtues data
@@ -518,16 +525,31 @@ export function HijriCalendarView({ location }: HijriCalendarViewProps) {
                     }
                   }
 
-                  // Add fasting info
-                  if (fastingInfo.isFasting) {
-                    content += `## Fasting\n`
-                    content += `- **${fastingInfo.reason}** (${fastingInfo.type})\n\n`
-                    if (fastingInfo.reason === 'Monday Fast' || fastingInfo.reason === 'Thursday Fast') {
-                      content += `> The Prophet ﷺ said: "Deeds are presented on Monday and Thursday, and I love that my deeds be presented while I am fasting."\n`
+                  // Add fasting info with details
+                  if (fastingInfo.isFasting && fastingInfo.reason !== 'Ramadan') {
+                    // Check if we have detailed content for this fast
+                    if (fastingInfo.reason === 'Monday Fast') {
+                      const mondayDetails = recurringFasts.weekly.find(f => f.id === 'monday-fast')?.details
+                      if (mondayDetails) {
+                        content += mondayDetails + `\n\n`
+                      }
+                    } else if (fastingInfo.reason === 'Thursday Fast') {
+                      const thursdayDetails = recurringFasts.weekly.find(f => f.id === 'thursday-fast')?.details
+                      if (thursdayDetails) {
+                        content += thursdayDetails + `\n\n`
+                      }
+                    } else if (fastingInfo.reason === 'Ayyam al-Beed (White Days)') {
+                      const ayyamDetails = recurringFasts.monthly.ayyamAlBeed.details
+                      if (ayyamDetails) {
+                        content += ayyamDetails + `\n\n`
+                      }
+                    } else {
+                      content += `## Fasting\n`
+                      content += `- **${fastingInfo.reason}** (${fastingInfo.type})\n\n`
                     }
                   } else if (fastingInfo.type === 'forbidden') {
                     content += `## Fasting Forbidden\n`
-                    content += `- ${fastingInfo.reason}: Fasting is prohibited on this day\n\n`
+                    content += `- **${fastingInfo.reason}**: Fasting is prohibited on this day\n\n`
                   }
 
                   setVirtueSheet({ title: `${currentMonthData.monthName} ${day.hijriDay}`, content })
