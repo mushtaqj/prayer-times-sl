@@ -1,18 +1,19 @@
 {
   "metadata": {
-    "source": "ACJU Sri Lanka / SLHub.com",
+    "source": "ACJU Sri Lanka / SQLite Database / SLHub",
     "description": "Historical Hijri calendar data based on moon sighting in Sri Lanka",
-    "lastUpdated": "2025-01-10",
+    "lastUpdated": "2026-01-10",
     "dataRange": {
       "from": {
         "hijriYear": 1424,
         "gregorianYear": 2003
       },
       "to": {
-        "hijriYear": 1446,
-        "gregorianYear": 2025
+        "hijriYear": 1447,
+        "gregorianYear": 2026
       }
-    }
+    },
+    "note": "1445 data compiled from SLHub calendars and calculated values. Months 3-9 of 1445 are estimates based on known start/end dates."
   },
   "months": [
     {
@@ -1777,174 +1778,223 @@
       "hijriMonth": 12,
       "monthName": "Dhul Hijjah",
       "gregorianStart": "2023-06-20",
-      "days": 29
+      "days": 30
     },
     {
       "hijriYear": 1445,
       "hijriMonth": 1,
       "monthName": "Muharram",
-      "gregorianStart": "2023-07-19",
-      "days": 30
+      "gregorianStart": "2023-07-20",
+      "days": 29
     },
     {
       "hijriYear": 1445,
       "hijriMonth": 2,
       "monthName": "Safar",
       "gregorianStart": "2023-08-18",
-      "days": 29
+      "days": 30
     },
     {
       "hijriYear": 1445,
       "hijriMonth": 3,
       "monthName": "Rabi al-Awwal",
-      "gregorianStart": "2023-09-16",
+      "gregorianStart": "2023-09-17",
       "days": 30
     },
     {
       "hijriYear": 1445,
       "hijriMonth": 4,
       "monthName": "Rabi al-Thani",
-      "gregorianStart": "2023-10-16",
+      "gregorianStart": "2023-10-17",
       "days": 29
     },
     {
       "hijriYear": 1445,
       "hijriMonth": 5,
       "monthName": "Jumada al-Awwal",
-      "gregorianStart": "2023-11-14",
+      "gregorianStart": "2023-11-15",
       "days": 30
     },
     {
       "hijriYear": 1445,
       "hijriMonth": 6,
       "monthName": "Jumada al-Akhirah",
-      "gregorianStart": "2023-12-14",
+      "gregorianStart": "2023-12-15",
       "days": 29
     },
     {
       "hijriYear": 1445,
       "hijriMonth": 7,
       "monthName": "Rajab",
-      "gregorianStart": "2024-01-12",
+      "gregorianStart": "2024-01-13",
       "days": 30
     },
     {
       "hijriYear": 1445,
       "hijriMonth": 8,
       "monthName": "Shaban",
-      "gregorianStart": "2024-02-11",
+      "gregorianStart": "2024-02-12",
       "days": 29
     },
     {
       "hijriYear": 1445,
       "hijriMonth": 9,
       "monthName": "Ramadan",
-      "gregorianStart": "2024-03-11",
-      "days": 30
+      "gregorianStart": "2024-03-12",
+      "days": 29
     },
     {
       "hijriYear": 1445,
       "hijriMonth": 10,
       "monthName": "Shawwal",
       "gregorianStart": "2024-04-10",
-      "days": 29
+      "days": 30
     },
     {
       "hijriYear": 1445,
       "hijriMonth": 11,
       "monthName": "Dhul Qadah",
-      "gregorianStart": "2024-05-09",
+      "gregorianStart": "2024-05-10",
       "days": 30
     },
     {
       "hijriYear": 1445,
       "hijriMonth": 12,
       "monthName": "Dhul Hijjah",
-      "gregorianStart": "2024-06-08",
+      "gregorianStart": "2024-06-09",
       "days": 29
     },
     {
       "hijriYear": 1446,
       "hijriMonth": 1,
       "monthName": "Muharram",
-      "gregorianStart": "2024-07-07",
+      "gregorianStart": "2024-07-08",
       "days": 30
     },
     {
       "hijriYear": 1446,
       "hijriMonth": 2,
       "monthName": "Safar",
-      "gregorianStart": "2024-08-06",
+      "gregorianStart": "2024-08-07",
       "days": 29
     },
     {
       "hijriYear": 1446,
       "hijriMonth": 3,
       "monthName": "Rabi al-Awwal",
-      "gregorianStart": "2024-09-04",
+      "gregorianStart": "2024-09-05",
       "days": 30
     },
     {
       "hijriYear": 1446,
       "hijriMonth": 4,
       "monthName": "Rabi al-Thani",
-      "gregorianStart": "2024-10-04",
-      "days": 29
+      "gregorianStart": "2024-10-05",
+      "days": 30
     },
     {
       "hijriYear": 1446,
       "hijriMonth": 5,
       "monthName": "Jumada al-Awwal",
-      "gregorianStart": "2024-11-02",
-      "days": 30
+      "gregorianStart": "2024-11-04",
+      "days": 29
     },
     {
       "hijriYear": 1446,
       "hijriMonth": 6,
       "monthName": "Jumada al-Akhirah",
-      "gregorianStart": "2024-12-02",
-      "days": 29
+      "gregorianStart": "2024-12-03",
+      "days": 30
     },
     {
       "hijriYear": 1446,
       "hijriMonth": 7,
       "monthName": "Rajab",
-      "gregorianStart": "2024-12-31",
-      "days": 30
+      "gregorianStart": "2025-01-02",
+      "days": 29
     },
     {
       "hijriYear": 1446,
       "hijriMonth": 8,
       "monthName": "Shaban",
-      "gregorianStart": "2025-01-30",
-      "days": 29
+      "gregorianStart": "2025-01-31",
+      "days": 30
     },
     {
       "hijriYear": 1446,
       "hijriMonth": 9,
       "monthName": "Ramadan",
-      "gregorianStart": "2025-02-28",
-      "days": 30
+      "gregorianStart": "2025-03-02",
+      "days": 29
     },
     {
       "hijriYear": 1446,
       "hijriMonth": 10,
       "monthName": "Shawwal",
-      "gregorianStart": "2025-03-30",
-      "days": 29
+      "gregorianStart": "2025-03-31",
+      "days": 30
     },
     {
       "hijriYear": 1446,
       "hijriMonth": 11,
       "monthName": "Dhul Qadah",
-      "gregorianStart": "2025-04-28",
-      "days": 30
+      "gregorianStart": "2025-04-30",
+      "days": 29
     },
     {
       "hijriYear": 1446,
       "hijriMonth": 12,
       "monthName": "Dhul Hijjah",
-      "gregorianStart": "2025-05-28",
+      "gregorianStart": "2025-05-29",
+      "days": 29
+    },
+    {
+      "hijriYear": 1447,
+      "hijriMonth": 1,
+      "monthName": "Muharram",
+      "gregorianStart": "2025-06-27",
+      "days": 30
+    },
+    {
+      "hijriYear": 1447,
+      "hijriMonth": 2,
+      "monthName": "Safar",
+      "gregorianStart": "2025-07-27",
+      "days": 29
+    },
+    {
+      "hijriYear": 1447,
+      "hijriMonth": 3,
+      "monthName": "Rabi al-Awwal",
+      "gregorianStart": "2025-08-25",
+      "days": 30
+    },
+    {
+      "hijriYear": 1447,
+      "hijriMonth": 4,
+      "monthName": "Rabi al-Thani",
+      "gregorianStart": "2025-09-24",
+      "days": 30
+    },
+    {
+      "hijriYear": 1447,
+      "hijriMonth": 5,
+      "monthName": "Jumada al-Awwal",
+      "gregorianStart": "2025-10-24",
+      "days": 29
+    },
+    {
+      "hijriYear": 1447,
+      "hijriMonth": 6,
+      "monthName": "Jumada al-Akhirah",
+      "gregorianStart": "2025-11-22",
+      "days": 30
+    },
+    {
+      "hijriYear": 1447,
+      "hijriMonth": 7,
+      "monthName": "Rajab",
+      "gregorianStart": "2025-12-22",
       "days": 29
     }
   ]
