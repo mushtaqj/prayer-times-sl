@@ -177,7 +177,11 @@ export function HijriCalendarView({ location }: HijriCalendarViewProps) {
       <Card className="border-border/50 bg-card/40 backdrop-blur-sm shadow-sm overflow-hidden">
         <CardContent className="p-0">
           {/* Month Navigation */}
-          <div className="flex items-center justify-between p-4 bg-primary/5 border-b border-border/50">
+          <div className={`flex items-center justify-between p-4 border-b border-border/50 ${
+            isCurrentMonth
+              ? 'bg-primary/15 ring-2 ring-primary/30 ring-inset'
+              : 'bg-primary/5'
+          }`}>
             <Button
               variant="ghost"
               size="icon"
@@ -189,16 +193,14 @@ export function HijriCalendarView({ location }: HijriCalendarViewProps) {
             </Button>
 
             <div className="text-center flex-1">
-              <div className="flex items-center justify-center gap-2">
-                <h2 className="text-xl font-bold text-foreground">
-                  {currentMonthData.monthName} {currentHijriYear}
-                </h2>
-                {isCurrentMonth && (
-                  <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-primary/20 text-primary font-medium">
-                    Current
-                  </span>
-                )}
-              </div>
+              {isCurrentMonth && (
+                <span className="text-[10px] uppercase tracking-widest text-primary font-semibold">
+                  Current Month
+                </span>
+              )}
+              <h2 className={`text-xl font-bold ${isCurrentMonth ? 'text-primary' : 'text-foreground'}`}>
+                {currentMonthData.monthName} {currentHijriYear}
+              </h2>
               <p className="text-sm text-muted-foreground">{gregorianRange}</p>
               {monthInfo && (
                 <p className="text-xs text-muted-foreground/70 mt-0.5">
