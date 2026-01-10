@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { ChevronLeft, ChevronRight, Calendar, CalendarDays, HelpCircle } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Calendar, CalendarDays, HelpCircle, ChevronDown, ChevronUp } from 'lucide-react'
 import { useHijriCalendar, getMoonPhase } from '@/hooks/useHijriCalendar'
 import { useIslamicEvents } from '@/hooks/useIslamicEvents'
 import {
@@ -25,7 +25,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip'
 
-const WEEKDAYS = ['Sat', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri']
+const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
 // Event type styling configuration
 const EVENT_STYLES = {
@@ -81,6 +81,7 @@ export function HijriCalendarView({ location }: HijriCalendarViewProps) {
   const [jumpMode, setJumpMode] = useState<'hijri' | 'gregorian'>('hijri')
   const [selectedHijriMonth, setSelectedHijriMonth] = useState<string>('')
   const [selectedHijriYear, setSelectedHijriYear] = useState<string>('')
+  const [showLegend, setShowLegend] = useState(false)
 
   const {
     currentMonthData,
@@ -107,11 +108,10 @@ export function HijriCalendarView({ location }: HijriCalendarViewProps) {
     return getMonthName(currentHijriMonth)
   }, [currentHijriMonth, getMonthName])
 
-  // Calculate which day of week the month starts on
+  // Calculate which day of week the month starts on (Sunday = 0)
   const startDayOfWeek = useMemo(() => {
     if (!calendarDays.length) return 0
-    const dayOfWeek = calendarDays[0].gregorianDate.getDay()
-    return (dayOfWeek + 1) % 7
+    return calendarDays[0].gregorianDate.getDay()
   }, [calendarDays])
 
   // Create the calendar grid with empty cells for padding
@@ -544,66 +544,75 @@ export function HijriCalendarView({ location }: HijriCalendarViewProps) {
         </CardContent>
       </Card>
 
-      {/* Legend */}
-      <Card className="border-border/50 bg-card/40 backdrop-blur-sm shadow-sm">
-        <CardContent className="p-4">
-          <div className="flex items-center gap-1.5 mb-3">
-            <HelpCircle className="h-4 w-4 text-muted-foreground" />
-            <span className="text-sm font-medium text-foreground">Legend</span>
-          </div>
-          <div className="grid grid-cols-2 gap-3 text-sm">
-            {/* Event Types */}
-            <div className="space-y-2">
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Event Types</p>
-              <div className="flex items-center gap-2">
-                <span className="w-6 h-6 rounded border border-border bg-green-500/15 flex items-center justify-center text-sm">{EVENT_STYLES.eid.emoji}</span>
-                <span className="text-foreground">Eid</span>
+      {/* Legend Toggle */}
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => setShowLegend(!showLegend)}
+        className="w-full flex items-center justify-center gap-2 text-muted-foreground"
+      >
+        <HelpCircle className="h-4 w-4" />
+        <span>Legend</span>
+        {showLegend ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+      </Button>
+
+      {/* Legend Content */}
+      {showLegend && (
+        <Card className="border-border/50 bg-card/40 backdrop-blur-sm shadow-sm">
+          <CardContent className="p-4">
+            <div className="grid grid-cols-2 gap-3 text-sm">
+              {/* Event Types */}
+              <div className="space-y-2">
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Event Types</p>
+                <div className="flex items-center gap-2">
+                  <span className="w-6 h-6 rounded border border-border bg-green-500/15 flex items-center justify-center text-sm">{EVENT_STYLES.eid.emoji}</span>
+                  <span className="text-foreground">Eid</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-6 h-6 rounded border border-border bg-purple-500/15 flex items-center justify-center text-sm">{EVENT_STYLES.holy.emoji}</span>
+                  <span className="text-foreground">Holy Day</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-6 h-6 rounded border border-border bg-amber-500/15 flex items-center justify-center text-sm">{EVENT_STYLES.fast.emoji}</span>
+                  <span className="text-foreground">Obligatory Fast</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-6 h-6 rounded border border-border bg-sky-500/10 flex items-center justify-center text-sm">{EVENT_STYLES.sunnah.emoji}</span>
+                  <span className="text-foreground">Sunnah Fast</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-6 h-6 rounded border border-border bg-indigo-500/10 flex items-center justify-center text-sm">{EVENT_STYLES.recommended.emoji}</span>
+                  <span className="text-foreground">Recommended</span>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="w-6 h-6 rounded border border-border bg-purple-500/15 flex items-center justify-center text-sm">{EVENT_STYLES.holy.emoji}</span>
-                <span className="text-foreground">Holy Day</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-6 h-6 rounded border border-border bg-amber-500/15 flex items-center justify-center text-sm">{EVENT_STYLES.fast.emoji}</span>
-                <span className="text-foreground">Obligatory Fast</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-6 h-6 rounded border border-border bg-sky-500/10 flex items-center justify-center text-sm">{EVENT_STYLES.sunnah.emoji}</span>
-                <span className="text-foreground">Sunnah Fast</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-6 h-6 rounded border border-border bg-indigo-500/10 flex items-center justify-center text-sm">{EVENT_STYLES.recommended.emoji}</span>
-                <span className="text-foreground">Recommended</span>
+              {/* Other Indicators */}
+              <div className="space-y-2">
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Other</p>
+                <div className="flex items-center gap-2">
+                  <span className="w-6 h-6 rounded border border-border bg-primary/15 ring-2 ring-primary flex items-center justify-center text-xs font-bold text-primary">1</span>
+                  <span className="text-foreground">Today</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-6 h-6 rounded border border-border bg-primary/5 flex items-center justify-center text-xs font-bold text-primary">F</span>
+                  <span className="text-foreground">Friday</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-base">🌑 🌕</span>
+                  <span className="text-foreground">Moon Phase</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-3 h-3 rounded-full bg-amber-500 shadow-sm"></span>
+                  <span className="text-foreground text-xs">Obligatory Fast</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-3 h-3 rounded-full bg-sky-400 shadow-sm"></span>
+                  <span className="text-foreground text-xs">Sunnah Fast</span>
+                </div>
               </div>
             </div>
-            {/* Other Indicators */}
-            <div className="space-y-2">
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Other</p>
-              <div className="flex items-center gap-2">
-                <span className="w-6 h-6 rounded border border-border bg-primary/15 ring-2 ring-primary flex items-center justify-center text-xs font-bold text-primary">1</span>
-                <span className="text-foreground">Today</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-6 h-6 rounded border border-border bg-primary/5 flex items-center justify-center text-xs font-bold text-primary">F</span>
-                <span className="text-foreground">Friday</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-6 h-6 rounded bg-amber-500/10 ring-2 ring-dashed ring-amber-500 flex items-center justify-center text-[8px] font-bold text-amber-600">30?</span>
-                <span className="text-foreground">Day 30 Pending</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-base">🌑 🌕</span>
-                <span className="text-foreground">Moon Phase</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-amber-500 shadow-sm"></span>
-                <span className="w-3 h-3 rounded-full bg-sky-400 shadow-sm"></span>
-                <span className="text-foreground">Fasting Dot</span>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Data Attribution */}
       <p className="text-center text-xs text-muted-foreground/60">
