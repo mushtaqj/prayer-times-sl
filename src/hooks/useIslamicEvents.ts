@@ -61,7 +61,15 @@ export function useIslamicEvents() {
       details: virtuesData.recurring[f.id as keyof typeof virtuesData.recurring]
     }))
 
-    return { ...rf, annual, monthly, weekly }
+    // Add Friday as a special recurring item
+    const friday = {
+      id: 'friday',
+      name: 'Friday',
+      nameArabic: 'يوم الجمعة',
+      details: virtuesData.recurring['friday' as keyof typeof virtuesData.recurring]
+    }
+
+    return { ...rf, annual, monthly, weekly, friday }
   }, [])
 
   // Get events for a specific Hijri date

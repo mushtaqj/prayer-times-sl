@@ -483,10 +483,61 @@ export function HijriCalendarView({ location }: HijriCalendarViewProps) {
                 }
                 const hasTooltip = tooltipLines.length > 0
 
+                // Determine if this day should be clickable
+                // isFriday is already defined above based on column index
+                const isClickable = dayEvents.length > 0 || fastingInfo.isFasting || fastingInfo.type === 'forbidden' || isFriday
+
+                const handleDayClick = () => {
+                  if (!isClickable) return
+
+                  // Build day-specific content
+                  const dayName = day.gregorianDate.toLocaleDateString('en-US', { weekday: 'long' })
+                  let content = `# ${dayName}, ${currentMonthData.monthName} ${day.hijriDay}\n\n`
+
+                  // Add events
+                  if (dayEvents.length > 0) {
+                    content += `## Special Events\n`
+                    dayEvents.forEach(e => {
+                      content += `- **${e.name}**\n`
+                    })
+                    content += `\n`
+                  }
+
+                  // Add Friday info - use full content from virtues data
+                  if (isFriday) {
+                    // Get Friday virtues from our data
+                    const fridayVirtues = recurringFasts.friday?.details
+                    if (fridayVirtues) {
+                      content += fridayVirtues + `\n\n`
+                    } else {
+                      content += `## Friday Blessings\n`
+                      content += `- **Surah Kahf**: Recite for light until next Friday\n`
+                      content += `- **Salawat**: Send abundant blessings upon the Prophet ﷺ\n`
+                      content += `- **Best Dua Time**: Between Asr and Maghrib\n`
+                      content += `- **Jumu'ah Prayer**: Obligatory for men\n\n`
+                    }
+                  }
+
+                  // Add fasting info
+                  if (fastingInfo.isFasting) {
+                    content += `## Fasting\n`
+                    content += `- **${fastingInfo.reason}** (${fastingInfo.type})\n\n`
+                    if (fastingInfo.reason === 'Monday Fast' || fastingInfo.reason === 'Thursday Fast') {
+                      content += `> The Prophet ﷺ said: "Deeds are presented on Monday and Thursday, and I love that my deeds be presented while I am fasting."\n`
+                    }
+                  } else if (fastingInfo.type === 'forbidden') {
+                    content += `## Fasting Forbidden\n`
+                    content += `- ${fastingInfo.reason}: Fasting is prohibited on this day\n\n`
+                  }
+
+                  setVirtueSheet({ title: `${currentMonthData.monthName} ${day.hijriDay}`, content })
+                }
+
                 const cellContent = (
                   <div
-                    className={`aspect-square p-1 flex flex-col relative transition-colors border-b border-border ${!isLastCol ? 'border-r border-border' : ''} ${cellBg} ${day.isToday ? 'ring-2 ring-primary ring-inset z-10' : ''
+                    className={`aspect-square p-1 flex flex-col relative transition-colors border-b border-border ${isClickable ? 'cursor-pointer hover:bg-muted/50' : ''} ${!isLastCol ? 'border-r border-border' : ''} ${cellBg} ${day.isToday ? 'ring-2 ring-primary ring-inset z-10' : ''
                       }`}
+                    onClick={handleDayClick}
                   >
                     {/* Internal border for events */}
                     {eventStyle && (
@@ -658,37 +709,6 @@ export function HijriCalendarView({ location }: HijriCalendarViewProps) {
                   Sunnah
                 </span>
               </div>
-
-              {/* Weekly Fasts - Monday & Thursday */}
-              {recurringFasts.weekly.map((fast) => (
-                <div key={fast.id} className="flex items-start gap-3 p-2 rounded-lg bg-sky-500/10 border border-sky-500/20">
-                  <div className="text-center min-w-[40px] flex flex-col items-center justify-center pt-1">
-                    <Moon className="w-5 h-5 text-sky-600 dark:text-sky-400" />
-                    <span className="text-sm font-bold mt-1 text-sky-600 dark:text-sky-400">
-                      {fast.dayOfWeek === 1 ? 'Mon' : 'Thu'}
-                    </span>
-                  </div>
-                  <div className="flex-1">
-                    <p className="font-medium text-sm text-foreground flex items-center gap-2">
-                      {fast.name}
-                      {fast.details && (
-                        <button
-                          onClick={() => setVirtueSheet({ title: fast.name, content: fast.details! })}
-                          className="inline-flex items-center justify-center text-primary/80 hover:text-primary transition-colors"
-                          title={`Learn about ${fast.name}`}
-                        >
-                          <Info className="w-4 h-4" />
-                        </button>
-                      )}
-                    </p>
-                    <p className="text-xs text-muted-foreground">{fast.nameArabic}</p>
-                    <p className="text-xs text-muted-foreground/80 mt-0.5">{fast.description}</p>
-                  </div>
-                  <span className="text-[10px] px-1.5 py-0.5 rounded font-medium bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-current/10">
-                    Sunnah
-                  </span>
-                </div>
-              ))}
 
               {monthEvents.length === 0 && (
                 <p className="text-sm text-muted-foreground text-center py-2">
