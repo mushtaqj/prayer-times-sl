@@ -14,7 +14,16 @@ export interface HijriMonth {
   hijriMonth: number
   monthName: string
   gregorianStart: string
+  gregorianEnd: string | null
   days: number
+  status: 'completed' | 'ongoing' | 'upcoming'
+}
+
+export interface HijriMonthMaster {
+  number: number
+  name: string
+  nameArabic: string
+  meaning: string
 }
 
 interface CalendarDay {

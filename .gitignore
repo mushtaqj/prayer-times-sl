@@ -30,3 +30,7 @@ yarn-error.log*
 # Cache
 .eslintcache
 *.tsbuildinfo
+
+# SQLite database
+data/*.db
+data/*.db-journal

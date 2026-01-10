@@ -2,7 +2,7 @@
   "metadata": {
     "description": "Important Islamic dates and events",
     "source": "Traditional Islamic calendar",
-    "lastUpdated": "2025-01-10"
+    "lastUpdated": "2026-01-10"
   },
   "events": [
     {
@@ -16,17 +16,6 @@
       "description": "Beginning of the new Hijri year"
     },
     {
-      "id": "ashura",
-      "name": "Day of Ashura",
-      "nameArabic": "يوم عاشوراء",
-      "hijriMonth": 1,
-      "hijriDay": 10,
-      "type": "holy",
-      "isFastingDay": true,
-      "fastingType": "recommended",
-      "description": "Day of fasting commemorating various significant events"
-    },
-    {
       "id": "tasu-a",
       "name": "Tasu'a",
       "nameArabic": "تاسوعاء",
@@ -36,6 +25,17 @@
       "isFastingDay": true,
       "fastingType": "recommended",
       "description": "Day before Ashura, recommended to fast with Ashura"
+    },
+    {
+      "id": "ashura",
+      "name": "Day of Ashura",
+      "nameArabic": "يوم عاشوراء",
+      "hijriMonth": 1,
+      "hijriDay": 10,
+      "type": "holy",
+      "isFastingDay": true,
+      "fastingType": "recommended",
+      "description": "Day of fasting commemorating various significant events"
     },
     {
       "id": "mawlid",
@@ -180,7 +180,11 @@
       "ayyamAlBeed": {
         "name": "Ayyam al-Beed (White Days)",
         "nameArabic": "أيام البيض",
-        "days": [13, 14, 15],
+        "days": [
+          13,
+          14,
+          15
+        ],
         "type": "sunnah",
         "description": "13th, 14th, and 15th of each Hijri month - recommended monthly fasts"
       }
@@ -209,17 +213,77 @@
     ]
   },
   "hijriMonths": [
-    { "number": 1, "name": "Muharram", "nameArabic": "محرم", "meaning": "Forbidden" },
-    { "number": 2, "name": "Safar", "nameArabic": "صفر", "meaning": "Void" },
-    { "number": 3, "name": "Rabi al-Awwal", "nameArabic": "ربيع الأول", "meaning": "First Spring" },
-    { "number": 4, "name": "Rabi al-Thani", "nameArabic": "ربيع الثاني", "meaning": "Second Spring" },
-    { "number": 5, "name": "Jumada al-Awwal", "nameArabic": "جمادى الأولى", "meaning": "First of Parched Land" },
-    { "number": 6, "name": "Jumada al-Akhirah", "nameArabic": "جمادى الآخرة", "meaning": "Last of Parched Land" },
-    { "number": 7, "name": "Rajab", "nameArabic": "رجب", "meaning": "Respect" },
-    { "number": 8, "name": "Shaban", "nameArabic": "شعبان", "meaning": "Scattered" },
-    { "number": 9, "name": "Ramadan", "nameArabic": "رمضان", "meaning": "Burning Heat" },
-    { "number": 10, "name": "Shawwal", "nameArabic": "شوال", "meaning": "Raised" },
-    { "number": 11, "name": "Dhul Qadah", "nameArabic": "ذو القعدة", "meaning": "The One of Truce" },
-    { "number": 12, "name": "Dhul Hijjah", "nameArabic": "ذو الحجة", "meaning": "The One of Pilgrimage" }
+    {
+      "number": 1,
+      "name": "Muharram",
+      "nameArabic": "محرم",
+      "meaning": "Forbidden"
+    },
+    {
+      "number": 2,
+      "name": "Safar",
+      "nameArabic": "صفر",
+      "meaning": "Void"
+    },
+    {
+      "number": 3,
+      "name": "Rabi al-Awwal",
+      "nameArabic": "ربيع الأول",
+      "meaning": "First Spring"
+    },
+    {
+      "number": 4,
+      "name": "Rabi al-Thani",
+      "nameArabic": "ربيع الثاني",
+      "meaning": "Second Spring"
+    },
+    {
+      "number": 5,
+      "name": "Jumada al-Awwal",
+      "nameArabic": "جمادى الأولى",
+      "meaning": "First of Parched Land"
+    },
+    {
+      "number": 6,
+      "name": "Jumada al-Akhirah",
+      "nameArabic": "جمادى الآخرة",
+      "meaning": "Last of Parched Land"
+    },
+    {
+      "number": 7,
+      "name": "Rajab",
+      "nameArabic": "رجب",
+      "meaning": "Respect"
+    },
+    {
+      "number": 8,
+      "name": "Shaban",
+      "nameArabic": "شعبان",
+      "meaning": "Scattered"
+    },
+    {
+      "number": 9,
+      "name": "Ramadan",
+      "nameArabic": "رمضان",
+      "meaning": "Burning Heat"
+    },
+    {
+      "number": 10,
+      "name": "Shawwal",
+      "nameArabic": "شوال",
+      "meaning": "Raised"
+    },
+    {
+      "number": 11,
+      "name": "Dhul Qadah",
+      "nameArabic": "ذو القعدة",
+      "meaning": "The One of Truce"
+    },
+    {
+      "number": 12,
+      "name": "Dhul Hijjah",
+      "nameArabic": "ذو الحجة",
+      "meaning": "The One of Pilgrimage"
+    }
   ]
 }
