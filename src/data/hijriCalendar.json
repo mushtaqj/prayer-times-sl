@@ -85,7 +85,6 @@
       "hijriMonth": 1,
       "monthName": "Muharram",
       "gregorianStart": "2003-03-04",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -94,7 +93,6 @@
       "hijriMonth": 2,
       "monthName": "Safar",
       "gregorianStart": "2003-04-03",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -103,7 +101,6 @@
       "hijriMonth": 3,
       "monthName": "Rabi al-Awwal",
       "gregorianStart": "2003-05-03",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -112,7 +109,6 @@
       "hijriMonth": 4,
       "monthName": "Rabi al-Thani",
       "gregorianStart": "2003-06-01",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -121,7 +117,6 @@
       "hijriMonth": 5,
       "monthName": "Jumada al-Awwal",
       "gregorianStart": "2003-07-01",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -130,7 +125,6 @@
       "hijriMonth": 6,
       "monthName": "Jumada al-Akhirah",
       "gregorianStart": "2003-07-30",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -139,7 +133,6 @@
       "hijriMonth": 7,
       "monthName": "Rajab",
       "gregorianStart": "2003-08-29",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -148,7 +141,6 @@
       "hijriMonth": 8,
       "monthName": "Shaban",
       "gregorianStart": "2003-09-27",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -157,7 +149,6 @@
       "hijriMonth": 9,
       "monthName": "Ramadan",
       "gregorianStart": "2003-10-26",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -166,7 +157,6 @@
       "hijriMonth": 10,
       "monthName": "Shawwal",
       "gregorianStart": "2003-11-24",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -175,7 +165,6 @@
       "hijriMonth": 11,
       "monthName": "Dhul Qadah",
       "gregorianStart": "2003-12-24",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -184,7 +173,6 @@
       "hijriMonth": 12,
       "monthName": "Dhul Hijjah",
       "gregorianStart": "2004-01-23",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -193,7 +181,6 @@
       "hijriMonth": 1,
       "monthName": "Muharram",
       "gregorianStart": "2004-02-21",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -202,7 +189,6 @@
       "hijriMonth": 2,
       "monthName": "Safar",
       "gregorianStart": "2004-03-22",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -211,7 +197,6 @@
       "hijriMonth": 3,
       "monthName": "Rabi al-Awwal",
       "gregorianStart": "2004-04-21",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -220,7 +205,6 @@
       "hijriMonth": 4,
       "monthName": "Rabi al-Thani",
       "gregorianStart": "2004-05-20",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -229,7 +213,6 @@
       "hijriMonth": 5,
       "monthName": "Jumada al-Awwal",
       "gregorianStart": "2004-06-19",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -238,7 +221,6 @@
       "hijriMonth": 6,
       "monthName": "Jumada al-Akhirah",
       "gregorianStart": "2004-07-19",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -247,7 +229,6 @@
       "hijriMonth": 7,
       "monthName": "Rajab",
       "gregorianStart": "2004-08-17",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -256,7 +237,6 @@
       "hijriMonth": 8,
       "monthName": "Shaban",
       "gregorianStart": "2004-09-16",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -265,7 +245,6 @@
       "hijriMonth": 9,
       "monthName": "Ramadan",
       "gregorianStart": "2004-10-15",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -274,7 +253,6 @@
       "hijriMonth": 10,
       "monthName": "Shawwal",
       "gregorianStart": "2004-11-13",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -283,7 +261,6 @@
       "hijriMonth": 11,
       "monthName": "Dhul Qadah",
       "gregorianStart": "2004-12-13",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -292,7 +269,6 @@
       "hijriMonth": 12,
       "monthName": "Dhul Hijjah",
       "gregorianStart": "2005-01-11",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -301,7 +277,6 @@
       "hijriMonth": 1,
       "monthName": "Muharram",
       "gregorianStart": "2005-02-10",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -310,7 +285,6 @@
       "hijriMonth": 2,
       "monthName": "Safar",
       "gregorianStart": "2005-03-11",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -319,7 +293,6 @@
       "hijriMonth": 3,
       "monthName": "Rabi al-Awwal",
       "gregorianStart": "2005-04-10",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -328,7 +301,6 @@
       "hijriMonth": 4,
       "monthName": "Rabi al-Thani",
       "gregorianStart": "2005-05-09",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -337,7 +309,6 @@
       "hijriMonth": 5,
       "monthName": "Jumada al-Awwal",
       "gregorianStart": "2005-06-08",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -346,7 +317,6 @@
       "hijriMonth": 6,
       "monthName": "Jumada al-Akhirah",
       "gregorianStart": "2005-07-08",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -355,7 +325,6 @@
       "hijriMonth": 7,
       "monthName": "Rajab",
       "gregorianStart": "2005-08-06",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -364,7 +333,6 @@
       "hijriMonth": 8,
       "monthName": "Shaban",
       "gregorianStart": "2005-09-05",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -373,7 +341,6 @@
       "hijriMonth": 9,
       "monthName": "Ramadan",
       "gregorianStart": "2005-10-05",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -382,7 +349,6 @@
       "hijriMonth": 10,
       "monthName": "Shawwal",
       "gregorianStart": "2005-11-03",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -391,7 +357,6 @@
       "hijriMonth": 11,
       "monthName": "Dhul Qadah",
       "gregorianStart": "2005-12-03",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -400,7 +365,6 @@
       "hijriMonth": 12,
       "monthName": "Dhul Hijjah",
       "gregorianStart": "2006-01-01",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -409,7 +373,6 @@
       "hijriMonth": 1,
       "monthName": "Muharram",
       "gregorianStart": "2006-01-31",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -418,7 +381,6 @@
       "hijriMonth": 2,
       "monthName": "Safar",
       "gregorianStart": "2006-03-01",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -427,7 +389,6 @@
       "hijriMonth": 3,
       "monthName": "Rabi al-Awwal",
       "gregorianStart": "2006-03-30",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -436,7 +397,6 @@
       "hijriMonth": 4,
       "monthName": "Rabi al-Thani",
       "gregorianStart": "2006-04-29",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -445,7 +405,6 @@
       "hijriMonth": 5,
       "monthName": "Jumada al-Awwal",
       "gregorianStart": "2006-05-28",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -454,7 +413,6 @@
       "hijriMonth": 6,
       "monthName": "Jumada al-Akhirah",
       "gregorianStart": "2006-06-27",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -463,7 +421,6 @@
       "hijriMonth": 7,
       "monthName": "Rajab",
       "gregorianStart": "2006-07-27",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -472,7 +429,6 @@
       "hijriMonth": 8,
       "monthName": "Shaban",
       "gregorianStart": "2006-08-25",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -481,7 +437,6 @@
       "hijriMonth": 9,
       "monthName": "Ramadan",
       "gregorianStart": "2006-09-23",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -490,7 +445,6 @@
       "hijriMonth": 10,
       "monthName": "Shawwal",
       "gregorianStart": "2006-10-23",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -499,7 +453,6 @@
       "hijriMonth": 11,
       "monthName": "Dhul Qadah",
       "gregorianStart": "2006-11-22",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -508,7 +461,6 @@
       "hijriMonth": 12,
       "monthName": "Dhul Hijjah",
       "gregorianStart": "2006-12-21",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -517,7 +469,6 @@
       "hijriMonth": 1,
       "monthName": "Muharram",
       "gregorianStart": "2007-01-20",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -526,7 +477,6 @@
       "hijriMonth": 2,
       "monthName": "Safar",
       "gregorianStart": "2007-02-19",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -535,7 +485,6 @@
       "hijriMonth": 3,
       "monthName": "Rabi al-Awwal",
       "gregorianStart": "2007-03-20",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -544,7 +493,6 @@
       "hijriMonth": 4,
       "monthName": "Rabi al-Thani",
       "gregorianStart": "2007-04-18",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -553,7 +501,6 @@
       "hijriMonth": 5,
       "monthName": "Jumada al-Awwal",
       "gregorianStart": "2007-05-18",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -562,7 +509,6 @@
       "hijriMonth": 6,
       "monthName": "Jumada al-Akhirah",
       "gregorianStart": "2007-06-16",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -571,7 +517,6 @@
       "hijriMonth": 7,
       "monthName": "Rajab",
       "gregorianStart": "2007-07-16",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -580,7 +525,6 @@
       "hijriMonth": 8,
       "monthName": "Shaban",
       "gregorianStart": "2007-08-14",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -589,7 +533,6 @@
       "hijriMonth": 9,
       "monthName": "Ramadan",
       "gregorianStart": "2007-09-13",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -598,7 +541,6 @@
       "hijriMonth": 10,
       "monthName": "Shawwal",
       "gregorianStart": "2007-10-12",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -607,7 +549,6 @@
       "hijriMonth": 11,
       "monthName": "Dhul Qadah",
       "gregorianStart": "2007-11-11",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -616,7 +557,6 @@
       "hijriMonth": 12,
       "monthName": "Dhul Hijjah",
       "gregorianStart": "2007-12-11",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -625,7 +565,6 @@
       "hijriMonth": 1,
       "monthName": "Muharram",
       "gregorianStart": "2008-01-10",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -634,7 +573,6 @@
       "hijriMonth": 2,
       "monthName": "Safar",
       "gregorianStart": "2008-02-08",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -643,7 +581,6 @@
       "hijriMonth": 3,
       "monthName": "Rabi al-Awwal",
       "gregorianStart": "2008-03-09",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -652,7 +589,6 @@
       "hijriMonth": 4,
       "monthName": "Rabi al-Thani",
       "gregorianStart": "2008-04-07",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -661,7 +597,6 @@
       "hijriMonth": 5,
       "monthName": "Jumada al-Awwal",
       "gregorianStart": "2008-05-07",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -670,7 +605,6 @@
       "hijriMonth": 6,
       "monthName": "Jumada al-Akhirah",
       "gregorianStart": "2008-06-05",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -679,7 +613,6 @@
       "hijriMonth": 7,
       "monthName": "Rajab",
       "gregorianStart": "2008-07-04",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -688,7 +621,6 @@
       "hijriMonth": 8,
       "monthName": "Shaban",
       "gregorianStart": "2008-08-03",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -697,7 +629,6 @@
       "hijriMonth": 9,
       "monthName": "Ramadan",
       "gregorianStart": "2008-09-01",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -706,7 +637,6 @@
       "hijriMonth": 10,
       "monthName": "Shawwal",
       "gregorianStart": "2008-09-30",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -715,7 +645,6 @@
       "hijriMonth": 11,
       "monthName": "Dhul Qadah",
       "gregorianStart": "2008-10-30",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -724,7 +653,6 @@
       "hijriMonth": 12,
       "monthName": "Dhul Hijjah",
       "gregorianStart": "2008-11-29",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -733,7 +661,6 @@
       "hijriMonth": 1,
       "monthName": "Muharram",
       "gregorianStart": "2008-12-29",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -742,7 +669,6 @@
       "hijriMonth": 2,
       "monthName": "Safar",
       "gregorianStart": "2009-01-28",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -751,7 +677,6 @@
       "hijriMonth": 3,
       "monthName": "Rabi al-Awwal",
       "gregorianStart": "2009-02-26",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -760,7 +685,6 @@
       "hijriMonth": 4,
       "monthName": "Rabi al-Thani",
       "gregorianStart": "2009-03-28",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -769,7 +693,6 @@
       "hijriMonth": 5,
       "monthName": "Jumada al-Awwal",
       "gregorianStart": "2009-04-26",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -778,7 +701,6 @@
       "hijriMonth": 6,
       "monthName": "Jumada al-Akhirah",
       "gregorianStart": "2009-05-26",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -787,7 +709,6 @@
       "hijriMonth": 7,
       "monthName": "Rajab",
       "gregorianStart": "2009-06-24",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -796,7 +717,6 @@
       "hijriMonth": 8,
       "monthName": "Shaban",
       "gregorianStart": "2009-07-23",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -805,7 +725,6 @@
       "hijriMonth": 9,
       "monthName": "Ramadan",
       "gregorianStart": "2009-08-21",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -814,7 +733,6 @@
       "hijriMonth": 10,
       "monthName": "Shawwal",
       "gregorianStart": "2009-09-20",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -823,7 +741,6 @@
       "hijriMonth": 11,
       "monthName": "Dhul Qadah",
       "gregorianStart": "2009-10-19",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -832,7 +749,6 @@
       "hijriMonth": 12,
       "monthName": "Dhul Hijjah",
       "gregorianStart": "2009-11-18",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -841,7 +757,6 @@
       "hijriMonth": 1,
       "monthName": "Muharram",
       "gregorianStart": "2009-12-18",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -850,7 +765,6 @@
       "hijriMonth": 2,
       "monthName": "Safar",
       "gregorianStart": "2010-01-17",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -859,7 +773,6 @@
       "hijriMonth": 3,
       "monthName": "Rabi al-Awwal",
       "gregorianStart": "2010-02-15",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -868,7 +781,6 @@
       "hijriMonth": 4,
       "monthName": "Rabi al-Thani",
       "gregorianStart": "2010-03-17",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -877,7 +789,6 @@
       "hijriMonth": 5,
       "monthName": "Jumada al-Awwal",
       "gregorianStart": "2010-04-16",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -886,7 +797,6 @@
       "hijriMonth": 6,
       "monthName": "Jumada al-Akhirah",
       "gregorianStart": "2010-05-15",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -895,7 +805,6 @@
       "hijriMonth": 7,
       "monthName": "Rajab",
       "gregorianStart": "2010-06-13",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -904,7 +813,6 @@
       "hijriMonth": 8,
       "monthName": "Shaban",
       "gregorianStart": "2010-07-13",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -913,7 +821,6 @@
       "hijriMonth": 9,
       "monthName": "Ramadan",
       "gregorianStart": "2010-08-11",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -922,7 +829,6 @@
       "hijriMonth": 10,
       "monthName": "Shawwal",
       "gregorianStart": "2010-09-09",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -931,7 +837,6 @@
       "hijriMonth": 11,
       "monthName": "Dhul Qadah",
       "gregorianStart": "2010-10-09",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -940,7 +845,6 @@
       "hijriMonth": 12,
       "monthName": "Dhul Hijjah",
       "gregorianStart": "2010-11-07",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -949,7 +853,6 @@
       "hijriMonth": 1,
       "monthName": "Muharram",
       "gregorianStart": "2010-12-07",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -958,7 +861,6 @@
       "hijriMonth": 2,
       "monthName": "Safar",
       "gregorianStart": "2011-01-06",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -967,7 +869,6 @@
       "hijriMonth": 3,
       "monthName": "Rabi al-Awwal",
       "gregorianStart": "2011-02-04",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -976,7 +877,6 @@
       "hijriMonth": 4,
       "monthName": "Rabi al-Thani",
       "gregorianStart": "2011-03-06",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -985,7 +885,6 @@
       "hijriMonth": 5,
       "monthName": "Jumada al-Awwal",
       "gregorianStart": "2011-04-05",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -994,7 +893,6 @@
       "hijriMonth": 6,
       "monthName": "Jumada al-Akhirah",
       "gregorianStart": "2011-05-05",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -1003,7 +901,6 @@
       "hijriMonth": 7,
       "monthName": "Rajab",
       "gregorianStart": "2011-06-03",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -1012,7 +909,6 @@
       "hijriMonth": 8,
       "monthName": "Shaban",
       "gregorianStart": "2011-07-03",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -1021,7 +917,6 @@
       "hijriMonth": 9,
       "monthName": "Ramadan",
       "gregorianStart": "2011-08-01",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -1030,7 +925,6 @@
       "hijriMonth": 10,
       "monthName": "Shawwal",
       "gregorianStart": "2011-08-30",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -1039,7 +933,6 @@
       "hijriMonth": 11,
       "monthName": "Dhul Qadah",
       "gregorianStart": "2011-09-28",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -1048,7 +941,6 @@
       "hijriMonth": 12,
       "monthName": "Dhul Hijjah",
       "gregorianStart": "2011-10-28",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -1057,7 +949,6 @@
       "hijriMonth": 1,
       "monthName": "Muharram",
       "gregorianStart": "2011-11-26",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -1066,7 +957,6 @@
       "hijriMonth": 2,
       "monthName": "Safar",
       "gregorianStart": "2011-12-26",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -1075,7 +965,6 @@
       "hijriMonth": 3,
       "monthName": "Rabi al-Awwal",
       "gregorianStart": "2012-01-24",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -1084,7 +973,6 @@
       "hijriMonth": 4,
       "monthName": "Rabi al-Thani",
       "gregorianStart": "2012-02-23",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -1093,7 +981,6 @@
       "hijriMonth": 5,
       "monthName": "Jumada al-Awwal",
       "gregorianStart": "2012-03-24",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -1102,7 +989,6 @@
       "hijriMonth": 6,
       "monthName": "Jumada al-Akhirah",
       "gregorianStart": "2012-04-23",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -1111,7 +997,6 @@
       "hijriMonth": 7,
       "monthName": "Rajab",
       "gregorianStart": "2012-05-22",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -1120,7 +1005,6 @@
       "hijriMonth": 8,
       "monthName": "Shaban",
       "gregorianStart": "2012-06-21",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -1129,7 +1013,6 @@
       "hijriMonth": 9,
       "monthName": "Ramadan",
       "gregorianStart": "2012-07-20",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -1138,7 +1021,6 @@
       "hijriMonth": 10,
       "monthName": "Shawwal",
       "gregorianStart": "2012-08-18",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -1147,7 +1029,6 @@
       "hijriMonth": 11,
       "monthName": "Dhul Qadah",
       "gregorianStart": "2012-09-17",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -1156,7 +1037,6 @@
       "hijriMonth": 12,
       "monthName": "Dhul Hijjah",
       "gregorianStart": "2012-10-17",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -1165,7 +1045,6 @@
       "hijriMonth": 1,
       "monthName": "Muharram",
       "gregorianStart": "2012-11-15",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -1174,7 +1053,6 @@
       "hijriMonth": 2,
       "monthName": "Safar",
       "gregorianStart": "2012-12-14",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -1183,7 +1061,6 @@
       "hijriMonth": 3,
       "monthName": "Rabi al-Awwal",
       "gregorianStart": "2013-01-13",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -1192,7 +1069,6 @@
       "hijriMonth": 4,
       "monthName": "Rabi al-Thani",
       "gregorianStart": "2013-02-12",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -1201,7 +1077,6 @@
       "hijriMonth": 5,
       "monthName": "Jumada al-Awwal",
       "gregorianStart": "2013-03-13",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -1210,7 +1085,6 @@
       "hijriMonth": 6,
       "monthName": "Jumada al-Akhirah",
       "gregorianStart": "2013-04-11",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -1219,7 +1093,6 @@
       "hijriMonth": 7,
       "monthName": "Rajab",
       "gregorianStart": "2013-05-11",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -1228,7 +1101,6 @@
       "hijriMonth": 8,
       "monthName": "Shaban",
       "gregorianStart": "2013-06-10",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -1237,7 +1109,6 @@
       "hijriMonth": 9,
       "monthName": "Ramadan",
       "gregorianStart": "2013-07-09",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -1246,7 +1117,6 @@
       "hijriMonth": 10,
       "monthName": "Shawwal",
       "gregorianStart": "2013-08-08",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -1255,7 +1125,6 @@
       "hijriMonth": 11,
       "monthName": "Dhul Qadah",
       "gregorianStart": "2013-09-07",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -1264,7 +1133,6 @@
       "hijriMonth": 12,
       "monthName": "Dhul Hijjah",
       "gregorianStart": "2013-10-06",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -1273,7 +1141,6 @@
       "hijriMonth": 1,
       "monthName": "Muharram",
       "gregorianStart": "2013-11-04",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -1282,7 +1149,6 @@
       "hijriMonth": 2,
       "monthName": "Safar",
       "gregorianStart": "2013-12-04",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -1291,7 +1157,6 @@
       "hijriMonth": 3,
       "monthName": "Rabi al-Awwal",
       "gregorianStart": "2014-01-02",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -1300,7 +1165,6 @@
       "hijriMonth": 4,
       "monthName": "Rabi al-Thani",
       "gregorianStart": "2014-02-01",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -1309,7 +1173,6 @@
       "hijriMonth": 5,
       "monthName": "Jumada al-Awwal",
       "gregorianStart": "2014-03-02",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -1318,7 +1181,6 @@
       "hijriMonth": 6,
       "monthName": "Jumada al-Akhirah",
       "gregorianStart": "2014-04-01",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -1327,7 +1189,6 @@
       "hijriMonth": 7,
       "monthName": "Rajab",
       "gregorianStart": "2014-04-30",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -1336,7 +1197,6 @@
       "hijriMonth": 8,
       "monthName": "Shaban",
       "gregorianStart": "2014-05-30",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -1345,7 +1205,6 @@
       "hijriMonth": 9,
       "monthName": "Ramadan",
       "gregorianStart": "2014-06-28",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -1354,7 +1213,6 @@
       "hijriMonth": 10,
       "monthName": "Shawwal",
       "gregorianStart": "2014-07-28",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -1363,7 +1221,6 @@
       "hijriMonth": 11,
       "monthName": "Dhul Qadah",
       "gregorianStart": "2014-08-27",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -1372,7 +1229,6 @@
       "hijriMonth": 12,
       "monthName": "Dhul Hijjah",
       "gregorianStart": "2014-09-26",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -1381,7 +1237,6 @@
       "hijriMonth": 1,
       "monthName": "Muharram",
       "gregorianStart": "2014-10-25",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -1390,7 +1245,6 @@
       "hijriMonth": 2,
       "monthName": "Safar",
       "gregorianStart": "2014-11-24",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -1399,7 +1253,6 @@
       "hijriMonth": 3,
       "monthName": "Rabi al-Awwal",
       "gregorianStart": "2014-12-23",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -1408,7 +1261,6 @@
       "hijriMonth": 4,
       "monthName": "Rabi al-Thani",
       "gregorianStart": "2015-01-21",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -1417,7 +1269,6 @@
       "hijriMonth": 5,
       "monthName": "Jumada al-Awwal",
       "gregorianStart": "2015-02-20",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -1426,7 +1277,6 @@
       "hijriMonth": 6,
       "monthName": "Jumada al-Akhirah",
       "gregorianStart": "2015-03-21",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -1435,7 +1285,6 @@
       "hijriMonth": 7,
       "monthName": "Rajab",
       "gregorianStart": "2015-04-20",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -1444,7 +1293,6 @@
       "hijriMonth": 8,
       "monthName": "Shaban",
       "gregorianStart": "2015-05-19",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -1453,7 +1301,6 @@
       "hijriMonth": 9,
       "monthName": "Ramadan",
       "gregorianStart": "2015-06-18",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -1462,7 +1309,6 @@
       "hijriMonth": 10,
       "monthName": "Shawwal",
       "gregorianStart": "2015-07-17",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -1471,7 +1317,6 @@
       "hijriMonth": 11,
       "monthName": "Dhul Qadah",
       "gregorianStart": "2015-08-16",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -1480,7 +1325,6 @@
       "hijriMonth": 12,
       "monthName": "Dhul Hijjah",
       "gregorianStart": "2015-09-14",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -1489,7 +1333,6 @@
       "hijriMonth": 1,
       "monthName": "Muharram",
       "gregorianStart": "2015-10-14",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -1498,7 +1341,6 @@
       "hijriMonth": 2,
       "monthName": "Safar",
       "gregorianStart": "2015-11-13",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -1507,7 +1349,6 @@
       "hijriMonth": 3,
       "monthName": "Rabi al-Awwal",
       "gregorianStart": "2015-12-12",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -1516,7 +1357,6 @@
       "hijriMonth": 4,
       "monthName": "Rabi al-Thani",
       "gregorianStart": "2016-01-11",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -1525,7 +1365,6 @@
       "hijriMonth": 5,
       "monthName": "Jumada al-Awwal",
       "gregorianStart": "2016-02-10",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -1534,7 +1373,6 @@
       "hijriMonth": 6,
       "monthName": "Jumada al-Akhirah",
       "gregorianStart": "2016-03-10",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -1543,7 +1381,6 @@
       "hijriMonth": 7,
       "monthName": "Rajab",
       "gregorianStart": "2016-04-08",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -1552,7 +1389,6 @@
       "hijriMonth": 8,
       "monthName": "Shaban",
       "gregorianStart": "2016-05-08",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -1561,7 +1397,6 @@
       "hijriMonth": 9,
       "monthName": "Ramadan",
       "gregorianStart": "2016-06-06",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -1570,7 +1405,6 @@
       "hijriMonth": 10,
       "monthName": "Shawwal",
       "gregorianStart": "2016-07-05",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -1579,7 +1413,6 @@
       "hijriMonth": 11,
       "monthName": "Dhul Qadah",
       "gregorianStart": "2016-08-04",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -1588,7 +1421,6 @@
       "hijriMonth": 12,
       "monthName": "Dhul Hijjah",
       "gregorianStart": "2016-09-02",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -1597,7 +1429,6 @@
       "hijriMonth": 1,
       "monthName": "Muharram",
       "gregorianStart": "2016-10-02",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -1606,7 +1437,6 @@
       "hijriMonth": 2,
       "monthName": "Safar",
       "gregorianStart": "2016-11-01",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -1615,7 +1445,6 @@
       "hijriMonth": 3,
       "monthName": "Rabi al-Awwal",
       "gregorianStart": "2016-12-01",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -1624,7 +1453,6 @@
       "hijriMonth": 4,
       "monthName": "Rabi al-Thani",
       "gregorianStart": "2016-12-31",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -1633,7 +1461,6 @@
       "hijriMonth": 5,
       "monthName": "Jumada al-Awwal",
       "gregorianStart": "2017-01-29",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -1642,7 +1469,6 @@
       "hijriMonth": 6,
       "monthName": "Jumada al-Akhirah",
       "gregorianStart": "2017-02-28",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -1651,7 +1477,6 @@
       "hijriMonth": 7,
       "monthName": "Rajab",
       "gregorianStart": "2017-03-29",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -1660,7 +1485,6 @@
       "hijriMonth": 8,
       "monthName": "Shaban",
       "gregorianStart": "2017-04-27",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -1669,7 +1493,6 @@
       "hijriMonth": 9,
       "monthName": "Ramadan",
       "gregorianStart": "2017-05-26",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -1678,7 +1501,6 @@
       "hijriMonth": 10,
       "monthName": "Shawwal",
       "gregorianStart": "2017-06-25",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -1687,7 +1509,6 @@
       "hijriMonth": 11,
       "monthName": "Dhul Qadah",
       "gregorianStart": "2017-07-24",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -1696,7 +1517,6 @@
       "hijriMonth": 12,
       "monthName": "Dhul Hijjah",
       "gregorianStart": "2017-08-23",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -1705,7 +1525,6 @@
       "hijriMonth": 1,
       "monthName": "Muharram",
       "gregorianStart": "2017-09-21",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -1714,7 +1533,6 @@
       "hijriMonth": 2,
       "monthName": "Safar",
       "gregorianStart": "2017-10-21",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -1723,7 +1541,6 @@
       "hijriMonth": 3,
       "monthName": "Rabi al-Awwal",
       "gregorianStart": "2017-11-20",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -1732,7 +1549,6 @@
       "hijriMonth": 4,
       "monthName": "Rabi al-Thani",
       "gregorianStart": "2017-12-20",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -1741,7 +1557,6 @@
       "hijriMonth": 5,
       "monthName": "Jumada al-Awwal",
       "gregorianStart": "2018-01-18",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -1750,7 +1565,6 @@
       "hijriMonth": 6,
       "monthName": "Jumada al-Akhirah",
       "gregorianStart": "2018-02-17",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -1759,7 +1573,6 @@
       "hijriMonth": 7,
       "monthName": "Rajab",
       "gregorianStart": "2018-03-19",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -1768,7 +1581,6 @@
       "hijriMonth": 8,
       "monthName": "Shaban",
       "gregorianStart": "2018-04-17",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -1777,7 +1589,6 @@
       "hijriMonth": 9,
       "monthName": "Ramadan",
       "gregorianStart": "2018-05-17",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -1786,7 +1597,6 @@
       "hijriMonth": 10,
       "monthName": "Shawwal",
       "gregorianStart": "2018-06-15",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -1795,7 +1605,6 @@
       "hijriMonth": 11,
       "monthName": "Dhul Qadah",
       "gregorianStart": "2018-07-14",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -1804,7 +1613,6 @@
       "hijriMonth": 12,
       "monthName": "Dhul Hijjah",
       "gregorianStart": "2018-08-12",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -1813,7 +1621,6 @@
       "hijriMonth": 1,
       "monthName": "Muharram",
       "gregorianStart": "2018-09-11",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -1822,7 +1629,6 @@
       "hijriMonth": 2,
       "monthName": "Safar",
       "gregorianStart": "2018-10-10",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -1831,7 +1637,6 @@
       "hijriMonth": 3,
       "monthName": "Rabi al-Awwal",
       "gregorianStart": "2018-11-09",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -1840,7 +1645,6 @@
       "hijriMonth": 4,
       "monthName": "Rabi al-Thani",
       "gregorianStart": "2018-12-09",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -1849,7 +1653,6 @@
       "hijriMonth": 5,
       "monthName": "Jumada al-Awwal",
       "gregorianStart": "2019-01-07",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -1858,7 +1661,6 @@
       "hijriMonth": 6,
       "monthName": "Jumada al-Akhirah",
       "gregorianStart": "2019-02-06",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -1867,7 +1669,6 @@
       "hijriMonth": 7,
       "monthName": "Rajab",
       "gregorianStart": "2019-03-08",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -1876,7 +1677,6 @@
       "hijriMonth": 8,
       "monthName": "Shaban",
       "gregorianStart": "2019-04-06",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -1885,7 +1685,6 @@
       "hijriMonth": 9,
       "monthName": "Ramadan",
       "gregorianStart": "2019-05-06",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -1894,7 +1693,6 @@
       "hijriMonth": 10,
       "monthName": "Shawwal",
       "gregorianStart": "2019-06-04",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -1903,7 +1701,6 @@
       "hijriMonth": 11,
       "monthName": "Dhul Qadah",
       "gregorianStart": "2019-07-04",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -1912,7 +1709,6 @@
       "hijriMonth": 12,
       "monthName": "Dhul Hijjah",
       "gregorianStart": "2019-08-02",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -1921,7 +1717,6 @@
       "hijriMonth": 1,
       "monthName": "Muharram",
       "gregorianStart": "2019-09-01",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -1930,7 +1725,6 @@
       "hijriMonth": 2,
       "monthName": "Safar",
       "gregorianStart": "2019-09-30",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -1939,7 +1733,6 @@
       "hijriMonth": 3,
       "monthName": "Rabi al-Awwal",
       "gregorianStart": "2019-10-29",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -1948,7 +1741,6 @@
       "hijriMonth": 4,
       "monthName": "Rabi al-Thani",
       "gregorianStart": "2019-11-28",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -1957,7 +1749,6 @@
       "hijriMonth": 5,
       "monthName": "Jumada al-Awwal",
       "gregorianStart": "2019-12-27",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -1966,7 +1757,6 @@
       "hijriMonth": 6,
       "monthName": "Jumada al-Akhirah",
       "gregorianStart": "2020-01-26",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -1975,7 +1765,6 @@
       "hijriMonth": 7,
       "monthName": "Rajab",
       "gregorianStart": "2020-02-25",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -1984,7 +1773,6 @@
       "hijriMonth": 8,
       "monthName": "Shaban",
       "gregorianStart": "2020-03-25",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -1993,7 +1781,6 @@
       "hijriMonth": 9,
       "monthName": "Ramadan",
       "gregorianStart": "2020-04-24",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -2002,7 +1789,6 @@
       "hijriMonth": 10,
       "monthName": "Shawwal",
       "gregorianStart": "2020-05-23",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -2011,7 +1797,6 @@
       "hijriMonth": 11,
       "monthName": "Dhul Qadah",
       "gregorianStart": "2020-06-22",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -2020,7 +1805,6 @@
       "hijriMonth": 12,
       "monthName": "Dhul Hijjah",
       "gregorianStart": "2020-07-22",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -2029,7 +1813,6 @@
       "hijriMonth": 1,
       "monthName": "Muharram",
       "gregorianStart": "2020-08-20",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -2038,7 +1821,6 @@
       "hijriMonth": 2,
       "monthName": "Safar",
       "gregorianStart": "2020-09-18",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -2047,7 +1829,6 @@
       "hijriMonth": 3,
       "monthName": "Rabi al-Awwal",
       "gregorianStart": "2020-10-18",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -2056,7 +1837,6 @@
       "hijriMonth": 4,
       "monthName": "Rabi al-Thani",
       "gregorianStart": "2020-11-17",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -2065,7 +1845,6 @@
       "hijriMonth": 5,
       "monthName": "Jumada al-Awwal",
       "gregorianStart": "2020-12-16",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -2074,7 +1853,6 @@
       "hijriMonth": 6,
       "monthName": "Jumada al-Akhirah",
       "gregorianStart": "2021-01-14",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -2083,7 +1861,6 @@
       "hijriMonth": 7,
       "monthName": "Rajab",
       "gregorianStart": "2021-02-13",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -2092,7 +1869,6 @@
       "hijriMonth": 8,
       "monthName": "Shaban",
       "gregorianStart": "2021-03-14",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -2101,7 +1877,6 @@
       "hijriMonth": 9,
       "monthName": "Ramadan",
       "gregorianStart": "2021-04-13",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -2110,7 +1885,6 @@
       "hijriMonth": 10,
       "monthName": "Shawwal",
       "gregorianStart": "2021-05-13",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -2119,7 +1893,6 @@
       "hijriMonth": 11,
       "monthName": "Dhul Qadah",
       "gregorianStart": "2021-06-11",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -2128,7 +1901,6 @@
       "hijriMonth": 12,
       "monthName": "Dhul Hijjah",
       "gregorianStart": "2021-07-11",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -2137,7 +1909,6 @@
       "hijriMonth": 1,
       "monthName": "Muharram",
       "gregorianStart": "2021-08-10",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -2146,7 +1917,6 @@
       "hijriMonth": 2,
       "monthName": "Safar",
       "gregorianStart": "2021-09-08",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -2155,7 +1925,6 @@
       "hijriMonth": 3,
       "monthName": "Rabi al-Awwal",
       "gregorianStart": "2021-10-07",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -2164,7 +1933,6 @@
       "hijriMonth": 4,
       "monthName": "Rabi al-Thani",
       "gregorianStart": "2021-11-06",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -2173,7 +1941,6 @@
       "hijriMonth": 5,
       "monthName": "Jumada al-Awwal",
       "gregorianStart": "2021-12-05",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -2182,7 +1949,6 @@
       "hijriMonth": 6,
       "monthName": "Jumada al-Akhirah",
       "gregorianStart": "2022-01-04",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -2191,7 +1957,6 @@
       "hijriMonth": 7,
       "monthName": "Rajab",
       "gregorianStart": "2022-02-02",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -2200,7 +1965,6 @@
       "hijriMonth": 8,
       "monthName": "Shaban",
       "gregorianStart": "2022-03-04",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -2209,7 +1973,6 @@
       "hijriMonth": 9,
       "monthName": "Ramadan",
       "gregorianStart": "2022-04-02",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -2218,7 +1981,6 @@
       "hijriMonth": 10,
       "monthName": "Shawwal",
       "gregorianStart": "2022-05-02",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -2227,7 +1989,6 @@
       "hijriMonth": 11,
       "monthName": "Dhul Qadah",
       "gregorianStart": "2022-06-01",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -2236,7 +1997,6 @@
       "hijriMonth": 12,
       "monthName": "Dhul Hijjah",
       "gregorianStart": "2022-06-30",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -2245,7 +2005,6 @@
       "hijriMonth": 1,
       "monthName": "Muharram",
       "gregorianStart": "2022-07-30",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -2254,7 +2013,6 @@
       "hijriMonth": 2,
       "monthName": "Safar",
       "gregorianStart": "2022-08-28",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -2263,7 +2021,6 @@
       "hijriMonth": 3,
       "monthName": "Rabi al-Awwal",
       "gregorianStart": "2022-09-27",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -2272,7 +2029,6 @@
       "hijriMonth": 4,
       "monthName": "Rabi al-Thani",
       "gregorianStart": "2022-10-27",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -2281,7 +2037,6 @@
       "hijriMonth": 5,
       "monthName": "Jumada al-Awwal",
       "gregorianStart": "2022-11-25",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -2290,7 +2045,6 @@
       "hijriMonth": 6,
       "monthName": "Jumada al-Akhirah",
       "gregorianStart": "2022-12-25",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -2299,7 +2053,6 @@
       "hijriMonth": 7,
       "monthName": "Rajab",
       "gregorianStart": "2023-01-23",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -2308,7 +2061,6 @@
       "hijriMonth": 8,
       "monthName": "Shaban",
       "gregorianStart": "2023-02-21",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -2317,7 +2069,6 @@
       "hijriMonth": 9,
       "monthName": "Ramadan",
       "gregorianStart": "2023-03-23",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -2326,7 +2077,6 @@
       "hijriMonth": 10,
       "monthName": "Shawwal",
       "gregorianStart": "2023-04-21",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -2335,7 +2085,6 @@
       "hijriMonth": 11,
       "monthName": "Dhul Qadah",
       "gregorianStart": "2023-05-21",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -2344,7 +2093,6 @@
       "hijriMonth": 12,
       "monthName": "Dhul Hijjah",
       "gregorianStart": "2023-06-20",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -2353,7 +2101,6 @@
       "hijriMonth": 1,
       "monthName": "Muharram",
       "gregorianStart": "2023-07-20",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -2362,7 +2109,6 @@
       "hijriMonth": 2,
       "monthName": "Safar",
       "gregorianStart": "2023-08-18",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -2371,7 +2117,6 @@
       "hijriMonth": 3,
       "monthName": "Rabi al-Awwal",
       "gregorianStart": "2023-09-17",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -2380,7 +2125,6 @@
       "hijriMonth": 4,
       "monthName": "Rabi al-Thani",
       "gregorianStart": "2023-10-17",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -2389,7 +2133,6 @@
       "hijriMonth": 5,
       "monthName": "Jumada al-Awwal",
       "gregorianStart": "2023-11-16",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -2398,7 +2141,6 @@
       "hijriMonth": 6,
       "monthName": "Jumada al-Akhirah",
       "gregorianStart": "2023-12-16",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -2407,7 +2149,6 @@
       "hijriMonth": 7,
       "monthName": "Rajab",
       "gregorianStart": "2024-01-14",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -2416,7 +2157,6 @@
       "hijriMonth": 8,
       "monthName": "Shaban",
       "gregorianStart": "2024-02-12",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -2425,7 +2165,6 @@
       "hijriMonth": 9,
       "monthName": "Ramadan",
       "gregorianStart": "2024-03-12",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -2434,7 +2173,6 @@
       "hijriMonth": 10,
       "monthName": "Shawwal",
       "gregorianStart": "2024-04-10",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -2443,7 +2181,6 @@
       "hijriMonth": 11,
       "monthName": "Dhul Qadah",
       "gregorianStart": "2024-05-10",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -2452,7 +2189,6 @@
       "hijriMonth": 12,
       "monthName": "Dhul Hijjah",
       "gregorianStart": "2024-06-08",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -2461,7 +2197,6 @@
       "hijriMonth": 1,
       "monthName": "Muharram",
       "gregorianStart": "2024-07-08",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -2470,7 +2205,6 @@
       "hijriMonth": 2,
       "monthName": "Safar",
       "gregorianStart": "2024-08-07",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -2479,7 +2213,6 @@
       "hijriMonth": 3,
       "monthName": "Rabi al-Awwal",
       "gregorianStart": "2024-09-05",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -2488,7 +2221,6 @@
       "hijriMonth": 4,
       "monthName": "Rabi al-Thani",
       "gregorianStart": "2024-10-05",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -2497,7 +2229,6 @@
       "hijriMonth": 5,
       "monthName": "Jumada al-Awwal",
       "gregorianStart": "2024-11-04",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -2506,7 +2237,6 @@
       "hijriMonth": 6,
       "monthName": "Jumada al-Akhirah",
       "gregorianStart": "2024-12-03",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -2515,7 +2245,6 @@
       "hijriMonth": 7,
       "monthName": "Rajab",
       "gregorianStart": "2025-01-02",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -2524,7 +2253,6 @@
       "hijriMonth": 8,
       "monthName": "Shaban",
       "gregorianStart": "2025-01-31",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -2533,7 +2261,6 @@
       "hijriMonth": 9,
       "monthName": "Ramadan",
       "gregorianStart": "2025-03-02",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -2542,7 +2269,6 @@
       "hijriMonth": 10,
       "monthName": "Shawwal",
       "gregorianStart": "2025-03-31",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -2551,7 +2277,6 @@
       "hijriMonth": 11,
       "monthName": "Dhul Qadah",
       "gregorianStart": "2025-04-30",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -2560,7 +2285,6 @@
       "hijriMonth": 12,
       "monthName": "Dhul Hijjah",
       "gregorianStart": "2025-05-29",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -2569,7 +2293,6 @@
       "hijriMonth": 1,
       "monthName": "Muharram",
       "gregorianStart": "2025-06-27",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -2578,7 +2301,6 @@
       "hijriMonth": 2,
       "monthName": "Safar",
       "gregorianStart": "2025-07-27",
-      "gregorianEnd": null,
       "days": 29,
       "status": "completed"
     },
@@ -2587,7 +2309,6 @@
       "hijriMonth": 3,
       "monthName": "Rabi al-Awwal",
       "gregorianStart": "2025-08-25",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -2596,7 +2317,6 @@
       "hijriMonth": 4,
       "monthName": "Rabi al-Thani",
       "gregorianStart": "2025-09-24",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -2605,7 +2325,6 @@
       "hijriMonth": 5,
       "monthName": "Jumada al-Awwal",
       "gregorianStart": "2025-10-24",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -2614,7 +2333,6 @@
       "hijriMonth": 6,
       "monthName": "Jumada al-Akhirah",
       "gregorianStart": "2025-11-23",
-      "gregorianEnd": null,
       "days": 30,
       "status": "completed"
     },
@@ -2623,7 +2341,6 @@
       "hijriMonth": 7,
       "monthName": "Rajab",
       "gregorianStart": "2025-12-23",
-      "gregorianEnd": null,
       "days": 29,
       "status": "ongoing"
     }

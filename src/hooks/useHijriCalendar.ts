@@ -14,7 +14,6 @@ export interface HijriMonth {
   hijriMonth: number
   monthName: string
   gregorianStart: string
-  gregorianEnd: string | null
   days: number
   status: 'completed' | 'ongoing' | 'upcoming'
 }

@@ -28,12 +28,12 @@ db.exec(`
   );
 
   -- Hijri calendar entries (references master months)
+  -- Note: gregorianEnd is calculated from gregorianStart + days - 1
   CREATE TABLE IF NOT EXISTS hijri_calendar (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     hijri_year INTEGER NOT NULL,
     hijri_month_id INTEGER NOT NULL,
     gregorian_start DATE NOT NULL,
-    gregorian_end DATE,
     days INTEGER,
     status TEXT DEFAULT 'completed' CHECK(status IN ('completed', 'ongoing', 'upcoming')),
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -163,16 +163,15 @@ const insertCalendar = db.prepare(`
 
 // Determine current date to mark ongoing month
 const today = new Date();
-let ongoingFound = false;
 
 for (const entry of hijriCalendarData.months) {
-  const monthId = monthNameToId[entry.monthName];
+  const monthId = entry.hijriMonth || monthNameToId[entry.monthName];
   if (!monthId) {
-    console.warn(`Unknown month name: ${entry.monthName}`);
+    console.warn(`Unknown month: ${entry.monthName}`);
     continue;
   }
 
-  // Determine status
+  // Determine status based on dates
   const startDate = new Date(entry.gregorianStart);
   const endDate = new Date(startDate);
   endDate.setDate(endDate.getDate() + (entry.days || 30) - 1);
@@ -180,7 +179,6 @@ for (const entry of hijriCalendarData.months) {
   let status = 'completed';
   if (today >= startDate && today <= endDate) {
     status = 'ongoing';
-    ongoingFound = true;
   } else if (today < startDate) {
     status = 'upcoming';
   }

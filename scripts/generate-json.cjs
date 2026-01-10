@@ -26,7 +26,6 @@ const hijriCalendar = db.prepare(`
     hc.hijri_month_id,
     hm.name as month_name,
     hc.gregorian_start,
-    hc.gregorian_end,
     hc.days,
     hc.status
   FROM hijri_calendar hc
@@ -52,7 +51,6 @@ const hijriCalendarJson = {
     hijriMonth: entry.hijri_month_id,
     monthName: entry.month_name,
     gregorianStart: entry.gregorian_start,
-    gregorianEnd: entry.gregorian_end,
     days: entry.days,
     status: entry.status
   }))
