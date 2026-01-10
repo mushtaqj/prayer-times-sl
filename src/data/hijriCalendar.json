@@ -1981,13 +1981,13 @@
       "hijriMonth": 5,
       "monthName": "Jumada al-Awwal",
       "gregorianStart": "2025-10-24",
-      "days": 29
+      "days": 30
     },
     {
       "hijriYear": 1447,
       "hijriMonth": 6,
       "monthName": "Jumada al-Akhirah",
-      "gregorianStart": "2025-11-22",
+      "gregorianStart": "2025-11-23",
       "days": 30
     },
     {
