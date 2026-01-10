@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Header, type MainSection } from '@/components/Header'
+import { LandingPage } from '@/components/LandingPage'
 import { DailyView } from '@/components/DailyView'
 import { WeekView } from '@/components/WeekView'
 import { MonthView } from '@/components/MonthView'
@@ -16,14 +17,14 @@ function App() {
   const [selectedDistrict, setSelectedDistrict] = useState(() => {
     return localStorage.getItem('selectedDistrict') || 'colombo'
   })
-  const [mainSection, setMainSection] = useState<MainSection>('prayer')
+  const [mainSection, setMainSection] = useState<MainSection>('home')
   const [prayerView, setPrayerView] = useState<ViewType>('today')
   const [deferredPrompt, setDeferredPrompt] = useState<Event | null>(null)
   const [showInstallBanner, setShowInstallBanner] = useState(false)
 
   const { isDark, toggleTheme } = useTheme()
   const { alarms, toggleAlarm, requestNotificationPermission, hasPermission, scheduleNotifications } = useAlarms()
-  const { districts, todayPrayers, weekPrayers, getMonthPrayers, nextPrayer } = usePrayerTimes(selectedDistrict)
+  const { districts, todayPrayers, weekPrayers, getMonthPrayers, currentPrayer, nextPrayer } = usePrayerTimes(selectedDistrict)
 
   useEffect(() => {
     localStorage.setItem('selectedDistrict', selectedDistrict)
@@ -70,17 +71,34 @@ function App() {
   return (
     <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
       <div className="max-w-md md:max-w-4xl mx-auto min-h-screen flex flex-col shadow-2xl shadow-black/5 bg-card/30 border-x border-border/50">
-        <Header
-          districts={districts}
-          selectedDistrict={selectedDistrict}
-          onDistrictChange={setSelectedDistrict}
-          isDark={isDark}
-          onThemeToggle={toggleTheme}
-          mainSection={mainSection}
-          onSectionChange={setMainSection}
-        />
+        {/* Hide header on home page */}
+        {mainSection !== 'home' && (
+          <Header
+            districts={districts}
+            selectedDistrict={selectedDistrict}
+            onDistrictChange={setSelectedDistrict}
+            isDark={isDark}
+            onThemeToggle={toggleTheme}
+            mainSection={mainSection}
+            onSectionChange={setMainSection}
+          />
+        )}
 
         <main className="flex-1 flex flex-col relative">
+          {/* Home / Landing Page */}
+          {mainSection === 'home' && (
+            <div className="flex-1 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <LandingPage
+                currentPrayer={currentPrayer}
+                nextPrayer={nextPrayer}
+                location={locationName}
+                onNavigate={setMainSection}
+                isDark={isDark}
+                onThemeToggle={toggleTheme}
+              />
+            </div>
+          )}
+
           {/* Prayer Times Section */}
           {mainSection === 'prayer' && (
             <>

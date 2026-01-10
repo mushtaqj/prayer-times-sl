@@ -68,37 +68,69 @@ export function usePrayerTimes(districtId: string) {
     }
   }, [district])
 
-  const getNextPrayer = useMemo(() => {
-    if (!getTodayPrayers) return null
+  const getPrayerInfo = useMemo(() => {
+    if (!getTodayPrayers) return { current: null, next: null }
 
     const now = new Date()
     const currentTime = now.getHours() * 60 + now.getMinutes()
 
-    const prayers: { name: string; time: string; displayName: string }[] = [
-      { name: 'fajr', time: getTodayPrayers.fajr, displayName: 'Fajr' },
-      { name: 'sunrise', time: getTodayPrayers.sunrise, displayName: 'Sunrise' },
-      { name: 'dhuhr', time: getTodayPrayers.dhuhr, displayName: 'Dhuhr' },
-      { name: 'asr', time: getTodayPrayers.asr, displayName: 'Asr' },
-      { name: 'maghrib', time: getTodayPrayers.maghrib, displayName: 'Maghrib' },
-      { name: 'isha', time: getTodayPrayers.isha, displayName: 'Isha' },
+    const prayers: { name: string; time: string; displayName: string; arabicName: string }[] = [
+      { name: 'fajr', time: getTodayPrayers.fajr, displayName: 'Fajr', arabicName: 'الفجر' },
+      { name: 'sunrise', time: getTodayPrayers.sunrise, displayName: 'Sunrise', arabicName: 'الشروق' },
+      { name: 'dhuhr', time: getTodayPrayers.dhuhr, displayName: 'Dhuhr', arabicName: 'الظهر' },
+      { name: 'asr', time: getTodayPrayers.asr, displayName: 'Asr', arabicName: 'العصر' },
+      { name: 'maghrib', time: getTodayPrayers.maghrib, displayName: 'Maghrib', arabicName: 'المغرب' },
+      { name: 'isha', time: getTodayPrayers.isha, displayName: 'Isha', arabicName: 'العشاء' },
     ]
 
-    for (const prayer of prayers) {
-      const [timePart, period] = prayer.time.split(' ')
+    // Helper to parse time to minutes
+    const parseTimeToMinutes = (time: string): number => {
+      const [timePart, period] = time.split(' ')
       const [hours, minutes] = timePart.split(':').map(Number)
-
       let prayerHours = hours
       if (period === 'PM' && hours !== 12) prayerHours += 12
       if (period === 'AM' && hours === 12) prayerHours = 0
+      return prayerHours * 60 + minutes
+    }
 
-      const prayerTime = prayerHours * 60 + minutes
-
+    // Find next prayer index
+    let nextPrayerIndex = -1
+    for (let i = 0; i < prayers.length; i++) {
+      const prayerTime = parseTimeToMinutes(prayers[i].time)
       if (prayerTime > currentTime) {
-        return prayer
+        nextPrayerIndex = i
+        break
       }
     }
 
-    return prayers[0]
+    // If no next prayer found today, next is Fajr (tomorrow)
+    if (nextPrayerIndex === -1) {
+      nextPrayerIndex = 0
+    }
+
+    // Determine current prayer (the active prayer period we're in)
+    let currentPrayer = null
+    if (nextPrayerIndex === 0) {
+      // After Isha, before Fajr - current is Isha
+      currentPrayer = prayers[5] // Isha
+    } else if (nextPrayerIndex === 1) {
+      // After Fajr, before Sunrise - current is Fajr
+      currentPrayer = prayers[0] // Fajr
+    } else {
+      // Current is the previous prayer (skip sunrise for actual prayers)
+      const prevIndex = nextPrayerIndex - 1
+      if (prevIndex === 1) {
+        // Previous was sunrise, so current is still Fajr period ending
+        currentPrayer = prayers[0]
+      } else {
+        currentPrayer = prayers[prevIndex]
+      }
+    }
+
+    return {
+      current: currentPrayer,
+      next: prayers[nextPrayerIndex]
+    }
   }, [getTodayPrayers])
 
   return {
@@ -107,6 +139,7 @@ export function usePrayerTimes(districtId: string) {
     todayPrayers: getTodayPrayers,
     weekPrayers: getWeekPrayers,
     getMonthPrayers,
-    nextPrayer: getNextPrayer,
+    currentPrayer: getPrayerInfo.current,
+    nextPrayer: getPrayerInfo.next,
   }
 }

@@ -12,7 +12,7 @@ import { AppInfoModal } from './AppInfoModal'
 import { useLocation } from '@/hooks/useLocation'
 import type { District } from '@/hooks/usePrayerTimes'
 
-export type MainSection = 'prayer' | 'hijri'
+export type MainSection = 'home' | 'prayer' | 'hijri'
 
 interface HeaderProps {
   districts: District[]
@@ -48,38 +48,43 @@ export function Header({
       {/* Top row: Section toggle + controls */}
       <div className="flex items-center justify-between gap-3 px-4 py-3">
 
-        {/* Branding & Title */}
-        <div className="flex items-center gap-2">
-          <div className="bg-primary/10 p-2 rounded-lg hidden sm:block">
-            <Moon className="w-5 h-5 text-primary" />
-          </div>
-          <div className="flex flex-col">
+        {/* Branding & Title - Clickable to go home */}
+        <button
+          onClick={() => onSectionChange('home')}
+          className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+        >
+          <img
+            src="/icon-192x192.png"
+            alt="Prayer Times"
+            className="w-9 h-9 rounded-xl shadow-sm"
+          />
+          <div className="flex flex-col text-left">
             <h1 className="text-base font-bold leading-none tracking-tight">Prayer Times</h1>
-            <span className="text-[10px] text-muted-foreground font-medium">Sri Lanka • ACJU</span>
+            <span className="text-[10px] text-muted-foreground font-medium">Sri Lanka</span>
           </div>
-        </div>
+        </button>
 
-        {/* Section Toggle - Compact segmented control */}
+        {/* Section Toggle - Prayer & Hijri only (no Home button) */}
         <div className="flex items-center bg-muted/50 rounded-lg p-1 border border-border/50">
           <button
             onClick={() => onSectionChange('prayer')}
-            className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-medium transition-all ${mainSection === 'prayer'
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${mainSection === 'prayer'
               ? 'bg-background text-foreground shadow-sm ring-1 ring-black/5 dark:ring-white/10'
               : 'text-muted-foreground hover:text-foreground'
               }`}
           >
             <Clock className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Prayer</span>
+            <span>Prayer</span>
           </button>
           <button
             onClick={() => onSectionChange('hijri')}
-            className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-medium transition-all ${mainSection === 'hijri'
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${mainSection === 'hijri'
               ? 'bg-background text-foreground shadow-sm ring-1 ring-black/5 dark:ring-white/10'
               : 'text-muted-foreground hover:text-foreground'
               }`}
           >
             <Calendar className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Hijri</span>
+            <span>Hijri</span>
           </button>
         </div>
 
