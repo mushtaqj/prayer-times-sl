@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import prayerData from '@/data/prayerTimes.json'
+import { parseTimeToMinutes } from '@/lib/timeUtils'
 
 export interface PrayerTime {
   day: number
@@ -82,16 +83,6 @@ export function usePrayerTimes(districtId: string) {
       { name: 'maghrib', time: getTodayPrayers.maghrib, displayName: 'Maghrib', arabicName: 'المغرب' },
       { name: 'isha', time: getTodayPrayers.isha, displayName: 'Isha', arabicName: 'العشاء' },
     ]
-
-    // Helper to parse time to minutes
-    const parseTimeToMinutes = (time: string): number => {
-      const [timePart, period] = time.split(' ')
-      const [hours, minutes] = timePart.split(':').map(Number)
-      let prayerHours = hours
-      if (period === 'PM' && hours !== 12) prayerHours += 12
-      if (period === 'AM' && hours === 12) prayerHours = 0
-      return prayerHours * 60 + minutes
-    }
 
     // Find next prayer index
     let nextPrayerIndex = -1

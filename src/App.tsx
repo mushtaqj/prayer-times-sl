@@ -11,11 +11,12 @@ import { Card, CardContent } from '@/components/ui/card'
 import { useTheme } from '@/hooks/useTheme'
 import { useAlarms } from '@/hooks/useAlarms'
 import { usePrayerTimes } from '@/hooks/usePrayerTimes'
+import { getStorageString, setStorageString } from '@/lib/storage'
 import { Bell, Download } from 'lucide-react'
 
 function App() {
   const [selectedDistrict, setSelectedDistrict] = useState(() => {
-    return localStorage.getItem('selectedDistrict') || 'colombo'
+    return getStorageString('selectedDistrict', 'colombo')
   })
   const [mainSection, setMainSection] = useState<MainSection>('home')
   const [prayerView, setPrayerView] = useState<ViewType>('today')
@@ -27,7 +28,7 @@ function App() {
   const { districts, todayPrayers, weekPrayers, getMonthPrayers, currentPrayer, nextPrayer } = usePrayerTimes(selectedDistrict)
 
   useEffect(() => {
-    localStorage.setItem('selectedDistrict', selectedDistrict)
+    setStorageString('selectedDistrict', selectedDistrict)
   }, [selectedDistrict])
 
   // PWA install prompt

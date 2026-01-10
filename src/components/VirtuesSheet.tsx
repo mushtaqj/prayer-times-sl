@@ -30,16 +30,16 @@ export function VirtuesSheet({ isOpen, onClose, title, content }: VirtuesSheetPr
                         <div className="prose dark:prose-invert prose-emerald prose-sm max-w-none leading-relaxed">
                             <Markdown
                                 components={{
-                                    h1: ({ node, ...props }) => <h1 className="text-xl font-bold text-primary mb-4 mt-2" {...props} />,
-                                    h2: ({ node, ...props }) => <h2 className="text-lg font-bold text-foreground mb-3 mt-6 border-b border-border/50 pb-1" {...props} />,
-                                    h3: ({ node, ...props }) => <h3 className="text-base font-semibold text-foreground/90 mb-2 mt-4" {...props} />,
-                                    p: ({ node, ...props }) => <p className="mb-4 text-muted-foreground/90" {...props} />,
-                                    ul: ({ node, ...props }) => <ul className="list-disc list-inside mb-4 space-y-1" {...props} />,
-                                    li: ({ node, ...props }) => <li className="marker:text-primary/70" {...props} />,
-                                    blockquote: ({ node, ...props }) => (
+                                    h1: (props) => <h1 className="text-xl font-bold text-primary mb-4 mt-2" {...props} />,
+                                    h2: (props) => <h2 className="text-lg font-bold text-foreground mb-3 mt-6 border-b border-border/50 pb-1" {...props} />,
+                                    h3: (props) => <h3 className="text-base font-semibold text-foreground/90 mb-2 mt-4" {...props} />,
+                                    p: (props) => <p className="mb-4 text-muted-foreground/90" {...props} />,
+                                    ul: (props) => <ul className="list-disc list-inside mb-4 space-y-1" {...props} />,
+                                    li: (props) => <li className="marker:text-primary/70" {...props} />,
+                                    blockquote: (props) => (
                                         <blockquote className="border-l-4 border-primary/30 pl-4 py-1 my-4 bg-primary/5 rounded-r-md italic text-foreground/80" {...props} />
                                     ),
-                                    strong: ({ node, ...props }) => <strong className="font-semibold text-foreground" {...props} />,
+                                    strong: (props) => <strong className="font-semibold text-foreground" {...props} />,
                                 }}
                             >
                                 {content}

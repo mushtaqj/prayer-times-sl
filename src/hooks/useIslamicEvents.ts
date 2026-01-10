@@ -27,8 +27,57 @@ export interface HijriMonthInfo {
   details?: string
 }
 
+// Recurring fast types
+interface WeeklyFast {
+  id: string
+  name: string
+  nameArabic: string
+  dayOfWeek: number
+  type: string
+  description: string
+  details?: string
+}
+
+interface AnnualFast {
+  id: string
+  name: string
+  nameArabic: string
+  hijriMonth: number
+  startDay?: number
+  endDay?: number
+  duration?: number
+  type: string
+  description: string
+  timing?: 'fixed' | 'flexible'
+  details?: string
+}
+
+interface MonthlyFast {
+  ayyamAlBeed: {
+    name: string
+    nameArabic: string
+    days: number[]
+    type: string
+    description: string
+    details?: string
+  }
+}
+
+interface RecurringFasts {
+  weekly: WeeklyFast[]
+  monthly: MonthlyFast
+  annual: AnnualFast[]
+  friday?: {
+    id: string
+    name: string
+    nameArabic: string
+    details?: string
+  }
+}
+
 export function useIslamicEvents() {
-  const events = useMemo(() => {
+  // eslint-disable-next-line react-hooks/preserve-manual-memoization
+  const events: IslamicEvent[] = useMemo(() => {
     return (eventsData.events as IslamicEvent[]).map(e => ({
       ...e,
       details: virtuesData.events[e.id as keyof typeof virtuesData.events]
@@ -42,21 +91,22 @@ export function useIslamicEvents() {
     }))
   }, [])
 
-  const recurringFasts = useMemo(() => {
+  const recurringFasts: RecurringFasts = useMemo(() => {
     const rf = eventsData.recurringFasts
     // Inject details into recurring fasts
-    const annual = rf.annual.map(f => ({
+    const annual: AnnualFast[] = rf.annual.map(f => ({
       ...f,
+      timing: f.timing as 'fixed' | 'flexible' | undefined,
       details: virtuesData.recurring[f.id as keyof typeof virtuesData.recurring]
     }))
-    const monthly = {
+    const monthly: MonthlyFast = {
       ...rf.monthly,
       ayyamAlBeed: {
         ...rf.monthly.ayyamAlBeed,
         details: virtuesData.recurring['ayyam-al-beed']
       }
     }
-    const weekly = rf.weekly.map(f => ({
+    const weekly: WeeklyFast[] = rf.weekly.map(f => ({
       ...f,
       details: virtuesData.recurring[f.id as keyof typeof virtuesData.recurring]
     }))
@@ -69,7 +119,7 @@ export function useIslamicEvents() {
       details: virtuesData.recurring['friday' as keyof typeof virtuesData.recurring]
     }
 
-    return { ...rf, annual, monthly, weekly, friday }
+    return { annual, monthly, weekly, friday }
   }, [])
 
   // Get events for a specific Hijri date
@@ -91,24 +141,25 @@ export function useIslamicEvents() {
       const annualEvents = recurringFasts.annual.filter(e => e.hijriMonth === hijriMonth)
 
       annualEvents.forEach(event => {
-        monthEvents.push({
+        const eventToAdd: IslamicEvent = {
           id: event.id,
           name: event.name,
           nameArabic: event.nameArabic,
           hijriMonth: event.hijriMonth,
           hijriDay: 0, // 0 indicates general month event or range
-          type: event.type as any,
+          type: event.type as IslamicEvent['type'],
           isFastingDay: true,
           fastingType: event.type === 'recommended' ? 'recommended' : 'sunnah',
           description: event.description,
           details: event.details,
           isRecurring: true
-        })
+        }
+        monthEvents.push(eventToAdd)
       })
 
       return monthEvents
     }
-  }, [events])
+  }, [events, recurringFasts.annual])
 
   // Check if a date is a fasting day
   const isFastingDay = useMemo(() => {
@@ -165,6 +216,7 @@ export function useIslamicEvents() {
   }, [getEventsForDate])
 
   // Get upcoming events (next 30 days)
+  // eslint-disable-next-line react-hooks/preserve-manual-memoization
   const upcomingEvents = useMemo(() => {
     const upcoming: { event: IslamicEvent; gregorianDate: Date; hijriDate: HijriDate }[] = []
     const today = new Date()
@@ -213,7 +265,7 @@ export function useIslamicEvents() {
       }
       // Check annual recurring events with 'fixed' timing (e.g. Dhul Hijjah)
       const annualFixedEvents = recurringFasts.annual.filter(
-        e => e.hijriMonth === hijriMonth && (e as any).timing === 'fixed'
+        e => e.hijriMonth === hijriMonth && e.timing === 'fixed'
       )
 
       for (const event of annualFixedEvents) {
@@ -225,7 +277,7 @@ export function useIslamicEvents() {
       }
       return false
     }
-  }, [events])
+  }, [events, recurringFasts.annual])
 
   // Get all events for a specific day including recurring
   const getAllEventsForDay = useMemo(() => {
@@ -257,7 +309,7 @@ export function useIslamicEvents() {
 
         // Add fixed annual recurring events
         const annualFixedEvents = recurringFasts.annual.filter(
-          e => e.hijriMonth === hijriMonth && (e as any).timing === 'fixed'
+          e => e.hijriMonth === hijriMonth && e.timing === 'fixed'
         )
 
         for (const event of annualFixedEvents) {
@@ -273,7 +325,7 @@ export function useIslamicEvents() {
               name: event.name,
               type: event.type,
               isRecurring: true,
-              details: (event as any).details
+              details: event.details
             })
           }
         }
@@ -302,7 +354,7 @@ export function useIslamicEvents() {
 
       return result
     }
-  }, [events])
+  }, [events, recurringFasts.annual])
 
   // Get event type colors for styling
   const getEventTypeColor = (type: string): string => {

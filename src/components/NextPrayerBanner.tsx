@@ -1,37 +1,11 @@
 import { useState, useEffect } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
+import { parseTime, formatCountdown } from '@/lib/timeUtils'
 
 interface NextPrayerBannerProps {
   prayerName: string
   prayerTime: string
-}
-
-function parseTime(time: string): Date {
-  const now = new Date()
-  const [timePart, period] = time.split(' ')
-  const [hours, minutes] = timePart.split(':').map(Number)
-
-  let targetHours = hours
-  if (period === 'PM' && hours !== 12) targetHours += 12
-  if (period === 'AM' && hours === 12) targetHours = 0
-
-  const targetTime = new Date(now)
-  targetTime.setHours(targetHours, minutes, 0, 0)
-  return targetTime
-}
-
-function formatCountdown(ms: number): string {
-  if (ms <= 0) return 'Now'
-
-  const totalSeconds = Math.floor(ms / 1000)
-  const hours = Math.floor(totalSeconds / 3600)
-  const minutes = Math.floor((totalSeconds % 3600) / 60)
-
-  if (hours > 0) {
-    return `${hours}h ${minutes}m`
-  }
-  return `${minutes}m`
 }
 
 export function NextPrayerBanner({ prayerName, prayerTime }: NextPrayerBannerProps) {

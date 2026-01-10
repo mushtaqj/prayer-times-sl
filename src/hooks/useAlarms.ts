@@ -1,4 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
+import { parseTime } from '@/lib/timeUtils'
+import { getStorageItem, setStorageItem } from '@/lib/storage'
 
 export type PrayerName = 'fajr' | 'sunrise' | 'dhuhr' | 'asr' | 'maghrib' | 'isha'
 
@@ -23,30 +25,31 @@ const prayerNames: Record<PrayerName, string> = {
   isha: 'Isha',
 }
 
+const defaultAlarms: AlarmSettings = {
+  fajr: false,
+  sunrise: false,
+  dhuhr: false,
+  asr: false,
+  maghrib: false,
+  isha: false,
+}
+
 export function useAlarms(): UseAlarmsReturn {
   const [alarms, setAlarms] = useState<AlarmSettings>(() => {
-    const saved = localStorage.getItem('prayerAlarms')
-    return saved ? JSON.parse(saved) : {
-      fajr: false,
-      sunrise: false,
-      dhuhr: false,
-      asr: false,
-      maghrib: false,
-      isha: false,
-    }
+    return getStorageItem('prayerAlarms', defaultAlarms)
   })
 
-  const [hasPermission, setHasPermission] = useState(false)
+  const [hasPermission, setHasPermission] = useState(() => {
+    // Initialize synchronously to avoid effect-based setState
+    if (typeof window !== 'undefined' && 'Notification' in window) {
+      return Notification.permission === 'granted'
+    }
+    return false
+  })
   const scheduledTimeouts = useRef<Map<PrayerName, ReturnType<typeof setTimeout>>>(new Map())
 
   useEffect(() => {
-    if ('Notification' in window) {
-      setHasPermission(Notification.permission === 'granted')
-    }
-  }, [])
-
-  useEffect(() => {
-    localStorage.setItem('prayerAlarms', JSON.stringify(alarms))
+    setStorageItem('prayerAlarms', alarms)
   }, [alarms])
 
   const toggleAlarm = useCallback((prayer: PrayerName) => {
@@ -75,20 +78,6 @@ export function useAlarms(): UseAlarmsReturn {
     }
 
     return false
-  }
-
-  const parseTime = (time: string): Date => {
-    const now = new Date()
-    const [timePart, period] = time.split(' ')
-    const [hours, minutes] = timePart.split(':').map(Number)
-
-    let targetHours = hours
-    if (period === 'PM' && hours !== 12) targetHours += 12
-    if (period === 'AM' && hours === 12) targetHours = 0
-
-    const targetTime = new Date(now)
-    targetTime.setHours(targetHours, minutes, 0, 0)
-    return targetTime
   }
 
   const scheduleNotifications = useCallback((prayerTimes: Record<PrayerName, string>) => {
@@ -140,8 +129,9 @@ export function useAlarms(): UseAlarmsReturn {
 
   // Cleanup on unmount
   useEffect(() => {
+    const timeoutsRef = scheduledTimeouts.current
     return () => {
-      scheduledTimeouts.current.forEach((timeout) => {
+      timeoutsRef.forEach((timeout) => {
         clearTimeout(timeout)
       })
     }

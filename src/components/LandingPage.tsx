@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { VirtuesSheet } from '@/components/VirtuesSheet'
 import { gregorianToHijri, getMoonPhase } from '@/hooks/useHijriCalendar'
 import { useIslamicEvents } from '@/hooks/useIslamicEvents'
+import { parseTime, formatCountdown } from '@/lib/timeUtils'
 import { Clock, Calendar, CalendarSearch, Moon, Sun, Sunrise, Sunset, CloudSun } from 'lucide-react'
 import type { MainSection } from '@/components/Header'
 
@@ -21,33 +22,6 @@ interface LandingPageProps {
   onNavigate: (section: MainSection) => void
   isDark: boolean
   onThemeToggle: () => void
-}
-
-function parseTime(time: string): Date {
-  const now = new Date()
-  const [timePart, period] = time.split(' ')
-  const [hours, minutes] = timePart.split(':').map(Number)
-
-  let targetHours = hours
-  if (period === 'PM' && hours !== 12) targetHours += 12
-  if (period === 'AM' && hours === 12) targetHours = 0
-
-  const targetTime = new Date(now)
-  targetTime.setHours(targetHours, minutes, 0, 0)
-  return targetTime
-}
-
-function formatCountdown(ms: number): string {
-  if (ms <= 0) return 'Now'
-
-  const totalMinutes = Math.floor(ms / 60000)
-  const hours = Math.floor(totalMinutes / 60)
-  const minutes = totalMinutes % 60
-
-  if (hours > 0) {
-    return `${hours}h ${minutes}m`
-  }
-  return `${minutes}m`
 }
 
 export function LandingPage({ currentPrayer, nextPrayer, location, onNavigate, isDark, onThemeToggle }: LandingPageProps) {
@@ -76,7 +50,7 @@ export function LandingPage({ currentPrayer, nextPrayer, location, onNavigate, i
 
     const updateCountdown = () => {
       const now = new Date()
-      let targetTime = parseTime(nextPrayer.time)
+      const targetTime = parseTime(nextPrayer.time)
 
       // If target time is in the past, it means next prayer is tomorrow (Fajr)
       if (targetTime <= now) {

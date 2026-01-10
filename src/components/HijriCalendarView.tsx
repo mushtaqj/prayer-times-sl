@@ -3,10 +3,10 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import {
   ChevronLeft, ChevronRight, Calendar, CalendarDays, HelpCircle,
-  ChevronDown, ChevronUp, Moon, Star, Gift, Sparkles,
-  BookOpen, Info // Added BookOpen and Info
+  ChevronDown, ChevronUp, Moon, Star, Sparkles,
+  BookOpen
 } from 'lucide-react'
-import { VirtuesSheet } from '@/components/VirtuesSheet' // Added VirtuesSheet
+import { VirtuesSheet } from '@/components/VirtuesSheet'
 import { useHijriCalendar, getMoonPhase } from '@/hooks/useHijriCalendar'
 import { useIslamicEvents } from '@/hooks/useIslamicEvents'
 import {
@@ -29,71 +29,14 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
-
-const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-
-// Event type styling configuration
-// REFINED: Using Lucide icons and distinct styles for specific events
-const EVENT_STYLES = {
-  eid: {
-    bg: 'bg-emerald-500/15',
-    indicator: 'bg-emerald-500',
-    text: 'text-emerald-700 dark:text-emerald-400',
-    icon: Gift,
-    label: 'Eid',
-    border: 'border-emerald-500/30'
-  },
-  holy: {
-    bg: 'bg-fuchsia-500/15',
-    indicator: 'bg-fuchsia-500',
-    text: 'text-fuchsia-700 dark:text-fuchsia-400',
-    icon: Sparkles,
-    label: 'Holy',
-    border: 'border-fuchsia-500/30'
-  },
-  // Unified Fasting Style - applied via indicator
-  fast: {
-    bg: 'bg-transparent',
-    indicator: 'bg-amber-500',
-    text: 'text-foreground',
-    icon: Moon, // Fill for obligatory
-    label: 'Fast',
-    border: 'border-transparent'
-  },
-  // Ayyam al-Beed - Distinct styling restored as requested
-  ayyamAlBeed: {
-    bg: 'bg-indigo-500/10',
-    indicator: 'bg-indigo-400',
-    text: 'text-indigo-700 dark:text-indigo-300',
-    icon: Moon, // Outline/Light for Sunnah
-    label: 'White Days',
-    border: 'border-indigo-500/20'
-  },
-  sunnah: {
-    bg: 'bg-transparent',
-    indicator: 'bg-sky-400',
-    text: 'text-foreground',
-    icon: Moon,
-    label: 'Sunnah',
-    border: 'border-transparent'
-  },
-  recommended: {
-    bg: 'bg-transparent',
-    indicator: 'bg-indigo-400',
-    text: 'text-foreground',
-    icon: Star,
-    label: 'Recommended',
-    border: 'border-transparent'
-  },
-} as const
-
-const HIJRI_MONTH_NAMES = [
-  'Muharram', 'Safar', 'Rabi al-Awwal', 'Rabi al-Thani',
-  'Jumada al-Awwal', 'Jumada al-Akhirah', 'Rajab', 'Shaban',
-  'Ramadan', 'Shawwal', 'Dhul Qadah', 'Dhul Hijjah'
-]
-
-const SACRED_MONTHS = [1, 7, 11, 12] // Muharram, Rajab, Dhul Qadah, Dhul Hijjah
+import {
+  CalendarLegend,
+  MonthEventsCard,
+  WEEKDAYS,
+  HIJRI_MONTH_NAMES,
+  SACRED_MONTHS,
+  EVENT_STYLES
+} from '@/components/calendar'
 
 interface HijriCalendarViewProps {
   location: string
@@ -654,92 +597,13 @@ export function HijriCalendarView({ location }: HijriCalendarViewProps) {
           </CardContent>
         </Card>
 
-        {/* Recurring Events This Month */}
-        <Card className="border-border/50 bg-card/40 backdrop-blur-sm shadow-sm">
-          <CardContent className="p-4">
-            <h3 className="text-sm font-semibold mb-3 text-foreground flex items-center gap-2">
-              <span>Events in {currentMonthData.monthName}</span>
-            </h3>
-            <div className="space-y-2">
-              {/* Fixed Events */}
-              {monthEvents.map((event) => {
-                const style = EVENT_STYLES[event.type as keyof typeof EVENT_STYLES] || EVENT_STYLES.holy
-                return (
-                  <div
-                    key={event.id}
-                    className={`flex items-start gap-3 p-2 rounded-lg ${style.bg === 'bg-transparent' ? 'bg-muted/30' : style.bg} border ${style.border}`}
-                  >
-                    <div className="text-center min-w-[40px] flex flex-col items-center justify-center pt-1">
-                      <style.icon className={`w-5 h-5 ${style.text}`} />
-                      <span className={`text-sm font-bold mt-1 ${style.text}`}>
-                        {event.hijriDay === 0 ? (event.name.includes('Days') ? '1-9' : 'All') : event.hijriDay}
-                      </span>
-                    </div>
-                    <div className="flex-1">
-                      <p className="font-medium text-sm text-foreground flex items-center gap-2">
-                        {event.name}
-                        {event.details && (
-                          <button
-                            onClick={() => setVirtueSheet({ title: event.name, content: event.details! })}
-                            className="inline-flex items-center justify-center text-primary/80 hover:text-primary transition-colors ml-1"
-                          >
-                            <Info className="w-4 h-4" />
-                          </button>
-                        )}
-                      </p>
-                      <p className="text-xs text-muted-foreground">{event.nameArabic}</p>
-                      <p className="text-xs text-muted-foreground/80 mt-0.5">{event.description}</p>
-                      {event.isFastingDay && (
-                        <span className="inline-flex items-center gap-1 text-[10px] text-amber-600 dark:text-amber-400 mt-1">
-                          <Moon className="w-3 h-3 fill-current" />
-                          {event.fastingType === 'obligatory' ? 'Obligatory Fast' : 'Recommended Fast'}
-                        </span>
-                      )}
-                    </div>
-                    <span
-                      className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${style.bg === 'bg-transparent' ? '' : style.bg} ${style.text} border border-current/10`}
-                    >
-                      {style.label}
-                    </span>
-                  </div>
-                )
-              })}
-
-              {/* Ayyam al-Beed (always shown) - Distinct style */}
-              <div className={`flex items-start gap-3 p-2 rounded-lg ${EVENT_STYLES.ayyamAlBeed.bg} border ${EVENT_STYLES.ayyamAlBeed.border}`}>
-                <div className="text-center min-w-[40px] flex flex-col items-center justify-center pt-1">
-                  <Moon className={`w-5 h-5 ${EVENT_STYLES.ayyamAlBeed.text}`} />
-                  <span className={`text-sm font-bold mt-1 ${EVENT_STYLES.ayyamAlBeed.text}`}>13-15</span>
-                </div>
-                <div className="flex-1">
-                  <p className="font-medium text-sm text-foreground flex items-center gap-2">
-                    Ayyam al-Beed (White Days)
-                    {recurringFasts.monthly.ayyamAlBeed.details && (
-                      <button
-                        onClick={() => setVirtueSheet({ title: 'Ayyam al-Beed', content: recurringFasts.monthly.ayyamAlBeed.details! })}
-                        className="inline-flex items-center justify-center text-primary/80 hover:text-primary transition-colors"
-                        title="Learn about White Days"
-                      >
-                        <Info className="w-4 h-4" />
-                      </button>
-                    )}
-                  </p>
-                  <p className="text-xs text-muted-foreground">ايام البيض</p>
-                  <p className="text-xs text-muted-foreground/80 mt-0.5">Sunnah fasting on the 13th, 14th, and 15th of every Hijri month</p>
-                </div>
-                <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${EVENT_STYLES.ayyamAlBeed.bg} ${EVENT_STYLES.ayyamAlBeed.text} border border-current/10`}>
-                  Sunnah
-                </span>
-              </div>
-
-              {monthEvents.length === 0 && (
-                <p className="text-sm text-muted-foreground text-center py-2">
-                  No major events this month
-                </p>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+        {/* Month Events */}
+        <MonthEventsCard
+          monthName={currentMonthData.monthName}
+          monthEvents={monthEvents}
+          recurringFastsMonthly={recurringFasts.monthly}
+          onOpenVirtueSheet={(title, content) => setVirtueSheet({ title, content })}
+        />
 
         {/* Legend Toggle */}
         <Button
@@ -754,52 +618,7 @@ export function HijriCalendarView({ location }: HijriCalendarViewProps) {
         </Button>
 
         {/* Legend Content */}
-        {showLegend && (
-          <Card className="border-border/50 bg-card/40 backdrop-blur-sm shadow-sm">
-            <CardContent className="p-4">
-              <div className="grid grid-cols-2 gap-3 text-sm">
-                {/* Event Types */}
-                <div className="space-y-2">
-                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Event Types</p>
-                  <div className="flex items-center gap-2">
-                    <span className={`w-6 h-6 rounded border ${EVENT_STYLES.eid.border} ${EVENT_STYLES.eid.bg} flex items-center justify-center text-sm`}>
-                      <Gift className={`w-3 h-3 ${EVENT_STYLES.eid.text}`} />
-                    </span>
-                    <span className="text-foreground">Eid</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className={`w-6 h-6 rounded border ${EVENT_STYLES.holy.border} ${EVENT_STYLES.holy.bg} flex items-center justify-center text-sm`}>
-                      <Sparkles className={`w-3 h-3 ${EVENT_STYLES.holy.text}`} />
-                    </span>
-                    <span className="text-foreground">Holy Day</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className={`w-6 h-6 rounded border ${EVENT_STYLES.ayyamAlBeed.border} ${EVENT_STYLES.ayyamAlBeed.bg} flex items-center justify-center text-sm`}>
-                      <Moon className={`w-3 h-3 ${EVENT_STYLES.ayyamAlBeed.text}`} />
-                    </span>
-                    <span className="text-foreground">Ayyam al-Beed</span>
-                  </div>
-                </div>
-                {/* Other Indicators */}
-                <div className="space-y-2">
-                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Indicators</p>
-                  <div className="flex items-center gap-2">
-                    <Moon className="w-3 h-3 text-amber-500 fill-amber-500" />
-                    <span className="text-foreground text-xs">Obligatory Fast</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Moon className="w-3 h-3 text-sky-400" />
-                    <span className="text-foreground text-xs">Sunnah Fast</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="bg-primary/10 px-2 py-0.5 rounded text-[10px] font-bold text-primary">Fri</span>
-                    <span className="text-foreground text-xs">Friday (Blessed)</span>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        )}
+        {showLegend && <CalendarLegend />}
 
         {/* Data Attribution */}
         <p className="text-center text-xs text-muted-foreground/60">
