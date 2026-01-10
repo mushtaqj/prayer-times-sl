@@ -3,8 +3,10 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import {
   ChevronLeft, ChevronRight, Calendar, CalendarDays, HelpCircle,
-  ChevronDown, ChevronUp, Moon, Star, Gift, Sparkles
+  ChevronDown, ChevronUp, Moon, Star, Gift, Sparkles,
+  BookOpen, Info // Added BookOpen and Info
 } from 'lucide-react'
+import { VirtuesSheet } from '@/components/VirtuesSheet' // Added VirtuesSheet
 import { useHijriCalendar, getMoonPhase } from '@/hooks/useHijriCalendar'
 import { useIslamicEvents } from '@/hooks/useIslamicEvents'
 import {
@@ -103,6 +105,7 @@ export function HijriCalendarView({ location }: HijriCalendarViewProps) {
   const [selectedHijriMonth, setSelectedHijriMonth] = useState<string>('')
   const [selectedHijriYear, setSelectedHijriYear] = useState<string>('')
   const [showLegend, setShowLegend] = useState(false)
+  const [virtueSheet, setVirtueSheet] = useState<{ title: string; content: string } | null>(null) // Added virtueSheet state
 
   const {
     currentMonthData,
@@ -271,8 +274,18 @@ export function HijriCalendarView({ location }: HijriCalendarViewProps) {
               </Button>
 
               <div className="text-center flex-1 flex flex-col items-center">
-                <h2 className={`text-xl font-bold ${isCurrentMonth ? 'text-primary' : 'text-foreground'}`}>
+                <h2 className={`text-xl font-bold ${isCurrentMonth ? 'text-primary' : 'text-foreground'} flex items-center justify-center gap-2`}>
                   {currentMonthData.monthName} {currentHijriYear}
+                  {(currentMonthData as any).details && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6 rounded-full hover:bg-primary/10 text-primary/70"
+                      onClick={() => setVirtueSheet({ title: currentMonthData.monthName, content: (currentMonthData as any).details })}
+                    >
+                      <BookOpen className="h-3.5 w-3.5" />
+                    </Button>
+                  )}
                 </h2>
                 <p className="text-sm text-muted-foreground">{gregorianRange}</p>
                 {monthInfo && (
@@ -589,7 +602,17 @@ export function HijriCalendarView({ location }: HijriCalendarViewProps) {
                       </span>
                     </div>
                     <div className="flex-1">
-                      <p className="font-medium text-sm text-foreground">{event.name}</p>
+                      <p className="font-medium text-sm text-foreground flex items-center gap-2">
+                        {event.name}
+                        {event.details && (
+                          <button
+                            onClick={() => setVirtueSheet({ title: event.name, content: event.details! })}
+                            className="inline-flex items-center justify-center text-muted-foreground/50 hover:text-primary transition-colors"
+                          >
+                            <Info className="w-3.5 h-3.5" />
+                          </button>
+                        )}
+                      </p>
                       <p className="text-xs text-muted-foreground">{event.nameArabic}</p>
                       <p className="text-xs text-muted-foreground/80 mt-0.5">{event.description}</p>
                       {event.isFastingDay && (
@@ -697,6 +720,13 @@ export function HijriCalendarView({ location }: HijriCalendarViewProps) {
         <p className="text-center text-xs text-muted-foreground/60">
           Hijri calendar for {location} based on ACJU moon sighting data
         </p>
+
+        <VirtuesSheet
+          isOpen={!!virtueSheet}
+          onClose={() => setVirtueSheet(null)}
+          title={virtueSheet?.title || ''}
+          content={virtueSheet?.content || ''}
+        />
       </div>
     </TooltipProvider>
   )

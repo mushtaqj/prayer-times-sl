@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import eventsData from '@/data/islamicEvents.json'
+import virtuesData from '@/data/virtues.json'
 import { gregorianToHijri } from './useHijriCalendar'
 import type { HijriDate } from './useHijriCalendar'
 
@@ -14,6 +15,7 @@ export interface IslamicEvent {
   fastingType?: 'obligatory' | 'recommended' | 'sunnah'
   fastingForbidden?: boolean
   description: string
+  details?: string
   isRecurring?: boolean
 }
 
@@ -22,12 +24,45 @@ export interface HijriMonthInfo {
   name: string
   nameArabic: string
   meaning: string
+  details?: string
 }
 
 export function useIslamicEvents() {
-  const events = useMemo(() => eventsData.events as IslamicEvent[], [])
-  const hijriMonths = useMemo(() => eventsData.hijriMonths as HijriMonthInfo[], [])
-  const recurringFasts = useMemo(() => eventsData.recurringFasts, [])
+  const events = useMemo(() => {
+    return (eventsData.events as IslamicEvent[]).map(e => ({
+      ...e,
+      details: virtuesData.events[e.id as keyof typeof virtuesData.events]
+    }))
+  }, [])
+
+  const hijriMonths = useMemo(() => {
+    return (eventsData.hijriMonths as HijriMonthInfo[]).map(m => ({
+      ...m,
+      details: virtuesData.months[String(m.number) as keyof typeof virtuesData.months]
+    }))
+  }, [])
+
+  const recurringFasts = useMemo(() => {
+    const rf = eventsData.recurringFasts
+    // Inject details into recurring fasts
+    const annual = rf.annual.map(f => ({
+      ...f,
+      details: virtuesData.recurring[f.id as keyof typeof virtuesData.recurring]
+    }))
+    const monthly = {
+      ...rf.monthly,
+      ayyamAlBeed: {
+        ...rf.monthly.ayyamAlBeed,
+        details: virtuesData.recurring['ayyam-al-beed']
+      }
+    }
+    const weekly = rf.weekly.map(f => ({
+      ...f,
+      details: virtuesData.recurring[f.id as keyof typeof virtuesData.recurring]
+    }))
+
+    return { ...rf, annual, monthly, weekly }
+  }, [])
 
   // Get events for a specific Hijri date
   const getEventsForDate = useMemo(() => {
@@ -58,6 +93,7 @@ export function useIslamicEvents() {
           isFastingDay: true,
           fastingType: event.type === 'recommended' ? 'recommended' : 'sunnah',
           description: event.description,
+          details: event.details,
           isRecurring: true
         })
       })
@@ -185,15 +221,15 @@ export function useIslamicEvents() {
 
   // Get all events for a specific day including recurring
   const getAllEventsForDay = useMemo(() => {
-    return (hijriMonth: number, hijriDay: number, gregorianDate?: Date): { name: string; type: string; isRecurring: boolean }[] => {
-      const result: { name: string; type: string; isRecurring: boolean }[] = []
+    return (hijriMonth: number, hijriDay: number, gregorianDate?: Date): { name: string; type: string; isRecurring: boolean; details?: string }[] => {
+      const result: { name: string; type: string; isRecurring: boolean; details?: string }[] = []
 
       // Add fixed events
       const fixedEvents = events.filter(e => e.hijriMonth === hijriMonth && e.hijriDay === hijriDay)
       let isFastingForbidden = false
 
       for (const event of fixedEvents) {
-        result.push({ name: event.name, type: event.type, isRecurring: false })
+        result.push({ name: event.name, type: event.type, isRecurring: false, details: event.details })
         if (event.fastingForbidden) {
           isFastingForbidden = true
         }
@@ -203,7 +239,12 @@ export function useIslamicEvents() {
       if (!isFastingForbidden) {
         // Add Ayyam al-Beed (13, 14, 15 of each month)
         if ([13, 14, 15].includes(hijriDay)) {
-          result.push({ name: 'Ayyam al-Beed', type: 'sunnah', isRecurring: true })
+          result.push({
+            name: 'Ayyam al-Beed',
+            type: 'sunnah',
+            isRecurring: true,
+            details: virtuesData.recurring['ayyam-al-beed']
+          })
         }
 
         // Add fixed annual recurring events
@@ -223,7 +264,8 @@ export function useIslamicEvents() {
             result.push({
               name: event.name,
               type: event.type,
-              isRecurring: true
+              isRecurring: true,
+              details: (event as any).details
             })
           }
         }
@@ -232,10 +274,20 @@ export function useIslamicEvents() {
         if (gregorianDate) {
           const dayOfWeek = gregorianDate.getDay()
           if (dayOfWeek === 1) {
-            result.push({ name: 'Monday Fast', type: 'sunnah', isRecurring: true })
+            result.push({
+              name: 'Monday Fast',
+              type: 'sunnah',
+              isRecurring: true,
+              details: virtuesData.recurring['monday-fast']
+            })
           }
           if (dayOfWeek === 4) {
-            result.push({ name: 'Thursday Fast', type: 'sunnah', isRecurring: true })
+            result.push({
+              name: 'Thursday Fast',
+              type: 'sunnah',
+              isRecurring: true,
+              details: virtuesData.recurring['thursday-fast']
+            })
           }
         }
       }

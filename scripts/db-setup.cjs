@@ -4,6 +4,7 @@ const fs = require('fs');
 
 const DB_PATH = path.join(__dirname, '..', 'data', 'prayer-times.db');
 const DATA_DIR = path.join(__dirname, '..', 'src', 'data');
+const virtuesData = require(path.join(DATA_DIR, 'virtues.json'));
 
 // Ensure data directory exists
 if (!fs.existsSync(path.join(__dirname, '..', 'data'))) {
@@ -13,18 +14,20 @@ if (!fs.existsSync(path.join(__dirname, '..', 'data'))) {
 const db = new Database(DB_PATH);
 
 // Enable foreign keys
-db.pragma('foreign_keys = ON');
+db.pragma('foreign_keys = OFF');
 
 console.log('Setting up database schema...\n');
 
 // Create tables
 db.exec(`
   -- Master table for the 12 Hijri months (index/reference)
+  DROP TABLE IF EXISTS hijri_months_master;
   CREATE TABLE IF NOT EXISTS hijri_months_master (
     id INTEGER PRIMARY KEY,
     name TEXT NOT NULL UNIQUE,
     name_arabic TEXT NOT NULL,
-    meaning TEXT
+    meaning TEXT,
+    details TEXT
   );
 
   -- Hijri calendar entries (references master months)
@@ -65,6 +68,7 @@ db.exec(`
   );
 
   -- Islamic events
+  DROP TABLE IF EXISTS islamic_events;
   CREATE TABLE IF NOT EXISTS islamic_events (
     id TEXT PRIMARY KEY,
     name TEXT NOT NULL,
@@ -76,27 +80,32 @@ db.exec(`
     fasting_type TEXT CHECK(fasting_type IN ('obligatory', 'recommended', 'sunnah')),
     fasting_forbidden INTEGER DEFAULT 0,
     description TEXT,
+    details TEXT,
     FOREIGN KEY (hijri_month_id) REFERENCES hijri_months_master(id)
   );
 
   -- Recurring fasts (weekly)
+  DROP TABLE IF EXISTS recurring_fasts_weekly;
   CREATE TABLE IF NOT EXISTS recurring_fasts_weekly (
     id TEXT PRIMARY KEY,
     name TEXT NOT NULL,
     name_arabic TEXT NOT NULL,
     day_of_week INTEGER NOT NULL CHECK(day_of_week >= 0 AND day_of_week <= 6),
     type TEXT NOT NULL,
-    description TEXT
+    description TEXT,
+    details TEXT
   );
 
   -- Recurring fasts (monthly)
+  DROP TABLE IF EXISTS recurring_fasts_monthly;
   CREATE TABLE IF NOT EXISTS recurring_fasts_monthly (
     id TEXT PRIMARY KEY,
     name TEXT NOT NULL,
     name_arabic TEXT NOT NULL,
     days TEXT NOT NULL, -- JSON array of days
     type TEXT NOT NULL,
-    description TEXT
+    description TEXT,
+    details TEXT
   );
 
   -- Recurring fasts (annual)
@@ -112,6 +121,7 @@ db.exec(`
     type TEXT NOT NULL,
     description TEXT,
     timing TEXT DEFAULT 'fixed',
+    details TEXT,
     FOREIGN KEY (hijri_month_id) REFERENCES hijri_months_master(id)
   );
 
@@ -141,12 +151,14 @@ const hijriMonths = [
 ];
 
 const insertMonth = db.prepare(`
-  INSERT OR REPLACE INTO hijri_months_master (id, name, name_arabic, meaning)
-  VALUES (?, ?, ?, ?)
+  INSERT OR REPLACE INTO hijri_months_master (id, name, name_arabic, meaning, details)
+  VALUES (?, ?, ?, ?, ?)
 `);
 
 for (const month of hijriMonths) {
-  insertMonth.run(month.id, month.name, month.name_arabic, month.meaning);
+  // Lookup details from virtuesData
+  const details = virtuesData.months[month.id] || null;
+  insertMonth.run(month.id, month.name, month.name_arabic, month.meaning, details);
 }
 console.log('Inserted 12 Hijri months into master table.\n');
 
@@ -248,8 +260,8 @@ const eventsPath = path.join(DATA_DIR, 'islamicEvents.json');
 const eventsData = JSON.parse(fs.readFileSync(eventsPath, 'utf8'));
 
 const insertEvent = db.prepare(`
-  INSERT OR REPLACE INTO islamic_events (id, name, name_arabic, hijri_month_id, hijri_day, type, is_fasting_day, fasting_type, fasting_forbidden, description)
-  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  INSERT OR REPLACE INTO islamic_events (id, name, name_arabic, hijri_month_id, hijri_day, type, is_fasting_day, fasting_type, fasting_forbidden, description, details)
+  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 `);
 
 for (const event of eventsData.events) {
@@ -263,24 +275,25 @@ for (const event of eventsData.events) {
     event.isFastingDay ? 1 : 0,
     event.fastingType || null,
     event.fastingForbidden ? 1 : 0,
-    event.description
+    event.description,
+    virtuesData.events[event.id] || null
   );
 }
 console.log(`Migrated ${eventsData.events.length} Islamic events.\n`);
 
 // Migrate recurring fasts
 const insertWeeklyFast = db.prepare(`
-  INSERT OR REPLACE INTO recurring_fasts_weekly (id, name, name_arabic, day_of_week, type, description)
-  VALUES (?, ?, ?, ?, ?, ?)
+  INSERT OR REPLACE INTO recurring_fasts_weekly (id, name, name_arabic, day_of_week, type, description, details)
+  VALUES (?, ?, ?, ?, ?, ?, ?)
 `);
 
 for (const fast of eventsData.recurringFasts.weekly) {
-  insertWeeklyFast.run(fast.id, fast.name, fast.nameArabic, fast.dayOfWeek, fast.type, fast.description);
+  insertWeeklyFast.run(fast.id, fast.name, fast.nameArabic, fast.dayOfWeek, fast.type, fast.description, virtuesData.recurring[fast.id] || null);
 }
 
 const insertMonthlyFast = db.prepare(`
-  INSERT OR REPLACE INTO recurring_fasts_monthly (id, name, name_arabic, days, type, description)
-  VALUES (?, ?, ?, ?, ?, ?)
+  INSERT OR REPLACE INTO recurring_fasts_monthly (id, name, name_arabic, days, type, description, details)
+  VALUES (?, ?, ?, ?, ?, ?, ?)
 `);
 
 const ayyamAlBeed = eventsData.recurringFasts.monthly.ayyamAlBeed;
@@ -290,13 +303,13 @@ insertMonthlyFast.run(
   ayyamAlBeed.nameArabic,
   JSON.stringify(ayyamAlBeed.days),
   ayyamAlBeed.type,
-  ayyamAlBeed.description
+  ayyamAlBeed.description,
+  virtuesData.recurring['ayyam-al-beed'] || null
 );
 
 const insertAnnualFast = db.prepare(`
-  INSERT OR REPLACE INTO recurring_fasts_annual (id, name, name_arabic, hijri_month_id, start_day, end_day, duration, type, description, timing)
-  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-
+  INSERT OR REPLACE INTO recurring_fasts_annual (id, name, name_arabic, hijri_month_id, start_day, end_day, duration, type, description, timing, details)
+  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 `);
 
 for (const fast of eventsData.recurringFasts.annual) {
@@ -310,7 +323,8 @@ for (const fast of eventsData.recurringFasts.annual) {
     fast.duration || null,
     fast.type,
     fast.description,
-    fast.timing || 'fixed'
+    fast.timing || 'fixed',
+    virtuesData.recurring[fast.id] || null
   );
 }
 console.log('Migrated recurring fasts.\n');

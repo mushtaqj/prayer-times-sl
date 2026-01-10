@@ -1,4 +1,5 @@
-import { Moon, Sun, MapPin, Loader2, Clock, Calendar } from 'lucide-react'
+import { useState } from 'react'
+import { Moon, Sun, MapPin, Loader2, Clock, Calendar, HelpCircle } from 'lucide-react'
 import {
   Select,
   SelectContent,
@@ -7,6 +8,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
+import { AppInfoModal } from './AppInfoModal'
 import { useLocation } from '@/hooks/useLocation'
 import type { District } from '@/hooks/usePrayerTimes'
 
@@ -32,6 +34,7 @@ export function Header({
   onSectionChange,
 }: HeaderProps) {
   const { detectLocation, isDetecting } = useLocation()
+  const [showInfo, setShowInfo] = useState(false)
 
   const handleDetectLocation = async () => {
     const district = await detectLocation()
@@ -41,31 +44,41 @@ export function Header({
   }
 
   return (
-    <header className="border-b border-border bg-background/80 backdrop-blur-md sticky top-0 z-20">
+    <header className="border-b border-border bg-background/80 backdrop-blur-xl sticky top-0 z-20 supports-[backdrop-filter]:bg-background/60">
       {/* Top row: Section toggle + controls */}
       <div className="flex items-center justify-between gap-3 px-4 py-3">
+
+        {/* Branding & Title */}
+        <div className="flex items-center gap-2">
+          <div className="bg-primary/10 p-2 rounded-lg hidden sm:block">
+            <Moon className="w-5 h-5 text-primary" />
+          </div>
+          <div className="flex flex-col">
+            <h1 className="text-base font-bold leading-none tracking-tight">Prayer Times</h1>
+            <span className="text-[10px] text-muted-foreground font-medium">Sri Lanka • ACJU</span>
+          </div>
+        </div>
+
         {/* Section Toggle - Compact segmented control */}
-        <div className="flex items-center bg-muted rounded-lg p-0.5">
+        <div className="flex items-center bg-muted/50 rounded-lg p-1 border border-border/50">
           <button
             onClick={() => onSectionChange('prayer')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
-              mainSection === 'prayer'
-                ? 'bg-background text-foreground shadow-sm'
-                : 'text-muted-foreground hover:text-foreground'
-            }`}
+            className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-medium transition-all ${mainSection === 'prayer'
+              ? 'bg-background text-foreground shadow-sm ring-1 ring-black/5 dark:ring-white/10'
+              : 'text-muted-foreground hover:text-foreground'
+              }`}
           >
-            <Clock className="w-4 h-4" />
+            <Clock className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Prayer</span>
           </button>
           <button
             onClick={() => onSectionChange('hijri')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
-              mainSection === 'hijri'
-                ? 'bg-background text-foreground shadow-sm'
-                : 'text-muted-foreground hover:text-foreground'
-            }`}
+            className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-medium transition-all ${mainSection === 'hijri'
+              ? 'bg-background text-foreground shadow-sm ring-1 ring-black/5 dark:ring-white/10'
+              : 'text-muted-foreground hover:text-foreground'
+              }`}
           >
-            <Calendar className="w-4 h-4" />
+            <Calendar className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Hijri</span>
           </button>
         </div>
@@ -108,8 +121,20 @@ export function Header({
           >
             {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </Button>
+
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setShowInfo(true)}
+            className="h-8 w-8 text-indigo-500 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-950/30 transition-colors"
+            title="App Info & Sources"
+          >
+            <HelpCircle className="w-4 h-4" />
+          </Button>
         </div>
       </div>
+
+      <AppInfoModal isOpen={showInfo} onClose={() => setShowInfo(false)} />
     </header>
   )
 }
