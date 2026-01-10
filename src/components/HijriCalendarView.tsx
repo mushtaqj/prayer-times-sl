@@ -182,23 +182,28 @@ export function HijriCalendarView({ location }: HijriCalendarViewProps) {
 
   let headerBorderColor = 'border-border/50'
   let headerBgColor = 'bg-card/40'
-  let monthTypeBadge = null
+  // Special Month Banner Configuration
+  let specialMonthBanner = null
 
   if (isRamadan) {
     headerBorderColor = 'border-amber-500/30'
     headerBgColor = 'bg-amber-500/5'
-    monthTypeBadge = (
-      <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 mb-1 gap-1">
-        <Star className="w-3 h-3 fill-current" /> Blessed Month
-      </span>
+    specialMonthBanner = (
+      <div className="w-full bg-amber-500/10 border-b border-amber-500/20 py-1.5 px-4 flex items-center justify-center gap-2 text-xs font-semibold text-amber-600 dark:text-amber-400">
+        <Star className="w-3.5 h-3.5 fill-current" />
+        <span>BLESSED MONTH OF RAMADAN</span>
+        <Star className="w-3.5 h-3.5 fill-current" />
+      </div>
     )
   } else if (isSacredMonth) {
     headerBorderColor = 'border-emerald-500/30'
     headerBgColor = 'bg-emerald-500/5'
-    monthTypeBadge = (
-      <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 mb-1 gap-1">
-        <Sparkles className="w-3 h-3" /> Sacred Month
-      </span>
+    specialMonthBanner = (
+      <div className="w-full bg-emerald-500/10 border-b border-emerald-500/20 py-1.5 px-4 flex items-center justify-center gap-2 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+        <Sparkles className="w-3.5 h-3.5" />
+        <span>SACRED MONTH</span>
+        <Sparkles className="w-3.5 h-3.5" />
+      </div>
     )
   }
 
@@ -237,11 +242,24 @@ export function HijriCalendarView({ location }: HijriCalendarViewProps) {
         {/* Calendar Header Card */}
         <Card className={`${headerBorderColor} ${headerBgColor} backdrop-blur-sm shadow-sm overflow-hidden border`}>
           <CardContent className="p-0">
+            {/* Special Month Banner */}
+            {specialMonthBanner}
+
             {/* Month Navigation */}
-            <div className={`flex items-center justify-between p-4 border-b border-border/50 ${isCurrentMonth
-              ? 'bg-primary/15 ring-2 ring-primary/30 ring-inset'
+            <div className={`flex items-center justify-between p-4 border-b border-border/50 relative ${isCurrentMonth
+              ? 'bg-primary/5'
               : 'bg-transparent'
               }`}>
+
+              {/* Current Month Ribbon */}
+              {isCurrentMonth && (
+                <div className="absolute top-0 right-0 overflow-hidden w-24 h-24 pointer-events-none">
+                  <div className="absolute top-0 right-0 bg-primary text-primary-foreground text-[9px] font-bold px-8 py-1 transform rotate-45 translate-x-8 translate-y-3 shadow-sm uppercase tracking-wider">
+                    Current
+                  </div>
+                </div>
+              )}
+
               <Button
                 variant="ghost"
                 size="icon"
@@ -253,12 +271,6 @@ export function HijriCalendarView({ location }: HijriCalendarViewProps) {
               </Button>
 
               <div className="text-center flex-1 flex flex-col items-center">
-                {monthTypeBadge}
-                {isCurrentMonth && !monthTypeBadge && (
-                  <span className="text-[10px] uppercase tracking-widest text-primary font-semibold mb-1">
-                    Current Month
-                  </span>
-                )}
                 <h2 className={`text-xl font-bold ${isCurrentMonth ? 'text-primary' : 'text-foreground'}`}>
                   {currentMonthData.monthName} {currentHijriYear}
                 </h2>
