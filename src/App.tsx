@@ -179,8 +179,8 @@ function App() {
             </div>
           )}
 
-          {/* Footer */}
-          <footer className="text-center text-sm text-muted-foreground py-6 border-t border-border/50 bg-card/30">
+          {/* Footer - hidden on mobile */}
+          <footer className="hidden sm:block text-center text-sm text-muted-foreground py-6 border-t border-border/50 bg-card/30">
             <p>Prayer times for {locationName} District</p>
             <p className="mt-1 font-heading text-primary/80">Sri Lanka</p>
           </footer>
