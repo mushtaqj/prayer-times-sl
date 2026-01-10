@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "source": "ACJU Sri Lanka / SQLite Database / SLHub",
-    "description": "Historical Hijri calendar data based on moon sighting in Sri Lanka",
+    "source": "ACJU Sri Lanka (All Ceylon Jamiyyathul Ulama)",
+    "description": "Historical Hijri calendar data based on official moon sighting in Sri Lanka",
     "lastUpdated": "2026-01-10",
     "dataRange": {
       "from": {
@@ -13,7 +13,7 @@
         "gregorianYear": 2026
       }
     },
-    "note": "1445 data compiled from SLHub calendars and calculated values. Months 3-9 of 1445 are estimates based on known start/end dates."
+    "note": "Data from 1424-1444 from ACJU SQLite database. Data for 1445 from official ACJU Twitter calendar images. Data for 1446-1447 from ACJU API."
   },
   "months": [
     {
@@ -1806,28 +1806,28 @@
       "hijriMonth": 4,
       "monthName": "Rabi al-Thani",
       "gregorianStart": "2023-10-17",
-      "days": 29
+      "days": 30
     },
     {
       "hijriYear": 1445,
       "hijriMonth": 5,
       "monthName": "Jumada al-Awwal",
-      "gregorianStart": "2023-11-15",
+      "gregorianStart": "2023-11-16",
       "days": 30
     },
     {
       "hijriYear": 1445,
       "hijriMonth": 6,
       "monthName": "Jumada al-Akhirah",
-      "gregorianStart": "2023-12-15",
+      "gregorianStart": "2023-12-16",
       "days": 29
     },
     {
       "hijriYear": 1445,
       "hijriMonth": 7,
       "monthName": "Rajab",
-      "gregorianStart": "2024-01-13",
-      "days": 30
+      "gregorianStart": "2024-01-14",
+      "days": 29
     },
     {
       "hijriYear": 1445,
@@ -1855,14 +1855,14 @@
       "hijriMonth": 11,
       "monthName": "Dhul Qadah",
       "gregorianStart": "2024-05-10",
-      "days": 30
+      "days": 29
     },
     {
       "hijriYear": 1445,
       "hijriMonth": 12,
       "monthName": "Dhul Hijjah",
-      "gregorianStart": "2024-06-09",
-      "days": 29
+      "gregorianStart": "2024-06-08",
+      "days": 30
     },
     {
       "hijriYear": 1446,
