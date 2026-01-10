@@ -122,7 +122,7 @@ export function HijriCalendarView({ location }: HijriCalendarViewProps) {
     availableYears,
   } = useHijriCalendar()
 
-  const { getEventsForMonth, getAllEventsForDay, isFastingDay, getMonthName } = useIslamicEvents()
+  const { getEventsForMonth, getAllEventsForDay, isFastingDay, getMonthName, recurringFasts } = useIslamicEvents()
 
   const monthEvents = useMemo(() => {
     return getEventsForMonth(currentHijriMonth)
@@ -276,12 +276,13 @@ export function HijriCalendarView({ location }: HijriCalendarViewProps) {
               <div className="text-center flex-1 flex flex-col items-center">
                 <h2 className={`text-xl font-bold ${isCurrentMonth ? 'text-primary' : 'text-foreground'} flex items-center justify-center gap-2`}>
                   {currentMonthData.monthName} {currentHijriYear}
-                  {(currentMonthData as any).details && (
+                  {monthInfo?.details && (
                     <Button
                       variant="ghost"
                       size="icon"
                       className="h-7 w-7 rounded-full hover:bg-primary/10 text-primary/90 ml-2"
-                      onClick={() => setVirtueSheet({ title: currentMonthData.monthName, content: (currentMonthData as any).details })}
+                      onClick={() => setVirtueSheet({ title: currentMonthData.monthName, content: monthInfo.details! })}
+                      title="Learn about this month"
                     >
                       <BookOpen className="h-4 w-4" />
                     </Button>
@@ -638,7 +639,18 @@ export function HijriCalendarView({ location }: HijriCalendarViewProps) {
                   <span className={`text-sm font-bold mt-1 ${EVENT_STYLES.ayyamAlBeed.text}`}>13-15</span>
                 </div>
                 <div className="flex-1">
-                  <p className="font-medium text-sm text-foreground">Ayyam al-Beed (White Days)</p>
+                  <p className="font-medium text-sm text-foreground flex items-center gap-2">
+                    Ayyam al-Beed (White Days)
+                    {recurringFasts.monthly.ayyamAlBeed.details && (
+                      <button
+                        onClick={() => setVirtueSheet({ title: 'Ayyam al-Beed', content: recurringFasts.monthly.ayyamAlBeed.details! })}
+                        className="inline-flex items-center justify-center text-primary/80 hover:text-primary transition-colors"
+                        title="Learn about White Days"
+                      >
+                        <Info className="w-4 h-4" />
+                      </button>
+                    )}
+                  </p>
                   <p className="text-xs text-muted-foreground">ايام البيض</p>
                   <p className="text-xs text-muted-foreground/80 mt-0.5">Sunnah fasting on the 13th, 14th, and 15th of every Hijri month</p>
                 </div>
@@ -646,6 +658,37 @@ export function HijriCalendarView({ location }: HijriCalendarViewProps) {
                   Sunnah
                 </span>
               </div>
+
+              {/* Weekly Fasts - Monday & Thursday */}
+              {recurringFasts.weekly.map((fast) => (
+                <div key={fast.id} className="flex items-start gap-3 p-2 rounded-lg bg-sky-500/10 border border-sky-500/20">
+                  <div className="text-center min-w-[40px] flex flex-col items-center justify-center pt-1">
+                    <Moon className="w-5 h-5 text-sky-600 dark:text-sky-400" />
+                    <span className="text-sm font-bold mt-1 text-sky-600 dark:text-sky-400">
+                      {fast.dayOfWeek === 1 ? 'Mon' : 'Thu'}
+                    </span>
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-medium text-sm text-foreground flex items-center gap-2">
+                      {fast.name}
+                      {fast.details && (
+                        <button
+                          onClick={() => setVirtueSheet({ title: fast.name, content: fast.details! })}
+                          className="inline-flex items-center justify-center text-primary/80 hover:text-primary transition-colors"
+                          title={`Learn about ${fast.name}`}
+                        >
+                          <Info className="w-4 h-4" />
+                        </button>
+                      )}
+                    </p>
+                    <p className="text-xs text-muted-foreground">{fast.nameArabic}</p>
+                    <p className="text-xs text-muted-foreground/80 mt-0.5">{fast.description}</p>
+                  </div>
+                  <span className="text-[10px] px-1.5 py-0.5 rounded font-medium bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-current/10">
+                    Sunnah
+                  </span>
+                </div>
+              ))}
 
               {monthEvents.length === 0 && (
                 <p className="text-sm text-muted-foreground text-center py-2">
