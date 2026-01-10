@@ -220,7 +220,8 @@
         "startDay": 2,
         "duration": 6,
         "type": "sunnah",
-        "description": "Six voluntary fasts after Eid al-Fitr"
+        "description": "Six voluntary fasts after Eid al-Fitr",
+        "timing": "flexible"
       },
       {
         "id": "dhul-hijjah-first-nine",
@@ -230,7 +231,8 @@
         "startDay": 1,
         "endDay": 9,
         "type": "recommended",
-        "description": "Highly recommended fasts, especially Day of Arafah"
+        "description": "Highly recommended fasts, especially Day of Arafah",
+        "timing": "fixed"
       }
     ]
   },

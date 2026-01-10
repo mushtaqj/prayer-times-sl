@@ -100,6 +100,7 @@ db.exec(`
   );
 
   -- Recurring fasts (annual)
+  DROP TABLE IF EXISTS recurring_fasts_annual;
   CREATE TABLE IF NOT EXISTS recurring_fasts_annual (
     id TEXT PRIMARY KEY,
     name TEXT NOT NULL,
@@ -110,6 +111,7 @@ db.exec(`
     duration INTEGER,
     type TEXT NOT NULL,
     description TEXT,
+    timing TEXT DEFAULT 'fixed',
     FOREIGN KEY (hijri_month_id) REFERENCES hijri_months_master(id)
   );
 
@@ -292,8 +294,9 @@ insertMonthlyFast.run(
 );
 
 const insertAnnualFast = db.prepare(`
-  INSERT OR REPLACE INTO recurring_fasts_annual (id, name, name_arabic, hijri_month_id, start_day, end_day, duration, type, description)
-  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+  INSERT OR REPLACE INTO recurring_fasts_annual (id, name, name_arabic, hijri_month_id, start_day, end_day, duration, type, description, timing)
+  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
 `);
 
 for (const fast of eventsData.recurringFasts.annual) {
@@ -306,7 +309,8 @@ for (const fast of eventsData.recurringFasts.annual) {
     fast.endDay || null,
     fast.duration || null,
     fast.type,
-    fast.description
+    fast.description,
+    fast.timing || 'fixed'
   );
 }
 console.log('Migrated recurring fasts.\n');

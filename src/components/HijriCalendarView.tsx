@@ -239,8 +239,8 @@ export function HijriCalendarView({ location }: HijriCalendarViewProps) {
           <CardContent className="p-0">
             {/* Month Navigation */}
             <div className={`flex items-center justify-between p-4 border-b border-border/50 ${isCurrentMonth
-                ? 'bg-primary/15 ring-2 ring-primary/30 ring-inset'
-                : 'bg-transparent'
+              ? 'bg-primary/15 ring-2 ring-primary/30 ring-inset'
+              : 'bg-transparent'
               }`}>
               <Button
                 variant="ghost"
@@ -419,6 +419,8 @@ export function HijriCalendarView({ location }: HijriCalendarViewProps) {
                   if (dayEvents.some(e => e.type === 'holy')) return 'holy'
                   // Ayyam al-Beed check - prioritized
                   if (dayEvents.some(e => e.isRecurring && e.name === 'Ayyam al-Beed')) return 'ayyamAlBeed'
+                  // Fixed Recurring Events (e.g. Dhul Hijjah)
+                  if (dayEvents.some(e => e.type === 'recommended')) return 'recommended'
                   return null
                 }
                 const primaryEventType = getPrimaryEventType()
@@ -570,7 +572,9 @@ export function HijriCalendarView({ location }: HijriCalendarViewProps) {
                   >
                     <div className="text-center min-w-[40px] flex flex-col items-center justify-center pt-1">
                       <style.icon className={`w-5 h-5 ${style.text}`} />
-                      <span className={`text-sm font-bold mt-1 ${style.text}`}>{event.hijriDay}</span>
+                      <span className={`text-sm font-bold mt-1 ${style.text}`}>
+                        {event.hijriDay === 0 ? (event.name.includes('Days') ? '1-9' : 'All') : event.hijriDay}
+                      </span>
                     </div>
                     <div className="flex-1">
                       <p className="font-medium text-sm text-foreground">{event.name}</p>
