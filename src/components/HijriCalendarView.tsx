@@ -27,6 +27,45 @@ import {
 
 const WEEKDAYS = ['Sat', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri']
 
+// Event type styling configuration
+const EVENT_STYLES = {
+  eid: {
+    bg: 'bg-green-500/15',
+    indicator: 'bg-green-500',
+    text: 'text-green-700 dark:text-green-400',
+    emoji: '🎉',
+    label: 'Eid',
+  },
+  holy: {
+    bg: 'bg-purple-500/15',
+    indicator: 'bg-purple-500',
+    text: 'text-purple-700 dark:text-purple-400',
+    emoji: '⭐',
+    label: 'Holy',
+  },
+  fast: {
+    bg: 'bg-amber-500/15',
+    indicator: 'bg-amber-500',
+    text: 'text-amber-700 dark:text-amber-400',
+    emoji: '🌙',
+    label: 'Fast',
+  },
+  sunnah: {
+    bg: 'bg-sky-500/10',
+    indicator: 'bg-sky-400',
+    text: 'text-sky-700 dark:text-sky-400',
+    emoji: '🤲',
+    label: 'Sunnah',
+  },
+  recommended: {
+    bg: 'bg-indigo-500/10',
+    indicator: 'bg-indigo-400',
+    text: 'text-indigo-700 dark:text-indigo-400',
+    emoji: '💎',
+    label: 'Recommended',
+  },
+} as const
+
 const HIJRI_MONTH_NAMES = [
   'Muharram', 'Safar', 'Rabi al-Awwal', 'Rabi al-Thani',
   'Jumada al-Awwal', 'Jumada al-Akhirah', 'Rajab', 'Shaban',
@@ -42,8 +81,6 @@ export function HijriCalendarView({ location }: HijriCalendarViewProps) {
   const [jumpMode, setJumpMode] = useState<'hijri' | 'gregorian'>('hijri')
   const [selectedHijriMonth, setSelectedHijriMonth] = useState<string>('')
   const [selectedHijriYear, setSelectedHijriYear] = useState<string>('')
-  const [selectedGregorianMonth, setSelectedGregorianMonth] = useState<string>('')
-  const [selectedGregorianYear, setSelectedGregorianYear] = useState<string>('')
 
   const {
     currentMonthData,
@@ -60,7 +97,7 @@ export function HijriCalendarView({ location }: HijriCalendarViewProps) {
     availableYears,
   } = useHijriCalendar()
 
-  const { getEventsForMonth, hasEvent, getAllEventsForDay, isFastingDay, getMonthName } = useIslamicEvents()
+  const { getEventsForMonth, getAllEventsForDay, isFastingDay, getMonthName } = useIslamicEvents()
 
   const monthEvents = useMemo(() => {
     return getEventsForMonth(currentHijriMonth)
@@ -288,7 +325,6 @@ export function HijriCalendarView({ location }: HijriCalendarViewProps) {
               }
 
               const moonPhase = getMoonPhase(day.hijriDay)
-              const dayHasEvent = hasEvent(currentHijriMonth, day.hijriDay)
               const dayEvents = getAllEventsForDay(currentHijriMonth, day.hijriDay, day.gregorianDate)
               const fastingInfo = isFastingDay({
                 day: day.hijriDay,
@@ -301,25 +337,44 @@ export function HijriCalendarView({ location }: HijriCalendarViewProps) {
               const isAyyamAlBeed = [13, 14, 15].includes(day.hijriDay)
               const showMoon = day.hijriDay === 1 || day.hijriDay === 15 || day.hijriDay === 29
 
+              // Determine primary event type for styling (priority: eid > holy > fast > recommended > sunnah)
+              const getPrimaryEventType = (): keyof typeof EVENT_STYLES | null => {
+                if (dayEvents.some(e => e.type === 'eid')) return 'eid'
+                if (dayEvents.some(e => e.type === 'holy')) return 'holy'
+                if (fastingInfo.isFasting && fastingInfo.type === 'obligatory') return 'fast'
+                if (dayEvents.some(e => e.type === 'recommended')) return 'recommended'
+                if (isAyyamAlBeed || dayEvents.some(e => e.type === 'sunnah')) return 'sunnah'
+                return null
+              }
+              const primaryEventType = getPrimaryEventType()
+              const eventStyle = primaryEventType ? EVENT_STYLES[primaryEventType] : null
+
               // Determine cell background
               let cellBg = 'bg-background'
+              let textColor = 'text-foreground'
               if (day.isToday) {
                 cellBg = 'bg-primary/15'
-              } else if (isAyyamAlBeed) {
-                cellBg = 'bg-sky-500/10'
-              } else if (dayHasEvent && !isAyyamAlBeed) {
-                cellBg = 'bg-emerald-500/10'
+                textColor = 'text-primary'
+              } else if (eventStyle) {
+                cellBg = eventStyle.bg
+                textColor = eventStyle.text
               } else if (isFriday) {
                 cellBg = 'bg-primary/5'
+                textColor = 'text-primary'
               }
 
               // Build tooltip content
               const tooltipLines: string[] = []
               if (dayEvents.length > 0) {
-                dayEvents.forEach(e => tooltipLines.push(e.name))
+                dayEvents.forEach(e => {
+                  const style = EVENT_STYLES[e.type as keyof typeof EVENT_STYLES]
+                  const emoji = style?.emoji || ''
+                  tooltipLines.push(`${emoji} ${e.name}`)
+                })
               }
-              if (fastingInfo.isFasting && fastingInfo.reason) {
-                tooltipLines.push(`Fasting: ${fastingInfo.reason}`)
+              if (fastingInfo.isFasting && fastingInfo.reason && !tooltipLines.some(l => l.includes(fastingInfo.reason!))) {
+                const fastEmoji = fastingInfo.type === 'obligatory' ? '🌙' : '🤲'
+                tooltipLines.push(`${fastEmoji} Fasting: ${fastingInfo.reason}`)
               }
               const hasTooltip = tooltipLines.length > 0
 
@@ -330,27 +385,30 @@ export function HijriCalendarView({ location }: HijriCalendarViewProps) {
                   }`}
                 >
                   {/* Moon Phase - Only on key days */}
-                  {showMoon && (
+                  {showMoon && !eventStyle && (
                     <span className="absolute top-0.5 right-0.5 text-base">
                       {moonPhase.icon}
                     </span>
                   )}
 
-                  {/* Event indicator - Top left corner */}
-                  {dayHasEvent && (
-                    <span className="absolute top-1 left-1 w-2 h-2 rounded-full bg-emerald-500 shadow-sm" />
+                  {/* Event emoji - Top left corner */}
+                  {eventStyle && (
+                    <span className="absolute top-0.5 left-0.5 text-sm">
+                      {eventStyle.emoji}
+                    </span>
+                  )}
+
+                  {/* Event indicator dot - Top right (when there's an emoji and moon) */}
+                  {showMoon && eventStyle && (
+                    <span className="absolute top-0.5 right-0.5 text-base">
+                      {moonPhase.icon}
+                    </span>
                   )}
 
                   {/* Hijri Day Number - PROMINENT */}
                   <span
                     className={`text-xl font-bold leading-none ${
-                      day.isToday
-                        ? 'text-primary'
-                        : isFriday
-                        ? 'text-primary'
-                        : dayHasEvent
-                        ? 'text-emerald-700 dark:text-emerald-400'
-                        : 'text-foreground'
+                      day.isToday ? 'text-primary' : textColor
                     }`}
                   >
                     {day.hijriDay}
@@ -425,40 +483,41 @@ export function HijriCalendarView({ location }: HijriCalendarViewProps) {
           </h3>
           <div className="space-y-2">
             {/* Fixed Events */}
-            {monthEvents.map((event) => (
-              <div
-                key={event.id}
-                className="flex items-start gap-3 p-2 rounded-lg bg-muted/30"
-              >
-                <div className="text-center min-w-[40px]">
-                  <span className="text-lg font-bold text-primary">{event.hijriDay}</span>
-                </div>
-                <div className="flex-1">
-                  <p className="font-medium text-sm text-foreground">{event.name}</p>
-                  <p className="text-xs text-muted-foreground">{event.nameArabic}</p>
-                  <p className="text-xs text-muted-foreground/80 mt-0.5">{event.description}</p>
-                  {event.isFastingDay && (
-                    <span className="inline-flex items-center gap-1 text-[10px] text-amber-600 dark:text-amber-400 mt-1">
-                      <span className="w-1 h-1 rounded-full bg-amber-500"></span>
-                      {event.fastingType === 'obligatory' ? 'Obligatory Fast' : 'Recommended Fast'}
-                    </span>
-                  )}
-                </div>
-                <span
-                  className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${
-                    event.type === 'eid'
-                      ? 'bg-green-500/20 text-green-600 dark:text-green-400'
-                      : 'bg-blue-500/20 text-blue-600 dark:text-blue-400'
-                  }`}
+            {monthEvents.map((event) => {
+              const style = EVENT_STYLES[event.type as keyof typeof EVENT_STYLES] || EVENT_STYLES.holy
+              return (
+                <div
+                  key={event.id}
+                  className={`flex items-start gap-3 p-2 rounded-lg ${style.bg} border border-${style.indicator.replace('bg-', '')}/20`}
                 >
-                  {event.type === 'eid' ? 'Eid' : 'Holy'}
-                </span>
-              </div>
-            ))}
+                  <div className="text-center min-w-[40px] flex flex-col items-center">
+                    <span className="text-lg">{style.emoji}</span>
+                    <span className={`text-lg font-bold ${style.text}`}>{event.hijriDay}</span>
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-medium text-sm text-foreground">{event.name}</p>
+                    <p className="text-xs text-muted-foreground">{event.nameArabic}</p>
+                    <p className="text-xs text-muted-foreground/80 mt-0.5">{event.description}</p>
+                    {event.isFastingDay && (
+                      <span className="inline-flex items-center gap-1 text-[10px] text-amber-600 dark:text-amber-400 mt-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                        {event.fastingType === 'obligatory' ? 'Obligatory Fast' : 'Recommended Fast'}
+                      </span>
+                    )}
+                  </div>
+                  <span
+                    className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${style.bg} ${style.text}`}
+                  >
+                    {style.label}
+                  </span>
+                </div>
+              )
+            })}
 
             {/* Ayyam al-Beed (always shown) */}
             <div className="flex items-start gap-3 p-2 rounded-lg bg-sky-500/10 border border-sky-500/20">
-              <div className="text-center min-w-[40px]">
+              <div className="text-center min-w-[40px] flex flex-col items-center">
+                <span className="text-lg">{EVENT_STYLES.sunnah.emoji}</span>
                 <span className="text-sm font-bold text-sky-600 dark:text-sky-400">13-15</span>
               </div>
               <div className="flex-1">
@@ -488,48 +547,53 @@ export function HijriCalendarView({ location }: HijriCalendarViewProps) {
             <span className="text-sm font-medium text-foreground">Legend</span>
           </div>
           <div className="grid grid-cols-2 gap-3 text-sm">
-            {/* Background colors */}
+            {/* Event Types */}
             <div className="space-y-2">
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Backgrounds</p>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Event Types</p>
               <div className="flex items-center gap-2">
-                <span className="w-5 h-5 rounded border border-border bg-primary/15 ring-2 ring-primary"></span>
-                <span className="text-foreground">Today</span>
+                <span className="w-6 h-6 rounded border border-border bg-green-500/15 flex items-center justify-center text-sm">{EVENT_STYLES.eid.emoji}</span>
+                <span className="text-foreground">Eid</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="w-5 h-5 rounded border border-border bg-primary/5"></span>
-                <span className="text-foreground">Friday</span>
+                <span className="w-6 h-6 rounded border border-border bg-purple-500/15 flex items-center justify-center text-sm">{EVENT_STYLES.holy.emoji}</span>
+                <span className="text-foreground">Holy Day</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="w-5 h-5 rounded border border-border bg-emerald-500/10"></span>
-                <span className="text-foreground">Event Day</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-5 h-5 rounded border border-border bg-sky-500/10"></span>
-                <span className="text-foreground">Ayyam al-Beed</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-5 h-5 rounded bg-amber-500/10 ring-2 ring-dashed ring-amber-500 flex items-center justify-center text-[8px] font-bold text-amber-600">30?</span>
-                <span className="text-foreground">Day 30 Pending</span>
-              </div>
-            </div>
-            {/* Indicators */}
-            <div className="space-y-2">
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Indicators</p>
-              <div className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-emerald-500 shadow-sm"></span>
-                <span className="text-foreground">Event</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-amber-500 shadow-sm"></span>
+                <span className="w-6 h-6 rounded border border-border bg-amber-500/15 flex items-center justify-center text-sm">{EVENT_STYLES.fast.emoji}</span>
                 <span className="text-foreground">Obligatory Fast</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-sky-400 shadow-sm"></span>
+                <span className="w-6 h-6 rounded border border-border bg-sky-500/10 flex items-center justify-center text-sm">{EVENT_STYLES.sunnah.emoji}</span>
                 <span className="text-foreground">Sunnah Fast</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-6 h-6 rounded border border-border bg-indigo-500/10 flex items-center justify-center text-sm">{EVENT_STYLES.recommended.emoji}</span>
+                <span className="text-foreground">Recommended</span>
+              </div>
+            </div>
+            {/* Other Indicators */}
+            <div className="space-y-2">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Other</p>
+              <div className="flex items-center gap-2">
+                <span className="w-6 h-6 rounded border border-border bg-primary/15 ring-2 ring-primary flex items-center justify-center text-xs font-bold text-primary">1</span>
+                <span className="text-foreground">Today</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-6 h-6 rounded border border-border bg-primary/5 flex items-center justify-center text-xs font-bold text-primary">F</span>
+                <span className="text-foreground">Friday</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-6 h-6 rounded bg-amber-500/10 ring-2 ring-dashed ring-amber-500 flex items-center justify-center text-[8px] font-bold text-amber-600">30?</span>
+                <span className="text-foreground">Day 30 Pending</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-base">🌑 🌕</span>
                 <span className="text-foreground">Moon Phase</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-3 h-3 rounded-full bg-amber-500 shadow-sm"></span>
+                <span className="w-3 h-3 rounded-full bg-sky-400 shadow-sm"></span>
+                <span className="text-foreground">Fasting Dot</span>
               </div>
             </div>
           </div>
