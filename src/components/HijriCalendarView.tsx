@@ -338,12 +338,17 @@ export function HijriCalendarView({ location }: HijriCalendarViewProps) {
               const showMoon = day.hijriDay === 1 || day.hijriDay === 15 || day.hijriDay === 29
 
               // Determine primary event type for styling (priority: eid > holy > fast > recommended > sunnah)
+              // Note: Weekly sunnah fasts (Mon/Thu) only show fasting dot, not colored background
               const getPrimaryEventType = (): keyof typeof EVENT_STYLES | null => {
                 if (dayEvents.some(e => e.type === 'eid')) return 'eid'
                 if (dayEvents.some(e => e.type === 'holy')) return 'holy'
                 if (fastingInfo.isFasting && fastingInfo.type === 'obligatory') return 'fast'
                 if (dayEvents.some(e => e.type === 'recommended')) return 'recommended'
-                if (isAyyamAlBeed || dayEvents.some(e => e.type === 'sunnah')) return 'sunnah'
+                // Only show sunnah background for Ayyam al-Beed and Six Days of Shawwal, not weekly Mon/Thu fasts
+                const significantSunnahEvents = dayEvents.filter(e =>
+                  e.type === 'sunnah' && !e.name.includes('Monday') && !e.name.includes('Thursday')
+                )
+                if (isAyyamAlBeed || significantSunnahEvents.length > 0) return 'sunnah'
                 return null
               }
               const primaryEventType = getPrimaryEventType()
