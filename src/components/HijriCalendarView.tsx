@@ -168,7 +168,24 @@ export function HijriCalendarView({ location }: HijriCalendarViewProps) {
   const gregorianStart = new Date(currentMonthData.gregorianStart)
   const gregorianEnd = new Date(gregorianStart)
   gregorianEnd.setDate(gregorianEnd.getDate() + currentMonthData.days - 1)
-  const gregorianRange = `${gregorianStart.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${gregorianEnd.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`
+
+  // Format Gregorian range - show months prominently when spanning two months
+  const startMonth = gregorianStart.toLocaleDateString('en-US', { month: 'short' })
+  const endMonth = gregorianEnd.toLocaleDateString('en-US', { month: 'short' })
+  const startYear = gregorianStart.getFullYear()
+  const endYear = gregorianEnd.getFullYear()
+
+  let gregorianRange: string
+  if (startMonth === endMonth && startYear === endYear) {
+    // Same month: "Jan 1-29, 2026"
+    gregorianRange = `${startMonth} ${gregorianStart.getDate()}-${gregorianEnd.getDate()}, ${endYear}`
+  } else if (startYear === endYear) {
+    // Different months, same year: "Dec 23 - Jan 20, 2026"
+    gregorianRange = `${startMonth} ${gregorianStart.getDate()} → ${endMonth} ${gregorianEnd.getDate()}, ${endYear}`
+  } else {
+    // Different years: "Dec 23, 2025 → Jan 20, 2026"
+    gregorianRange = `${startMonth} ${gregorianStart.getDate()}, ${startYear} → ${endMonth} ${gregorianEnd.getDate()}, ${endYear}`
+  }
 
   return (
     <TooltipProvider delayDuration={300}>
