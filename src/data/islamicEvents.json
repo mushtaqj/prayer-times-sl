@@ -155,6 +155,28 @@
       "isFastingDay": false,
       "fastingForbidden": true,
       "description": "Days of eating, drinking and remembrance of Allah"
+    },
+    {
+      "id": "battle-of-badr",
+      "name": "Battle of Badr",
+      "nameArabic": "غزوة بدر",
+      "hijriMonth": 9,
+      "hijriDay": 17,
+      "type": "recommended",
+      "isFastingDay": true,
+      "fastingType": "obligatory",
+      "description": "Decisive battle in the early days of Islam"
+    },
+    {
+      "id": "conquest-of-mecca",
+      "name": "Conquest of Mecca",
+      "nameArabic": "فتح مكة",
+      "hijriMonth": 9,
+      "hijriDay": 20,
+      "type": "recommended",
+      "isFastingDay": true,
+      "fastingType": "obligatory",
+      "description": "The rapid conquest of Mecca by the Muslims"
     }
   ],
   "recurringFasts": {
