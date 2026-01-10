@@ -344,7 +344,8 @@ export function HijriCalendarView({ location }: HijriCalendarViewProps) {
               })
               const isFriday = day.gregorianDate.getDay() === 5
               const isAyyamAlBeed = [13, 14, 15].includes(day.hijriDay)
-              const showMoon = day.hijriDay === 1 || day.hijriDay === 15 || day.hijriDay === 29
+              // Only show moon on key days: 1 (new moon) and 15 (full moon)
+              const showMoon = day.hijriDay === 1 || day.hijriDay === 15
 
               // Determine primary event type for styling (priority: eid > holy > fast > recommended > sunnah)
               // Note: Weekly sunnah fasts (Mon/Thu) only show fasting dot, not colored background
@@ -471,7 +472,6 @@ export function HijriCalendarView({ location }: HijriCalendarViewProps) {
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div className="aspect-square p-1 flex flex-col items-center justify-center relative transition-colors border-b border-border bg-amber-500/10 ring-2 ring-dashed ring-amber-500 ring-inset cursor-help">
-                    <span className="absolute top-0.5 right-0.5 text-base">🌘</span>
                     <span className="text-lg font-bold leading-none text-amber-600 dark:text-amber-400">
                       30?
                     </span>
