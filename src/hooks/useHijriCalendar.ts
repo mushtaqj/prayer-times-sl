@@ -176,6 +176,20 @@ export function useHijriCalendar() {
     }
   }, [months])
 
+  // Get array of available years
+  const availableYears = useMemo(() => {
+    return [...new Set(months.map(m => m.hijriYear))].sort()
+  }, [months])
+
+  // Navigate to a specific month
+  const goToMonth = useCallback((year: number, month: number) => {
+    const monthExists = months.some(m => m.hijriYear === year && m.hijriMonth === month)
+    if (monthExists) {
+      setCurrentHijriYear(year)
+      setCurrentHijriMonth(month)
+    }
+  }, [months])
+
   return {
     todayHijri,
     currentMonthData,
@@ -185,9 +199,11 @@ export function useHijriCalendar() {
     previousMonth,
     nextMonth,
     goToToday,
+    goToMonth,
     canGoPrevious,
     canGoNext,
     yearsRange,
+    availableYears,
     gregorianToHijri: gregorianToHijriMemo,
     getMoonPhase,
     setCurrentHijriYear,

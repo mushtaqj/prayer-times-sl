@@ -4,6 +4,7 @@ import { Separator } from '@/components/ui/separator'
 
 import { cn } from '@/lib/utils'
 import type { PrayerTime } from '@/hooks/usePrayerTimes'
+import { gregorianToHijri, getMoonPhase } from '@/hooks/useHijriCalendar'
 
 interface WeekViewProps {
   prayers: (PrayerTime & { date: Date })[]
@@ -42,6 +43,8 @@ export function WeekView({ prayers, location }: WeekViewProps) {
               month: 'short',
               day: 'numeric',
             })
+            const hijriDate = gregorianToHijri(prayer.date)
+            const moonPhase = hijriDate ? getMoonPhase(hijriDate.day) : null
 
             return (
               <div key={index} className={cn("rounded-xl transition-all", isToday && "bg-primary/5 -mx-2 px-2 py-2 border border-primary/10")}>
@@ -51,11 +54,19 @@ export function WeekView({ prayers, location }: WeekViewProps) {
                   isToday ? "text-primary" : "text-muted-foreground"
                 )}>
                   <Separator className={cn("flex-1", isToday ? "bg-primary/20" : "bg-border")} />
-                  <div className="flex items-center gap-2 px-2">
-                    <span className={cn("font-bold text-lg font-heading", isToday && "text-primary")}>{dayName}</span>
-                    <span className="text-xs uppercase tracking-wider opacity-70 mt-1">{dateStr}</span>
-                    {isToday && (
-                      <Badge variant="default" className="text-[10px] h-5 ml-1 bg-primary shadow-sm hover:bg-primary">Today</Badge>
+                  <div className="flex flex-col items-center gap-0.5 px-2">
+                    <div className="flex items-center gap-2">
+                      <span className={cn("font-bold text-lg font-heading", isToday && "text-primary")}>{dayName}</span>
+                      <span className="text-xs uppercase tracking-wider opacity-70 mt-1">{dateStr}</span>
+                      {isToday && (
+                        <Badge variant="default" className="text-[10px] h-5 ml-1 bg-primary shadow-sm hover:bg-primary">Today</Badge>
+                      )}
+                    </div>
+                    {hijriDate && (
+                      <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                        {moonPhase && <span className="text-sm">{moonPhase.icon}</span>}
+                        <span>{hijriDate.day} {hijriDate.monthName} {hijriDate.year}</span>
+                      </div>
                     )}
                   </div>
                   <Separator className={cn("flex-1", isToday ? "bg-primary/20" : "bg-border")} />

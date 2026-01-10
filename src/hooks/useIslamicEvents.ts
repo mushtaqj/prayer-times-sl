@@ -130,10 +130,66 @@ export function useIslamicEvents() {
     }
   }, [hijriMonths])
 
-  // Check if a specific Hijri day has an event
+  // Check if a specific Hijri day has an event (including recurring)
   const hasEvent = useMemo(() => {
     return (hijriMonth: number, hijriDay: number): boolean => {
-      return events.some(e => e.hijriMonth === hijriMonth && e.hijriDay === hijriDay)
+      // Check fixed events
+      if (events.some(e => e.hijriMonth === hijriMonth && e.hijriDay === hijriDay)) {
+        return true
+      }
+      // Check Ayyam al-Beed (13, 14, 15 of each month)
+      if ([13, 14, 15].includes(hijriDay)) {
+        return true
+      }
+      // Check annual recurring: Shawwal 6 days (2-7), Dhul Hijjah first 9 (1-9)
+      if (hijriMonth === 10 && hijriDay >= 2 && hijriDay <= 7) {
+        return true // Six days of Shawwal
+      }
+      if (hijriMonth === 12 && hijriDay >= 1 && hijriDay <= 9) {
+        return true // First 9 days of Dhul Hijjah
+      }
+      return false
+    }
+  }, [events])
+
+  // Get all events for a specific day including recurring
+  const getAllEventsForDay = useMemo(() => {
+    return (hijriMonth: number, hijriDay: number, gregorianDate?: Date): { name: string; type: string; isRecurring: boolean }[] => {
+      const result: { name: string; type: string; isRecurring: boolean }[] = []
+
+      // Add fixed events
+      const fixedEvents = events.filter(e => e.hijriMonth === hijriMonth && e.hijriDay === hijriDay)
+      for (const event of fixedEvents) {
+        result.push({ name: event.name, type: event.type, isRecurring: false })
+      }
+
+      // Add Ayyam al-Beed (13, 14, 15 of each month)
+      if ([13, 14, 15].includes(hijriDay)) {
+        result.push({ name: 'Ayyam al-Beed', type: 'sunnah', isRecurring: true })
+      }
+
+      // Add Six days of Shawwal (2-7 of month 10)
+      if (hijriMonth === 10 && hijriDay >= 2 && hijriDay <= 7) {
+        result.push({ name: 'Six Days of Shawwal', type: 'sunnah', isRecurring: true })
+      }
+
+      // Add First 9 days of Dhul Hijjah
+      if (hijriMonth === 12 && hijriDay >= 1 && hijriDay <= 9) {
+        result.push({ name: 'First Days of Dhul Hijjah', type: 'recommended', isRecurring: true })
+      }
+
+      // Add Monday/Thursday fasting if gregorianDate provided
+      if (gregorianDate) {
+        const dayOfWeek = gregorianDate.getDay()
+        if (dayOfWeek === 1) {
+          result.push({ name: 'Monday Fast', type: 'sunnah', isRecurring: true })
+        }
+        if (dayOfWeek === 4) {
+          result.push({ name: 'Thursday Fast', type: 'sunnah', isRecurring: true })
+        }
+      }
+
+      return result
     }
   }, [events])
 
@@ -161,6 +217,7 @@ export function useIslamicEvents() {
     upcomingEvents,
     getEventsForDate,
     getEventsForMonth,
+    getAllEventsForDay,
     isFastingDay,
     getMonthName,
     hasEvent,
