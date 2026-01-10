@@ -280,10 +280,10 @@ export function HijriCalendarView({ location }: HijriCalendarViewProps) {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-6 w-6 rounded-full hover:bg-primary/10 text-primary/70"
+                      className="h-7 w-7 rounded-full hover:bg-primary/10 text-primary/90 ml-2"
                       onClick={() => setVirtueSheet({ title: currentMonthData.monthName, content: (currentMonthData as any).details })}
                     >
-                      <BookOpen className="h-3.5 w-3.5" />
+                      <BookOpen className="h-4 w-4" />
                     </Button>
                   )}
                 </h2>
@@ -607,9 +607,9 @@ export function HijriCalendarView({ location }: HijriCalendarViewProps) {
                         {event.details && (
                           <button
                             onClick={() => setVirtueSheet({ title: event.name, content: event.details! })}
-                            className="inline-flex items-center justify-center text-muted-foreground/50 hover:text-primary transition-colors"
+                            className="inline-flex items-center justify-center text-primary/80 hover:text-primary transition-colors ml-1"
                           >
-                            <Info className="w-3.5 h-3.5" />
+                            <Info className="w-4 h-4" />
                           </button>
                         )}
                       </p>

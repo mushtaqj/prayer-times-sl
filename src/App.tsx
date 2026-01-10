@@ -85,7 +85,7 @@ function App() {
           {mainSection === 'prayer' && (
             <>
               {/* Sticky View Switcher - Only for Prayer Times */}
-              <div className="sticky top-[57px] z-10 bg-background/95 backdrop-blur-md px-4 py-3 border-b border-border/50 supports-[backdrop-filter]:bg-background/60">
+              <div className="sticky top-[60px] z-30 bg-background/95 backdrop-blur-md px-4 py-3 border-b border-border/50 supports-[backdrop-filter]:bg-background/60 shadow-sm">
                 <ViewSwitcher value={prayerView} onChange={setPrayerView} />
               </div>
 

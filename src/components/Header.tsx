@@ -44,7 +44,7 @@ export function Header({
   }
 
   return (
-    <header className="border-b border-border bg-background/80 backdrop-blur-xl sticky top-0 z-20 supports-[backdrop-filter]:bg-background/60">
+    <header className="border-b border-border bg-background/95 backdrop-blur-xl sticky top-0 z-40 shadow-sm supports-[backdrop-filter]:bg-background/60">
       {/* Top row: Section toggle + controls */}
       <div className="flex items-center justify-between gap-3 px-4 py-3">
 
