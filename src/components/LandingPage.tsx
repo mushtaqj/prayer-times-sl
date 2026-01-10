@@ -213,6 +213,25 @@ export function LandingPage({ currentPrayer, nextPrayer, location, onNavigate, i
       </div>
 
       <div className="flex-1 px-4 py-4 space-y-4">
+        {/* Date Header - Above Everything */}
+        <div className="flex items-center justify-between py-2">
+          <div>
+            {/* Hijri Date - Prominent */}
+            {hijriDate && (
+              <h2 className="text-2xl font-bold text-primary">
+                {hijriDate.day} {hijriDate.monthName} {hijriDate.year}
+              </h2>
+            )}
+            {/* Gregorian Date */}
+            <p className="text-sm text-muted-foreground">
+              {today.toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+            </p>
+            <p className="text-xs text-primary/70 font-medium">{location}, Sri Lanka</p>
+          </div>
+          {/* Moon Phase */}
+          <div className="text-4xl">{moonPhase?.icon}</div>
+        </div>
+
         {/* Hero Section - Next Prayer */}
         <Card className="relative overflow-hidden border-none shadow-xl bg-gradient-to-br from-primary via-primary to-accent text-primary-foreground">
           {/* Background decoration */}
@@ -277,68 +296,83 @@ export function LandingPage({ currentPrayer, nextPrayer, location, onNavigate, i
         </Card>
 
         {/* Today's Blessings Card */}
-        <Card className="border-border/50 bg-card/80 backdrop-blur-sm shadow-sm">
+        <Card className="border-border/50 bg-card/80 backdrop-blur-sm shadow-sm overflow-hidden">
           <CardContent className="p-4">
-            <h2 className="text-sm font-semibold text-foreground mb-3">Today's Blessings</h2>
-
-            {/* Hijri Date */}
-            {hijriDate && (
-              <div className="flex items-center justify-between mb-3">
-                <div>
-                  <p className="text-lg font-semibold text-foreground">
-                    {hijriDate.day} {hijriDate.monthName} {hijriDate.year}
-                  </p>
-                  <p className="text-xs text-muted-foreground">{location}</p>
+            {/* Special Events / Badges - Show prominently if any exist */}
+            {(isFriday || fastingInfo.isFasting || (hijriDate && [13, 14, 15].includes(hijriDate.day))) ? (
+              <>
+                {/* Day Badges */}
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {isFriday && (
+                    <span className="px-4 py-1.5 text-sm font-semibold rounded-full bg-gradient-to-r from-emerald-500/20 to-teal-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
+                      Jumu'ah (Friday)
+                    </span>
+                  )}
+                  {fastingInfo.isFasting && (
+                    <span className="px-4 py-1.5 text-sm font-semibold rounded-full bg-gradient-to-r from-amber-500/20 to-orange-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30">
+                      {fastingInfo.reason}
+                    </span>
+                  )}
+                  {hijriDate && [13, 14, 15].includes(hijriDate.day) && !fastingInfo.isFasting && (
+                    <span className="px-4 py-1.5 text-sm font-semibold rounded-full bg-gradient-to-r from-sky-500/20 to-blue-500/20 text-sky-600 dark:text-sky-400 border border-sky-500/30">
+                      Ayyam al-Beed
+                    </span>
+                  )}
                 </div>
-                <div className="text-2xl">{moonPhase?.icon}</div>
-              </div>
-            )}
 
-            {/* Day Badges */}
-            <div className="flex flex-wrap gap-2 mb-3">
-              {isFriday && (
-                <span className="px-3 py-1 text-xs font-medium rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
-                  Friday
-                </span>
-              )}
-              {fastingInfo.isFasting && (
-                <span className="px-3 py-1 text-xs font-medium rounded-full bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30">
-                  {fastingInfo.reason}
-                </span>
-              )}
-              {hijriDate && [13, 14, 15].includes(hijriDate.day) && (
-                <span className="px-3 py-1 text-xs font-medium rounded-full bg-sky-500/20 text-sky-600 dark:text-sky-400 border border-sky-500/30">
-                  Ayyam al-Beed
-                </span>
-              )}
-            </div>
+                {/* Recommended Ibadah Pills */}
+                {recommendedPills.length > 0 && (
+                  <div className="space-y-2 mb-4">
+                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Recommended Today</p>
+                    <div className="flex flex-wrap gap-2">
+                      {recommendedPills.map((pill, index) => (
+                        <button
+                          key={index}
+                          onClick={() => openVirtuesSheet(pill.label, pill.content)}
+                          className="px-3 py-2 text-sm font-medium rounded-xl bg-primary/10 text-primary hover:bg-primary/20 transition-all hover:scale-[1.02] active:scale-[0.98] border border-primary/20"
+                        >
+                          {pill.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
-            {/* Recommended Ibadah Pills */}
-            {recommendedPills.length > 0 && (
-              <div className="flex flex-wrap gap-2 mb-3">
-                {recommendedPills.map((pill, index) => (
+                {/* Compact Month Info - when there are special events */}
+                {monthInfo?.details && (
                   <button
-                    key={index}
-                    onClick={() => openVirtuesSheet(pill.label, pill.content)}
-                    className="px-3 py-1.5 text-xs font-medium rounded-full bg-primary/10 text-primary hover:bg-primary/20 transition-colors border border-primary/20"
+                    onClick={() => openVirtuesSheet(monthInfo.name, monthInfo.details || '')}
+                    className="w-full text-left px-3 py-2 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors text-xs text-muted-foreground"
                   >
-                    {pill.label}
+                    Learn about {monthInfo.name} →
                   </button>
-                ))}
-              </div>
-            )}
-
-            {/* Month Virtue Teaser */}
-            {monthInfo?.details && (
-              <button
-                onClick={() => openVirtuesSheet(monthInfo.name, monthInfo.details || '')}
-                className="w-full text-left p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors group"
-              >
-                <p className="text-xs text-muted-foreground line-clamp-2">
-                  {monthInfo.details.split('\n').find(line => line.trim() && !line.startsWith('#'))?.substring(0, 100)}...
-                </p>
-                <span className="text-xs text-primary font-medium group-hover:underline">Read more</span>
-              </button>
+                )}
+              </>
+            ) : (
+              /* No special events - Show month blessing prominently */
+              monthInfo?.details && (
+                <button
+                  onClick={() => openVirtuesSheet(monthInfo.name, monthInfo.details || '')}
+                  className="w-full text-left group"
+                >
+                  <div className="p-4 rounded-xl bg-gradient-to-br from-primary/5 via-primary/10 to-accent/5 border border-primary/10 hover:border-primary/20 transition-all">
+                    <h3 className="text-sm font-semibold text-primary mb-2">
+                      The Month of {monthInfo.name}
+                    </h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
+                      {monthInfo.details
+                        .split('\n')
+                        .filter(line => line.trim() && !line.startsWith('#') && !line.startsWith('>'))
+                        .join(' ')
+                        .replace(/\*\*/g, '')
+                        .substring(0, 180)}...
+                    </p>
+                    <span className="inline-flex items-center gap-1 mt-3 text-xs font-medium text-primary group-hover:underline">
+                      Read more about {monthInfo.name}
+                    </span>
+                  </div>
+                </button>
+              )
             )}
           </CardContent>
         </Card>
