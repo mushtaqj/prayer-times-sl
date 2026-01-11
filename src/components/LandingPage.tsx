@@ -21,6 +21,7 @@ interface LandingPageProps {
   location: string
   isDark: boolean
   onThemeToggle: () => void
+  installBanner?: React.ReactNode
 }
 
 export function LandingPage({
@@ -29,6 +30,7 @@ export function LandingPage({
   location,
   isDark,
   onThemeToggle,
+  installBanner,
 }: LandingPageProps) {
   const navigate = useNavigate()
   const [countdown, setCountdown] = useState('')
@@ -413,6 +415,8 @@ export function LandingPage({
           </button>
         </div>
 
+        {/* Install Banner */}
+        {installBanner}
       </div>
 
       {/* Month Picker Modal */}

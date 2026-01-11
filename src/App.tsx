@@ -8,8 +8,7 @@ import {WeekView} from '@/components/WeekView'
 import {MonthView} from '@/components/MonthView'
 import {HijriCalendarView} from '@/components/HijriCalendarView'
 import {ViewSwitcher} from '@/components/ViewSwitcher'
-import {Button} from '@/components/ui/button'
-import {Card, CardContent} from '@/components/ui/card'
+import {ActionBanner} from '@/components/ActionBanner'
 import {useTheme} from '@/hooks/useTheme'
 import {useAlarms} from '@/hooks/useAlarms'
 import {usePrayerTimes} from '@/hooks/usePrayerTimes'
@@ -47,7 +46,7 @@ function App() {
   // Schedule notifications for enabled alarms
   useEffect(() => {
     if (hasPermission && todayPrayers) {
-        return scheduleNotifications(todayPrayers)
+      return scheduleNotifications(todayPrayers)
     }
   }, [hasPermission, todayPrayers, alarms, scheduleNotifications])
 
@@ -71,6 +70,28 @@ function App() {
 
   // Determine if we're on the home page
   const isHomePage = location.pathname === '/'
+
+  // Notification banner component (for prayer pages)
+  const notificationBanner = !hasPermission && (
+    <ActionBanner
+      icon={Bell}
+      message="Enable notifications for prayer alerts"
+      actionLabel="Enable"
+      onAction={handleEnableNotifications}
+    />
+  )
+
+  // Install banner component (for landing page)
+  const installBanner = showInstallBanner && (
+    <ActionBanner
+      icon={Download}
+      message="Install app for offline access"
+      actionLabel="Install"
+      onAction={handleInstall}
+      secondaryLabel="Later"
+      onSecondary={() => setShowInstallBanner(false)}
+    />
+  )
 
   return (
     <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
@@ -108,6 +129,7 @@ function App() {
                     location={locationName}
                     isDark={isDark}
                     onThemeToggle={toggleTheme}
+                    installBanner={installBanner}
                   />
                 </div>
               }
@@ -124,44 +146,7 @@ function App() {
                   </div>
 
                   <div className="p-4 pb-20 sm:pb-4 space-y-6 flex-1">
-                    {/* Notification Banner */}
-                    {!hasPermission && (
-                      <Card className="bg-secondary/50 border-accent/20 backdrop-blur-sm">
-                        <CardContent className="p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-                          <div className="flex items-center gap-3">
-                            <div className="p-2 rounded-full bg-primary/10">
-                              <Bell className="w-5 h-5 text-primary" />
-                            </div>
-                            <span className="text-sm font-medium">Enable notifications for prayer alerts</span>
-                          </div>
-                          <Button size="sm" onClick={handleEnableNotifications} className="bg-primary text-primary-foreground hover:bg-primary/90">
-                            Enable
-                          </Button>
-                        </CardContent>
-                      </Card>
-                    )}
-
-                    {/* PWA Install Banner */}
-                    {showInstallBanner && (
-                      <Card className="bg-secondary/50 border-accent/20 backdrop-blur-sm">
-                        <CardContent className="p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-                          <div className="flex items-center gap-3">
-                            <div className="p-2 rounded-full bg-primary/10">
-                              <Download className="w-5 h-5 text-primary" />
-                            </div>
-                            <span className="text-sm font-medium">Install app for offline access</span>
-                          </div>
-                          <div className="flex gap-2">
-                            <Button size="sm" variant="ghost" onClick={() => setShowInstallBanner(false)}>
-                              Later
-                            </Button>
-                            <Button size="sm" onClick={handleInstall} className="bg-primary text-primary-foreground hover:bg-primary/90">
-                              Install
-                            </Button>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    )}
+                    {notificationBanner}
 
                     {/* Daily Prayer View */}
                     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -184,26 +169,12 @@ function App() {
               path="/prayer/week"
               element={
                 <>
-                  <div className="sticky top-12 sm:top-[60px] z-30 bg-background/95 backdrop-blur-md px-4 py-3 border-b border-border/50 supports-[backdrop-filter]:bg-background/60 shadow-sm">
+                  <div className="sticky top-[calc(48px+env(safe-area-inset-top))] sm:top-[60px] z-30 bg-background/95 backdrop-blur-md px-4 py-3 border-b border-border/50 supports-[backdrop-filter]:bg-background/60 shadow-sm">
                     <ViewSwitcher />
                   </div>
 
                   <div className="p-4 pb-20 sm:pb-4 space-y-6 flex-1">
-                    {!hasPermission && (
-                      <Card className="bg-secondary/50 border-accent/20 backdrop-blur-sm">
-                        <CardContent className="p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-                          <div className="flex items-center gap-3">
-                            <div className="p-2 rounded-full bg-primary/10">
-                              <Bell className="w-5 h-5 text-primary" />
-                            </div>
-                            <span className="text-sm font-medium">Enable notifications for prayer alerts</span>
-                          </div>
-                          <Button size="sm" onClick={handleEnableNotifications} className="bg-primary text-primary-foreground hover:bg-primary/90">
-                            Enable
-                          </Button>
-                        </CardContent>
-                      </Card>
-                    )}
+                    {notificationBanner}
 
                     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
                       <WeekView prayers={weekPrayers} location={locationName} />
@@ -218,26 +189,12 @@ function App() {
               path="/prayer/month"
               element={
                 <>
-                  <div className="sticky top-12 sm:top-[60px] z-30 bg-background/95 backdrop-blur-md px-4 py-3 border-b border-border/50 supports-[backdrop-filter]:bg-background/60 shadow-sm">
+                  <div className="sticky top-[calc(48px+env(safe-area-inset-top))] sm:top-[60px] z-30 bg-background/95 backdrop-blur-md px-4 py-3 border-b border-border/50 supports-[backdrop-filter]:bg-background/60 shadow-sm">
                     <ViewSwitcher />
                   </div>
 
                   <div className="p-4 pb-20 sm:pb-4 space-y-6 flex-1">
-                    {!hasPermission && (
-                      <Card className="bg-secondary/50 border-accent/20 backdrop-blur-sm">
-                        <CardContent className="p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-                          <div className="flex items-center gap-3">
-                            <div className="p-2 rounded-full bg-primary/10">
-                              <Bell className="w-5 h-5 text-primary" />
-                            </div>
-                            <span className="text-sm font-medium">Enable notifications for prayer alerts</span>
-                          </div>
-                          <Button size="sm" onClick={handleEnableNotifications} className="bg-primary text-primary-foreground hover:bg-primary/90">
-                            Enable
-                          </Button>
-                        </CardContent>
-                      </Card>
-                    )}
+                    {notificationBanner}
 
                     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
                       <MonthView getMonthPrayers={getMonthPrayers} location={locationName} />
