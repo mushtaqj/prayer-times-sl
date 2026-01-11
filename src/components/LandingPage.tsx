@@ -1,11 +1,12 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { VirtuesSheet } from '@/components/VirtuesSheet'
+import { CircleProgress } from '@/components/common/CircleProgress'
 import { gregorianToHijri, getMoonPhase } from '@/hooks/useHijriCalendar'
 import { useIslamicEvents } from '@/hooks/useIslamicEvents'
-import { parseTime, formatCountdown } from '@/lib/timeUtils'
+import { useCountdown } from '@/hooks/useCountdown'
 import { Clock, Calendar, CalendarSearch, Moon, Sun, Sunrise, Sunset, CloudSun } from 'lucide-react'
 
 interface PrayerInfo {
@@ -33,14 +34,18 @@ export function LandingPage({
   installBanner,
 }: LandingPageProps) {
   const navigate = useNavigate()
-  const [countdown, setCountdown] = useState('')
-  const [progress, setProgress] = useState(0)
   const [virtuesSheet, setVirtuesSheet] = useState<{ isOpen: boolean; title: string; content: string }>({
     isOpen: false,
     title: '',
     content: ''
   })
   const [showMonthPicker, setShowMonthPicker] = useState(false)
+
+  // Use the countdown hook
+  const { countdown, progress } = useCountdown({
+    targetTime: nextPrayer?.time || '00:00',
+    currentPrayerTime: currentPrayer?.time,
+  })
 
   const today = new Date()
   const hijriDate = gregorianToHijri(today)
@@ -51,41 +56,6 @@ export function LandingPage({
   const { isFastingDay, recurringFasts, getMonthName, hijriMonths } = useIslamicEvents()
   const fastingInfo = hijriDate ? isFastingDay(hijriDate) : { isFasting: false }
   const monthInfo = hijriDate ? getMonthName(hijriDate.month) : null
-
-  // Update countdown every minute
-  useEffect(() => {
-    if (!nextPrayer || !currentPrayer) return
-
-    const updateCountdown = () => {
-      const now = new Date()
-      const targetTime = parseTime(nextPrayer.time)
-
-      // If target time is in the past, it means next prayer is tomorrow (Fajr)
-      if (targetTime <= now) {
-        targetTime.setDate(targetTime.getDate() + 1)
-      }
-
-      const diff = targetTime.getTime() - now.getTime()
-      setCountdown(formatCountdown(diff))
-
-      // Calculate progress
-      const currentPrayerTime = parseTime(currentPrayer.time)
-      let totalDuration = targetTime.getTime() - currentPrayerTime.getTime()
-
-      if (totalDuration < 0) {
-        currentPrayerTime.setDate(currentPrayerTime.getDate() - 1)
-        totalDuration = targetTime.getTime() - currentPrayerTime.getTime()
-      }
-
-      const elapsed = now.getTime() - currentPrayerTime.getTime()
-      const progressPercent = Math.max(0, Math.min(100, (elapsed / totalDuration) * 100))
-      setProgress(progressPercent)
-    }
-
-    updateCountdown()
-    const interval = setInterval(updateCountdown, 60000)
-    return () => clearInterval(interval)
-  }, [nextPrayer, currentPrayer])
 
   const openVirtuesSheet = (title: string, content: string) => {
     setVirtuesSheet({ isOpen: true, title, content })
@@ -138,17 +108,15 @@ export function LandingPage({
     const iconClass = "w-8 h-8 sm:w-12 sm:h-12 drop-shadow-lg"
     switch (prayerName.toLowerCase()) {
       case 'fajr':
-        return <Sunrise className={iconClass} /> // Dawn
       case 'sunrise':
-        return <Sunrise className={iconClass} /> // Sun rising
+        return <Sunrise className={iconClass} />
       case 'dhuhr':
-        return <Sun className={iconClass} /> // Midday sun
+        return <Sun className={iconClass} />
       case 'asr':
-        return <CloudSun className={iconClass} /> // Afternoon
+        return <CloudSun className={iconClass} />
       case 'maghrib':
-        return <Sunset className={iconClass} /> // Sunset
+        return <Sunset className={iconClass} />
       case 'isha':
-        return <Moon className={iconClass} /> // Night
       default:
         return <Moon className={iconClass} />
     }
@@ -161,11 +129,6 @@ export function LandingPage({
       </div>
     )
   }
-
-  // SVG circle parameters - responsive sizes
-  const mobileSize = 140
-  const desktopSize = 180
-  const strokeWidth = 6
 
   return (
     <div className="flex flex-col h-[100dvh] overflow-hidden">
@@ -196,104 +159,46 @@ export function LandingPage({
         {/* Date Header - Compact */}
         <div className="flex items-center justify-between">
           <div>
-            {/* Hijri Date - Prominent */}
             {hijriDate && (
               <h2 className="text-xl sm:text-2xl font-bold text-primary leading-tight">
                 {hijriDate.day} {hijriDate.monthName} {hijriDate.year}
               </h2>
             )}
-            {/* Gregorian Date */}
             <p className="text-xs sm:text-sm text-muted-foreground">
               {today.toLocaleDateString('en-US', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
             </p>
           </div>
-          {/* Moon Phase */}
           <div className="text-3xl sm:text-4xl">{moonPhase?.icon}</div>
         </div>
 
         {/* Hero Section - Next Prayer */}
         <Card className="relative overflow-hidden border-none shadow-lg bg-gradient-to-br from-primary via-primary to-accent text-primary-foreground">
-          {/* Background decoration */}
           <div className="absolute inset-0 opacity-10">
             <div className="absolute top-0 right-0 w-32 h-32 bg-white rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
             <div className="absolute bottom-0 left-0 w-24 h-24 bg-white rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
           </div>
 
           <CardContent className="relative z-10 p-3 sm:p-4 flex flex-col items-center">
-            {/* Prayer-based Icon (sun/moon/sunrise/sunset) */}
             <div className="mb-1 sm:mb-2 text-white/90">
               {getPrayerIcon(nextPrayer.displayName)}
             </div>
 
-            {/* Prayer Name */}
             <p className="text-[10px] sm:text-xs uppercase tracking-[0.2em] opacity-70">Next Prayer</p>
             <h1 className="text-2xl sm:text-3xl font-bold font-heading">{nextPrayer.displayName}</h1>
             <p className="text-sm opacity-80 font-arabic">{nextPrayer.arabicName}</p>
 
             {/* Circular Progress Timer - Responsive */}
-            <div className="relative my-2 sm:my-3">
+            <div className="my-2 sm:my-3">
               {/* Mobile size */}
-              <svg
-                width={mobileSize}
-                height={mobileSize}
-                className="transform -rotate-90 sm:hidden"
-              >
-                <circle
-                  cx={mobileSize / 2}
-                  cy={mobileSize / 2}
-                  r={(mobileSize - strokeWidth) / 2}
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={strokeWidth}
-                  className="opacity-20"
-                />
-                <circle
-                  cx={mobileSize / 2}
-                  cy={mobileSize / 2}
-                  r={(mobileSize - strokeWidth) / 2}
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={strokeWidth}
-                  strokeLinecap="round"
-                  strokeDasharray={2 * Math.PI * ((mobileSize - strokeWidth) / 2)}
-                  strokeDashoffset={2 * Math.PI * ((mobileSize - strokeWidth) / 2) - (progress / 100) * 2 * Math.PI * ((mobileSize - strokeWidth) / 2)}
-                  className="opacity-90 transition-all duration-1000"
-                />
-              </svg>
+              <CircleProgress progress={progress} size={140} className="sm:hidden">
+                <span className="text-2xl font-bold">{nextPrayer.time}</span>
+                <span className="text-xs opacity-80">in {countdown}</span>
+              </CircleProgress>
               {/* Desktop size */}
-              <svg
-                width={desktopSize}
-                height={desktopSize}
-                className="transform -rotate-90 hidden sm:block"
-              >
-                <circle
-                  cx={desktopSize / 2}
-                  cy={desktopSize / 2}
-                  r={(desktopSize - strokeWidth) / 2}
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={strokeWidth}
-                  className="opacity-20"
-                />
-                <circle
-                  cx={desktopSize / 2}
-                  cy={desktopSize / 2}
-                  r={(desktopSize - strokeWidth) / 2}
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={strokeWidth}
-                  strokeLinecap="round"
-                  strokeDasharray={2 * Math.PI * ((desktopSize - strokeWidth) / 2)}
-                  strokeDashoffset={2 * Math.PI * ((desktopSize - strokeWidth) / 2) - (progress / 100) * 2 * Math.PI * ((desktopSize - strokeWidth) / 2)}
-                  className="opacity-90 transition-all duration-1000"
-                />
-              </svg>
-
-              {/* Center content */}
-              <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-2xl sm:text-3xl font-bold">{nextPrayer.time}</span>
-                <span className="text-xs sm:text-sm opacity-80">in {countdown}</span>
-              </div>
+              <CircleProgress progress={progress} size={180} className="hidden sm:block">
+                <span className="text-3xl font-bold">{nextPrayer.time}</span>
+                <span className="text-sm opacity-80">in {countdown}</span>
+              </CircleProgress>
             </div>
 
             {/* Current Prayer indicator */}
@@ -308,10 +213,8 @@ export function LandingPage({
         {/* Today's Blessings Card - Compact */}
         <Card className="border-border/50 bg-card/80 backdrop-blur-sm shadow-sm overflow-hidden">
           <CardContent className="p-3">
-            {/* Special Events / Badges - Show prominently if any exist */}
             {(isFriday || fastingInfo.isFasting || (hijriDate && [13, 14, 15].includes(hijriDate.day))) ? (
               <>
-                {/* Day Badges */}
                 <div className="flex flex-wrap gap-1.5 mb-2">
                   {isFriday && (
                     <span className="px-2.5 py-1 text-xs font-semibold rounded-full bg-gradient-to-r from-emerald-500/20 to-teal-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
@@ -330,7 +233,6 @@ export function LandingPage({
                   )}
                 </div>
 
-                {/* Recommended Ibadah Pills */}
                 {recommendedPills.length > 0 && (
                   <div className="flex flex-wrap gap-1.5">
                     {recommendedPills.map((pill, index) => (
@@ -354,7 +256,6 @@ export function LandingPage({
                 )}
               </>
             ) : (
-              /* No special events - Show month blessing compactly */
               monthInfo?.details && (
                 <button
                   onClick={() => openVirtuesSheet(monthInfo.name, monthInfo.details || '')}
@@ -381,7 +282,6 @@ export function LandingPage({
 
         {/* Navigation Buttons - Compact */}
         <div className="grid grid-cols-3 gap-2">
-          {/* Prayer Times Button */}
           <button
             onClick={() => navigate('/prayer')}
             className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-md shadow-emerald-500/20 hover:shadow-lg hover:scale-[1.02] transition-all active:scale-[0.98]"
@@ -392,7 +292,6 @@ export function LandingPage({
             <span className="text-[10px] sm:text-xs font-semibold">Prayer Times</span>
           </button>
 
-          {/* Hijri Calendar Button */}
           <button
             onClick={() => navigate('/hijri')}
             className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-md shadow-emerald-500/20 hover:shadow-lg hover:scale-[1.02] transition-all active:scale-[0.98]"
@@ -403,7 +302,6 @@ export function LandingPage({
             <span className="text-[10px] sm:text-xs font-semibold">Hijri Calendar</span>
           </button>
 
-          {/* Jump to Month Button */}
           <button
             onClick={() => setShowMonthPicker(true)}
             className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-md shadow-emerald-500/20 hover:shadow-lg hover:scale-[1.02] transition-all active:scale-[0.98]"
@@ -415,7 +313,6 @@ export function LandingPage({
           </button>
         </div>
 
-        {/* Install Banner */}
         {installBanner}
       </div>
 
@@ -433,7 +330,6 @@ export function LandingPage({
                   key={month.number}
                   onClick={() => {
                     setShowMonthPicker(false)
-                    // Navigate to hijri calendar with the selected month
                     navigate('/hijri')
                   }}
                   className={`p-3 rounded-xl text-center transition-all hover:scale-[1.02] active:scale-[0.98] ${
@@ -460,7 +356,6 @@ export function LandingPage({
         </div>
       )}
 
-      {/* Virtues Sheet */}
       <VirtuesSheet
         isOpen={virtuesSheet.isOpen}
         onClose={() => setVirtuesSheet(prev => ({ ...prev, isOpen: false }))}

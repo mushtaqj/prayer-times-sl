@@ -1,7 +1,6 @@
-import { useState, useEffect } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
-import { parseTime, formatCountdown } from '@/lib/timeUtils'
+import { useCountdown } from '@/hooks/useCountdown'
 
 interface NextPrayerBannerProps {
   prayerName: string
@@ -10,50 +9,10 @@ interface NextPrayerBannerProps {
 }
 
 export function NextPrayerBanner({ prayerName, prayerTime, currentPrayerTime }: NextPrayerBannerProps) {
-  const [countdown, setCountdown] = useState('')
-  const [progress, setProgress] = useState(0)
-
-  useEffect(() => {
-    const updateCountdown = () => {
-      const now = new Date()
-      const targetTime = parseTime(prayerTime)
-
-      // If target time is in the past, it means next prayer is tomorrow (Fajr)
-      if (targetTime <= now) {
-        targetTime.setDate(targetTime.getDate() + 1)
-      }
-
-      const diff = targetTime.getTime() - now.getTime()
-      setCountdown(formatCountdown(diff))
-
-      // Calculate progress based on time elapsed since current prayer
-      if (currentPrayerTime) {
-        const currentTime = parseTime(currentPrayerTime)
-        let totalDuration = targetTime.getTime() - currentTime.getTime()
-
-        // If current prayer time is after target (crossing midnight), adjust
-        if (totalDuration < 0) {
-          currentTime.setDate(currentTime.getDate() - 1)
-          totalDuration = targetTime.getTime() - currentTime.getTime()
-        }
-
-        const elapsed = now.getTime() - currentTime.getTime()
-        const progressPercent = Math.max(0, Math.min(100, (elapsed / totalDuration) * 100))
-        setProgress(progressPercent)
-      } else {
-        // Fallback: assume ~6 hours between prayers
-        const totalDuration = 6 * 60 * 60 * 1000
-        const elapsed = totalDuration - diff
-        const progressPercent = Math.max(0, Math.min(100, (elapsed / totalDuration) * 100))
-        setProgress(progressPercent)
-      }
-    }
-
-    updateCountdown()
-    const interval = setInterval(updateCountdown, 60000) // Update every minute
-
-    return () => clearInterval(interval)
-  }, [prayerTime, currentPrayerTime])
+  const { countdown, progress } = useCountdown({
+    targetTime: prayerTime,
+    currentPrayerTime,
+  })
 
   return (
     <Card className="relative overflow-hidden border-none shadow-lg bg-primary text-primary-foreground group">

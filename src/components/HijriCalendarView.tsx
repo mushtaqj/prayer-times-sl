@@ -2,40 +2,26 @@ import { useMemo, useState } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import {
-  ChevronLeft, ChevronRight, Calendar, CalendarDays, HelpCircle,
-  ChevronDown, ChevronUp, Moon, Star, Sparkles,
+  ChevronLeft, ChevronRight, Calendar,
+  ChevronDown, ChevronUp, HelpCircle,
   BookOpen
 } from 'lucide-react'
 import { VirtuesSheet } from '@/components/VirtuesSheet'
-import { useHijriCalendar, getMoonPhase } from '@/hooks/useHijriCalendar'
+import { useHijriCalendar } from '@/hooks/useHijriCalendar'
 import { useIslamicEvents } from '@/hooks/useIslamicEvents'
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import {
-  Tooltip,
-  TooltipContent,
   TooltipProvider,
-  TooltipTrigger,
 } from '@/components/ui/tooltip'
 import {
   CalendarLegend,
   MonthEventsCard,
+  CalendarDay,
+  EmptyCalendarCell,
+  UncertainDay30Cell,
+  JumpToDateDialog,
+  getMonthTheme,
+  SpecialMonthBanner,
   WEEKDAYS,
-  HIJRI_MONTH_NAMES,
-  SACRED_MONTHS,
-  EVENT_STYLES
 } from '@/components/calendar'
 
 interface HijriCalendarViewProps {
@@ -43,12 +29,8 @@ interface HijriCalendarViewProps {
 }
 
 export function HijriCalendarView({ location }: HijriCalendarViewProps) {
-  const [jumpDialogOpen, setJumpDialogOpen] = useState(false)
-  const [jumpMode, setJumpMode] = useState<'hijri' | 'gregorian'>('hijri')
-  const [selectedHijriMonth, setSelectedHijriMonth] = useState<string>('')
-  const [selectedHijriYear, setSelectedHijriYear] = useState<string>('')
   const [showLegend, setShowLegend] = useState(false)
-  const [virtueSheet, setVirtueSheet] = useState<{ title: string; content: string } | null>(null) // Added virtueSheet state
+  const [virtueSheet, setVirtueSheet] = useState<{ title: string; content: string } | null>(null)
 
   const {
     currentMonthData,
@@ -102,55 +84,77 @@ export function HijriCalendarView({ location }: HijriCalendarViewProps) {
     return isCurrentMonth && currentMonthData?.days === 29
   }, [isCurrentMonth, currentMonthData])
 
-  // Handle jump to date
-  const handleJumpToDate = () => {
-    if (jumpMode === 'hijri') {
-      const year = parseInt(selectedHijriYear)
-      const month = parseInt(selectedHijriMonth)
-      if (year && month) {
-        goToMonth(year, month)
-        setJumpDialogOpen(false)
-      }
-    } else {
-      // For Gregorian, we'd need to convert - for now just use Hijri
-      const year = parseInt(selectedHijriYear)
-      const month = parseInt(selectedHijriMonth)
-      if (year && month) {
-        goToMonth(year, month)
-        setJumpDialogOpen(false)
+  // Get month theme (Ramadan/Sacred month styling)
+  const monthTheme = getMonthTheme(currentHijriMonth)
+
+  // Handle day click - opens virtue sheet with day details
+  const handleDayClick = (day: typeof calendarDays[0], isFriday: boolean) => {
+    const dayEvents = getAllEventsForDay(currentHijriMonth, day.hijriDay, day.gregorianDate)
+    const fastingInfo = isFastingDay({
+      day: day.hijriDay,
+      month: currentHijriMonth,
+      monthName: currentMonthData!.monthName,
+      year: currentHijriYear,
+      gregorianDate: day.gregorianDate,
+    })
+
+    // Build day-specific content
+    const dayName = day.gregorianDate.toLocaleDateString('en-US', { weekday: 'long' })
+    let content = `# ${dayName}, ${currentMonthData!.monthName} ${day.hijriDay}\n\n`
+
+    // Add events WITH their full details
+    if (dayEvents.length > 0) {
+      dayEvents.forEach(e => {
+        if (e.details) {
+          content += e.details + `\n\n`
+        } else {
+          content += `## ${e.name}\n`
+          content += `*${e.type}*\n\n`
+        }
+      })
+    }
+
+    // Add Friday info
+    if (isFriday) {
+      const fridayVirtues = recurringFasts.friday?.details
+      if (fridayVirtues) {
+        content += fridayVirtues + `\n\n`
+      } else {
+        content += `## Friday Blessings\n`
+        content += `- **Surah Kahf**: Recite for light until next Friday\n`
+        content += `- **Salawat**: Send abundant blessings upon the Prophet ﷺ\n`
+        content += `- **Best Dua Time**: Between Asr and Maghrib\n`
+        content += `- **Jumu'ah Prayer**: Obligatory for men\n\n`
       }
     }
-  }
 
-  // Determine Month Theme
-  const isSacredMonth = SACRED_MONTHS.includes(currentHijriMonth)
-  const isRamadan = currentHijriMonth === 9
+    // Add fasting info with details
+    if (fastingInfo.isFasting && fastingInfo.reason !== 'Ramadan') {
+      if (fastingInfo.reason === 'Monday Fast') {
+        const mondayDetails = recurringFasts.weekly.find(f => f.id === 'monday-fast')?.details
+        if (mondayDetails) {
+          content += mondayDetails + `\n\n`
+        }
+      } else if (fastingInfo.reason === 'Thursday Fast') {
+        const thursdayDetails = recurringFasts.weekly.find(f => f.id === 'thursday-fast')?.details
+        if (thursdayDetails) {
+          content += thursdayDetails + `\n\n`
+        }
+      } else if (fastingInfo.reason === 'Ayyam al-Beed (White Days)') {
+        const ayyamDetails = recurringFasts.monthly.ayyamAlBeed.details
+        if (ayyamDetails) {
+          content += ayyamDetails + `\n\n`
+        }
+      } else {
+        content += `## Fasting\n`
+        content += `- **${fastingInfo.reason}** (${fastingInfo.type})\n\n`
+      }
+    } else if (fastingInfo.type === 'forbidden') {
+      content += `## Fasting Forbidden\n`
+      content += `- **${fastingInfo.reason}**: Fasting is prohibited on this day\n\n`
+    }
 
-  let headerBorderColor = 'border-border/50'
-  let headerBgColor = 'bg-card/40'
-  // Special Month Banner Configuration
-  let specialMonthBanner = null
-
-  if (isRamadan) {
-    headerBorderColor = 'border-amber-500/30'
-    headerBgColor = 'bg-amber-500/5'
-    specialMonthBanner = (
-      <div className="w-full bg-amber-500/10 border-b border-amber-500/20 py-1.5 px-4 flex items-center justify-center gap-2 text-xs font-semibold text-amber-600 dark:text-amber-400">
-        <Star className="w-3.5 h-3.5 fill-current" />
-        <span>BLESSED MONTH OF RAMADAN</span>
-        <Star className="w-3.5 h-3.5 fill-current" />
-      </div>
-    )
-  } else if (isSacredMonth) {
-    headerBorderColor = 'border-emerald-500/30'
-    headerBgColor = 'bg-emerald-500/5'
-    specialMonthBanner = (
-      <div className="w-full bg-emerald-500/10 border-b border-emerald-500/20 py-1.5 px-4 flex items-center justify-center gap-2 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
-        <Sparkles className="w-3.5 h-3.5" />
-        <span>SACRED MONTH</span>
-        <Sparkles className="w-3.5 h-3.5" />
-      </div>
-    )
+    setVirtueSheet({ title: `${currentMonthData!.monthName} ${day.hijriDay}`, content })
   }
 
   if (!currentMonthData) {
@@ -167,7 +171,7 @@ export function HijriCalendarView({ location }: HijriCalendarViewProps) {
   const gregorianEnd = new Date(gregorianStart)
   gregorianEnd.setDate(gregorianEnd.getDate() + currentMonthData.days - 1)
 
-  // Format Gregorian range - show months prominently when spanning two months
+  // Format Gregorian range
   const startMonth = gregorianStart.toLocaleDateString('en-US', { month: 'short' })
   const endMonth = gregorianEnd.toLocaleDateString('en-US', { month: 'short' })
   const startYear = gregorianStart.getFullYear()
@@ -186,17 +190,13 @@ export function HijriCalendarView({ location }: HijriCalendarViewProps) {
     <TooltipProvider delayDuration={300}>
       <div className="space-y-4">
         {/* Calendar Header Card */}
-        <Card className={`${headerBorderColor} ${headerBgColor} backdrop-blur-sm shadow-sm overflow-hidden border`}>
+        <Card className={`${monthTheme.headerBorderColor} ${monthTheme.headerBgColor} backdrop-blur-sm shadow-sm overflow-hidden border`}>
           <CardContent className="p-0">
             {/* Special Month Banner */}
-            {specialMonthBanner}
+            <SpecialMonthBanner hijriMonth={currentHijriMonth} />
 
             {/* Month Navigation */}
-            <div className={`flex items-center justify-between p-4 border-b border-border/50 relative ${isCurrentMonth
-              ? 'bg-primary/5'
-              : 'bg-transparent'
-              }`}>
-
+            <div className={`flex items-center justify-between p-4 border-b border-border/50 relative ${isCurrentMonth ? 'bg-primary/5' : 'bg-transparent'}`}>
               {/* Current Month Ribbon */}
               {isCurrentMonth && (
                 <div className="absolute top-0 right-0 overflow-hidden w-24 h-24 pointer-events-none">
@@ -263,75 +263,10 @@ export function HijriCalendarView({ location }: HijriCalendarViewProps) {
                   Today
                 </Button>
               )}
-              <Dialog open={jumpDialogOpen} onOpenChange={setJumpDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button variant="outline" size="sm" className="text-xs flex-1">
-                    <CalendarDays className="h-3.5 w-3.5 mr-1.5" />
-                    Jump to Date
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-md">
-                  <DialogHeader>
-                    <DialogTitle>Jump to Date</DialogTitle>
-                  </DialogHeader>
-                  <div className="space-y-4 pt-4">
-                    <div className="flex gap-2">
-                      <Button
-                        variant={jumpMode === 'hijri' ? 'default' : 'outline'}
-                        size="sm"
-                        onClick={() => setJumpMode('hijri')}
-                        className="flex-1"
-                      >
-                        Hijri
-                      </Button>
-                      <Button
-                        variant={jumpMode === 'gregorian' ? 'default' : 'outline'}
-                        size="sm"
-                        onClick={() => setJumpMode('gregorian')}
-                        className="flex-1"
-                        disabled
-                      >
-                        Gregorian
-                      </Button>
-                    </div>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <label className="text-sm font-medium mb-1.5 block">Month</label>
-                        <Select value={selectedHijriMonth} onValueChange={setSelectedHijriMonth}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select month" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {HIJRI_MONTH_NAMES.map((name, idx) => (
-                              <SelectItem key={idx + 1} value={String(idx + 1)}>
-                                {name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium mb-1.5 block">Year</label>
-                        <Select value={selectedHijriYear} onValueChange={setSelectedHijriYear}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select year" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {availableYears?.map((year) => (
-                              <SelectItem key={year} value={String(year)}>
-                                {year} AH
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-                    <Button onClick={handleJumpToDate} className="w-full">
-                      Go to Date
-                    </Button>
-                  </div>
-                </DialogContent>
-              </Dialog>
+              <JumpToDateDialog
+                availableYears={availableYears || []}
+                onJump={goToMonth}
+              />
             </div>
 
             {/* Weekday Headers */}
@@ -339,8 +274,7 @@ export function HijriCalendarView({ location }: HijriCalendarViewProps) {
               {WEEKDAYS.map((day, idx) => (
                 <div
                   key={day}
-                  className={`py-3 text-center text-[10px] font-bold uppercase tracking-wider text-muted-foreground border-b border-border ${idx < 6 ? 'border-r border-border/50' : ''
-                    } ${day === 'Fri' ? 'text-primary bg-primary/10' : ''}`} // Friday header highlighted
+                  className={`py-3 text-center text-[10px] font-bold uppercase tracking-wider text-muted-foreground border-b border-border ${idx < 6 ? 'border-r border-border/50' : ''} ${day === 'Fri' ? 'text-primary bg-primary/10' : ''}`}
                 >
                   {day}
                 </div>
@@ -352,19 +286,18 @@ export function HijriCalendarView({ location }: HijriCalendarViewProps) {
               {calendarGrid.map((day, index) => {
                 const colIndex = index % 7
                 const isLastCol = colIndex === 6
-                const isFriday = colIndex === 5 // Friday is 6th column (index 5 from 0)
+                const isFriday = colIndex === 5
 
                 if (!day) {
-                  // Empty cell rendering
                   return (
-                    <div
+                    <EmptyCalendarCell
                       key={`empty-${index}`}
-                      className={`aspect-square border-b border-border ${!isLastCol ? 'border-r border-border' : ''} ${isFriday ? 'bg-primary/5' : 'bg-muted/10'}`}
+                      isLastCol={isLastCol}
+                      isFriday={isFriday}
                     />
                   )
                 }
 
-                const moonPhase = getMoonPhase(day.hijriDay)
                 const dayEvents = getAllEventsForDay(currentHijriMonth, day.hijriDay, day.gregorianDate)
                 const fastingInfo = isFastingDay({
                   day: day.hijriDay,
@@ -373,226 +306,27 @@ export function HijriCalendarView({ location }: HijriCalendarViewProps) {
                   year: currentHijriYear,
                   gregorianDate: day.gregorianDate,
                 })
-                const showMoon = day.hijriDay === 1 || day.hijriDay === 15
 
-                // Detect Gregorian Month Change
-                const isGregorianStart = day.gregorianDate.getDate() === 1
-                const gregorianMonthName = day.gregorianDate.toLocaleDateString('en-US', { month: 'short' })
-                const gregorianDayLabel = isGregorianStart
-                  ? `${gregorianMonthName} 1`
-                  : day.gregorianDate.getDate().toString()
+                // Determine if clickable
+                const hasSpecialFasting = fastingInfo.isFasting && fastingInfo.reason !== 'Ramadan'
+                const isClickable = dayEvents.length > 0 || hasSpecialFasting || fastingInfo.type === 'forbidden' || isFriday
 
-                // Determine primary event type for styling
-                const getPrimaryEventType = (): keyof typeof EVENT_STYLES | null => {
-                  if (dayEvents.some(e => e.type === 'eid')) return 'eid'
-                  if (dayEvents.some(e => e.type === 'holy')) return 'holy'
-                  // Ayyam al-Beed check - prioritized
-                  if (dayEvents.some(e => e.isRecurring && e.name === 'Ayyam al-Beed')) return 'ayyamAlBeed'
-                  // Fixed Recurring Events (e.g. Dhul Hijjah)
-                  if (dayEvents.some(e => e.type === 'recommended')) return 'recommended'
-                  return null
-                }
-                const primaryEventType = getPrimaryEventType()
-                const eventStyle = primaryEventType ? EVENT_STYLES[primaryEventType] : null
-
-                // Determine cell background
-                let cellBg = 'bg-background'
-                let textColor = 'text-foreground'
-                let borderColor = 'border-transparent' // For inner border/ring
-
-                if (day.isToday) {
-                  cellBg = 'bg-primary/20'
-                  textColor = 'text-primary'
-                } else if (eventStyle) {
-                  // Backgrounds for Eid, Holy, Ayyam al-Beed
-                  cellBg = eventStyle.bg
-                  textColor = eventStyle.text
-                  borderColor = eventStyle.border
-                } else if (isFriday) {
-                  // Subtle highlight for entire Friday column
-                  cellBg = 'bg-primary/5'
-                  textColor = 'text-primary'
-                }
-
-                // Build tooltip content
-                const tooltipLines: string[] = []
-                if (dayEvents.length > 0) {
-                  dayEvents.forEach(e => {
-                    tooltipLines.push(e.name)
-                  })
-                }
-                if (fastingInfo.isFasting && fastingInfo.reason && !tooltipLines.some(l => l.includes(fastingInfo.reason!))) {
-                  tooltipLines.push(`Fasting: ${fastingInfo.reason}`)
-                }
-                const hasTooltip = tooltipLines.length > 0
-
-                // Determine if this day should be clickable
-                // isFriday is already defined above based on column index
-                // Exclude regular Ramadan days from being clickable (only special events, not just fasting)
-                const isRegularRamadanDay = currentHijriMonth === 9 && dayEvents.length === 0 && fastingInfo.reason === 'Ramadan'
-                const hasSpecialFasting = fastingInfo.isFasting && fastingInfo.reason !== 'Ramadan' // Ashura, Arafah, etc.
-                const isClickable = (dayEvents.length > 0 || hasSpecialFasting || fastingInfo.type === 'forbidden' || isFriday) && !isRegularRamadanDay
-
-                const handleDayClick = () => {
-                  if (!isClickable) return
-
-                  // Build day-specific content
-                  const dayName = day.gregorianDate.toLocaleDateString('en-US', { weekday: 'long' })
-                  let content = `# ${dayName}, ${currentMonthData.monthName} ${day.hijriDay}\n\n`
-
-                  // Add events WITH their full details
-                  if (dayEvents.length > 0) {
-                    dayEvents.forEach(e => {
-                      if (e.details) {
-                        // Use the full virtues content
-                        content += e.details + `\n\n`
-                      } else {
-                        content += `## ${e.name}\n`
-                        content += `*${e.type}*\n\n`
-                      }
-                    })
-                  }
-
-                  // Add Friday info - use full content from virtues data
-                  if (isFriday) {
-                    // Get Friday virtues from our data
-                    const fridayVirtues = recurringFasts.friday?.details
-                    if (fridayVirtues) {
-                      content += fridayVirtues + `\n\n`
-                    } else {
-                      content += `## Friday Blessings\n`
-                      content += `- **Surah Kahf**: Recite for light until next Friday\n`
-                      content += `- **Salawat**: Send abundant blessings upon the Prophet ﷺ\n`
-                      content += `- **Best Dua Time**: Between Asr and Maghrib\n`
-                      content += `- **Jumu'ah Prayer**: Obligatory for men\n\n`
-                    }
-                  }
-
-                  // Add fasting info with details
-                  if (fastingInfo.isFasting && fastingInfo.reason !== 'Ramadan') {
-                    // Check if we have detailed content for this fast
-                    if (fastingInfo.reason === 'Monday Fast') {
-                      const mondayDetails = recurringFasts.weekly.find(f => f.id === 'monday-fast')?.details
-                      if (mondayDetails) {
-                        content += mondayDetails + `\n\n`
-                      }
-                    } else if (fastingInfo.reason === 'Thursday Fast') {
-                      const thursdayDetails = recurringFasts.weekly.find(f => f.id === 'thursday-fast')?.details
-                      if (thursdayDetails) {
-                        content += thursdayDetails + `\n\n`
-                      }
-                    } else if (fastingInfo.reason === 'Ayyam al-Beed (White Days)') {
-                      const ayyamDetails = recurringFasts.monthly.ayyamAlBeed.details
-                      if (ayyamDetails) {
-                        content += ayyamDetails + `\n\n`
-                      }
-                    } else {
-                      content += `## Fasting\n`
-                      content += `- **${fastingInfo.reason}** (${fastingInfo.type})\n\n`
-                    }
-                  } else if (fastingInfo.type === 'forbidden') {
-                    content += `## Fasting Forbidden\n`
-                    content += `- **${fastingInfo.reason}**: Fasting is prohibited on this day\n\n`
-                  }
-
-                  setVirtueSheet({ title: `${currentMonthData.monthName} ${day.hijriDay}`, content })
-                }
-
-                const cellContent = (
-                  <div
-                    className={`aspect-square p-1 flex flex-col relative transition-colors border-b border-border ${isClickable ? 'cursor-pointer hover:bg-muted/50' : ''} ${!isLastCol ? 'border-r border-border' : ''} ${cellBg} ${day.isToday ? 'ring-2 ring-primary ring-inset z-10' : ''
-                      }`}
-                    onClick={handleDayClick}
-                  >
-                    {/* Internal border for events */}
-                    {eventStyle && (
-                      <div className={`absolute inset-0.5 border ${borderColor} rounded-sm pointer-events-none`} />
-                    )}
-
-                    {/* Moon Phase - Top Right (Key days) */}
-                    {showMoon && (
-                      <span className="absolute top-1 right-1 text-sm opacity-80">
-                        {moonPhase.icon}
-                      </span>
-                    )}
-
-                    {/* Eid Text Logic */}
-                    {primaryEventType === 'eid' && (
-                      <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none opacity-10">
-                        <span className="text-3xl font-extrabold uppercase">EID</span>
-                        <span className="text-3xl font-extrabold font-arabic">عيد</span>
-                      </div>
-                    )}
-
-                    {/* Indicators Row (Bottom Left) - INCREASED SIZE + ICONS */}
-                    <div className="absolute bottom-1.5 left-1.5 flex gap-0.5 z-10">
-                      {/* Event Icon - Only for Eid/Holy/Ayyam al-Beed */}
-                      {eventStyle && (
-                        <eventStyle.icon className={`w-3 h-3 ${eventStyle.text}`} fill="currentColor" />
-                      )}
-
-                      {/* Fasting Icon - Consistent for ALL fasts */}
-                      {fastingInfo.isFasting && !eventStyle && (
-                        <Moon className={`w-3 h-3 ${fastingInfo.type === 'obligatory' ? 'text-amber-500 fill-amber-500' : 'text-sky-400'}`} />
-                      )}
-                    </div>
-
-                    {/* Hijri Day Number - CENTER LARGED */}
-                    <div className="flex-1 flex items-center justify-center z-0">
-                      <span
-                        className={`text-2xl font-bold leading-none tracking-tight ${day.isToday ? 'text-primary' : textColor
-                          }`}
-                      >
-                        {day.hijriDay}
-                      </span>
-                    </div>
-
-                    {/* Gregorian Day - Bottom Right */}
-                    <span className={`absolute bottom-1 right-1.5 text-[10px] font-medium leading-none ${isGregorianStart ? 'text-primary font-bold' : 'text-muted-foreground/60'}`}>
-                      {gregorianDayLabel}
-                    </span>
-                  </div>
-                )
-
-                return hasTooltip ? (
-                  <Tooltip key={day.hijriDay}>
-                    <TooltipTrigger asChild>
-                      {cellContent}
-                    </TooltipTrigger>
-                    <TooltipContent className="max-w-xs p-2">
-                      <div className="space-y-1">
-                        <p className="text-xs text-muted-foreground font-semibold border-b border-border/20 pb-1 mb-1">
-                          {day.gregorianDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
-                        </p>
-                        {tooltipLines.map((line, i) => (
-                          <p key={i} className="text-sm">{line}</p>
-                        ))}
-                      </div>
-                    </TooltipContent>
-                  </Tooltip>
-                ) : (
-                  <div key={day.hijriDay}>{cellContent}</div>
+                return (
+                  <CalendarDay
+                    key={day.hijriDay}
+                    day={day}
+                    dayEvents={dayEvents}
+                    fastingInfo={fastingInfo}
+                    currentHijriMonth={currentHijriMonth}
+                    isLastCol={isLastCol}
+                    isFriday={isFriday}
+                    onDayClick={isClickable ? () => handleDayClick(day, isFriday) : undefined}
+                  />
                 )
               })}
 
-              {/* Day 30 Uncertain Cell - only for current month */}
-              {showDay30Uncertain && (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <div className="aspect-square p-1 flex flex-col items-center justify-center relative transition-colors border-b border-border bg-amber-500/10 ring-2 ring-dashed ring-amber-500 ring-inset cursor-help">
-                      <span className="text-lg font-bold leading-none text-amber-600 dark:text-amber-400">
-                        30?
-                      </span>
-                      <span className="text-[10px] text-amber-600/70 dark:text-amber-400/70 mt-1 leading-none">
-                        Pending
-                      </span>
-                    </div>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p className="text-sm">Moon sighting will determine if month has 30 days</p>
-                  </TooltipContent>
-                </Tooltip>
-              )}
+              {/* Day 30 Uncertain Cell */}
+              {showDay30Uncertain && <UncertainDay30Cell />}
             </div>
           </CardContent>
         </Card>

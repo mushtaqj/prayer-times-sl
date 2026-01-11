@@ -1,17 +1,11 @@
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Moon, Sun, MapPin, Loader2, Clock, Calendar, HelpCircle } from 'lucide-react'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+import { MapPin, Loader2, Clock, Calendar, HelpCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { AppInfoModal } from './AppInfoModal'
+import { ThemeToggleButton, DistrictSelector } from '@/components/common'
 import { useLocation as useGeoLocation } from '@/hooks/useLocation'
-import type { District } from '@/hooks/usePrayerTimes'
+import type { District } from '@/lib/data/types'
 
 interface HeaderProps {
   districts: District[]
@@ -39,16 +33,13 @@ export function Header({
     }
   }
 
-  // Determine which section is active based on current route
   const isPrayerSection = location.pathname.startsWith('/prayer')
   const isHijriSection = location.pathname === '/hijri'
 
   return (
     <header className="hidden sm:block border-b border-border bg-background/95 backdrop-blur-xl sticky top-0 z-40 shadow-sm supports-[backdrop-filter]:bg-background/60">
-      {/* Top row: Section toggle + controls */}
       <div className="flex items-center justify-between gap-2 px-2 sm:px-4 py-2 sm:py-3">
-
-        {/* Branding & Title - Clickable to go home */}
+        {/* Branding & Title */}
         <Link
           to="/"
           className="flex items-center gap-2 hover:opacity-80 transition-opacity shrink-0"
@@ -64,24 +55,26 @@ export function Header({
           </div>
         </Link>
 
-        {/* Section Toggle - Prayer & Hijri only (no Home button) */}
+        {/* Section Toggle */}
         <div className="flex items-center bg-muted/50 rounded-lg p-0.5 sm:p-1 border border-border/50">
           <Link
             to="/prayer"
-            className={`flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 rounded-md text-[11px] sm:text-xs font-medium transition-all ${isPrayerSection
-              ? 'bg-background text-foreground shadow-sm ring-1 ring-black/5 dark:ring-white/10'
-              : 'text-muted-foreground hover:text-foreground'
-              }`}
+            className={`flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 rounded-md text-[11px] sm:text-xs font-medium transition-all ${
+              isPrayerSection
+                ? 'bg-background text-foreground shadow-sm ring-1 ring-black/5 dark:ring-white/10'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
           >
             <Clock className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
             <span>Prayer</span>
           </Link>
           <Link
             to="/hijri"
-            className={`flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 rounded-md text-[11px] sm:text-xs font-medium transition-all ${isHijriSection
-              ? 'bg-background text-foreground shadow-sm ring-1 ring-black/5 dark:ring-white/10'
-              : 'text-muted-foreground hover:text-foreground'
-              }`}
+            className={`flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 rounded-md text-[11px] sm:text-xs font-medium transition-all ${
+              isHijriSection
+                ? 'bg-background text-foreground shadow-sm ring-1 ring-black/5 dark:ring-white/10'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
           >
             <Calendar className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
             <span>Hijri</span>
@@ -105,27 +98,14 @@ export function Header({
             )}
           </Button>
 
-          <Select value={selectedDistrict} onValueChange={onDistrictChange}>
-            <SelectTrigger className="w-20 sm:w-28 h-7 sm:h-8 text-[10px] sm:text-xs border-muted bg-card/50 backdrop-blur-sm">
-              <SelectValue placeholder="District" />
-            </SelectTrigger>
-            <SelectContent>
-              {districts.map(district => (
-                <SelectItem key={district.id} value={district.id}>
-                  {district.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <DistrictSelector
+            districts={districts}
+            value={selectedDistrict}
+            onChange={onDistrictChange}
+            size="default"
+          />
 
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onThemeToggle}
-            className="h-7 w-7 sm:h-8 sm:w-8 text-muted-foreground hover:text-primary transition-colors"
-          >
-            {isDark ? <Sun className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> : <Moon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
-          </Button>
+          <ThemeToggleButton isDark={isDark} onToggle={onThemeToggle} />
 
           <Button
             variant="ghost"

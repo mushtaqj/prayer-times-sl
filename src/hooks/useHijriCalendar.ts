@@ -1,6 +1,7 @@
 import { useMemo, useState, useCallback } from 'react'
 import hijriData from '@/data/hijriCalendar.json'
 import type { HijriDate, HijriMonth, HijriMonthInfo, CalendarDay, MoonPhase } from '@/lib/data/types'
+import { parseDate, isSameDay, addDays, daysBetween } from '@/lib/dateUtils'
 
 // Re-export types for backwards compatibility
 export type { HijriDate, HijriMonth, HijriMonthInfo as HijriMonthMaster, CalendarDay }
@@ -15,30 +16,6 @@ export function getMoonPhase(hijriDay: number): MoonPhase {
   if (hijriDay >= 17 && hijriDay <= 20) return { phase: 'Waning Gibbous', icon: '🌖' }
   if (hijriDay >= 21 && hijriDay <= 24) return { phase: 'Last Quarter', icon: '🌗' }
   return { phase: 'Waning Crescent', icon: '🌘' }
-}
-
-function parseDate(dateStr: string): Date {
-  const [year, month, day] = dateStr.split('-').map(Number)
-  return new Date(year, month - 1, day)
-}
-
-function isSameDay(date1: Date, date2: Date): boolean {
-  return (
-    date1.getFullYear() === date2.getFullYear() &&
-    date1.getMonth() === date2.getMonth() &&
-    date1.getDate() === date2.getDate()
-  )
-}
-
-function addDays(date: Date, days: number): Date {
-  const result = new Date(date)
-  result.setDate(result.getDate() + days)
-  return result
-}
-
-function daysBetween(date1: Date, date2: Date): number {
-  const oneDay = 24 * 60 * 60 * 1000
-  return Math.floor((date2.getTime() - date1.getTime()) / oneDay)
 }
 
 export function useHijriCalendar() {
