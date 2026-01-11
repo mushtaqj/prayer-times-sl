@@ -1,16 +1,39 @@
 # Prayer Times Sri Lanka
 
-A modern, mobile-first Progressive Web App (PWA) for Islamic prayer times across all districts in Sri Lanka.
+A modern, mobile-first Progressive Web App (PWA) for Islamic prayer times and Hijri calendar across all districts in Sri Lanka.
 
 ## Features
 
+### Prayer Times
 - **All 26 Districts**: Complete coverage of Sri Lanka across 13 prayer time zones
 - **Daily, Weekly & Monthly Views**: Multiple ways to view prayer schedules
 - **Auto Location Detection**: Automatically detects your nearest district using GPS
-- **Prayer Alarms**: Set notifications for any prayer time
+- **Prayer Alarms**: Set notifications for any prayer time (with 10-minute reminders)
+- **Next Prayer Countdown**: Visual countdown timer with progress indicator
+
+### Hijri Calendar
+- **Full Hijri Calendar**: Monthly calendar view with Hijri and Gregorian dates
+- **Moon Phases**: Visual moon phase indicators for each day
+- **Islamic Events**: Highlighted important dates (Ramadan, Eid, etc.)
+- **Special Day Indicators**: Fasting days, holy nights, and recommended practices
+- **Event Details**: Tap any event for detailed information and virtues
+
+### App Features
 - **Dark/Light Mode**: Theme toggle for comfortable viewing
 - **Offline Support**: Works without internet after first load (PWA)
-- **Mobile-First Design**: Optimized for mobile devices
+- **Installable**: Add to home screen for native app experience
+- **URL Routing**: Deep links to specific sections (`/prayer`, `/prayer/week`, `/hijri`)
+- **Mobile-First Design**: Optimized for mobile with bottom navigation
+
+## Routes
+
+| Route | Description |
+|-------|-------------|
+| `/` | Landing page with next prayer countdown |
+| `/prayer` | Today's prayer times |
+| `/prayer/week` | Weekly prayer schedule |
+| `/prayer/month` | Monthly prayer schedule |
+| `/hijri` | Hijri calendar view |
 
 ## Districts Covered
 
@@ -33,9 +56,10 @@ A modern, mobile-first Progressive Web App (PWA) for Islamic prayer times across
 ## Tech Stack
 
 - **React 19** with TypeScript
+- **React Router** for client-side routing
 - **Vite** for fast development and builds
-- **Tailwind CSS** with shadcn/ui components
-- **PWA** with service worker for offline support
+- **Tailwind CSS v4** with shadcn/ui components
+- **PWA** with Workbox service worker for offline support
 - **Local Storage** for persisting user preferences
 
 ## Getting Started
@@ -54,23 +78,32 @@ npm run build
 npm run preview
 ```
 
-## Data Source
+## PWA Features & Limitations
 
-Prayer times data sourced from [ACJU (All Ceylon Jamiyyathul Ulama)](https://www.acju.lk/prayer-times/).
+### What Works
+- Installable on home screen (Android, iOS, Desktop)
+- Offline access to all prayer times and calendar data
+- Standalone mode (no browser UI)
+- Theme and district preferences persist
 
----
+### Current Limitations
 
-# Hijri Calendar App (Planned)
+**Notifications require the app to be open.**
 
-A companion app for the Islamic Hijri calendar with moon sighting data for Sri Lanka.
+The current notification system uses browser `setTimeout` which only works while the app is running. When you close the app:
+- Scheduled notifications are lost
+- No alerts will fire
 
-## Planned Features
+**Why?** True background notifications require:
+- A backend server with Web Push (FCM/VAPID)
+- Or wrapping in a native app container (Capacitor)
 
-- **Hijri-Gregorian Date Conversion**: Convert between Islamic and Gregorian calendars
-- **Monthly Calendar View**: Visual calendar showing both Hijri and Gregorian dates
-- **Important Islamic Dates**: Highlighted events and holidays
-- **Moon Sighting Updates**: Integration with ACJU Hilaal Committee announcements
-- **Offline Support**: PWA for offline access
+**Workaround**: Keep the app open in a background tab for notifications to work.
+
+### Future Improvements
+- Web Push notifications with backend service
+- Better iOS PWA support detection
+- Periodic sync for background updates
 
 ## Islamic Months
 
@@ -94,32 +127,44 @@ A companion app for the Islamic Hijri calendar with moon sighting data for Sri L
 | Event | Date (Hijri) | Significance |
 |-------|--------------|--------------|
 | Islamic New Year | 1 Muharram | Beginning of new Hijri year |
-| Ashura | 10 Muharram | Day of fasting, commemorating various events |
+| Ashura | 10 Muharram | Day of fasting |
 | Mawlid al-Nabi | 12 Rabi al-Awwal | Prophet Muhammad's (PBUH) birthday |
 | Isra and Mi'raj | 27 Rajab | Night journey of Prophet Muhammad (PBUH) |
 | Shab e Barat | 15 Shaban | Night of forgiveness |
 | Ramadan Begins | 1 Ramadan | Start of fasting month |
 | Laylat al-Qadr | 27 Ramadan | Night of Power |
 | Eid al-Fitr | 1 Shawwal | Festival marking end of Ramadan |
-| Day of Arafah | 9 Dhul Hijjah | Day before Eid al-Adha, day of Hajj |
+| Day of Arafah | 9 Dhul Hijjah | Day before Eid al-Adha |
 | Eid al-Adha | 10 Dhul Hijjah | Festival of Sacrifice |
 
 ## Data Sources
 
+- [ACJU (All Ceylon Jamiyyathul Ulama)](https://www.acju.lk/prayer-times/) - Prayer times data
 - [ACJU Calendars](https://www.acju.lk/calenders-en/) - Official moon sighting announcements
 - [SLHub Hilaal Calendar](https://www.slhub.com/downloads/hilaal-calendar) - Monthly Hijri calendars
-- [IslamicFinder](https://www.islamicfinder.org/islamic-calendar/) - Islamic calendar reference
 
-## Implementation Notes
+## Project Structure
 
-The Hijri calendar is a lunar calendar with 354-355 days per year. Each month begins with the sighting of the new crescent moon. In Sri Lanka, the ACJU Hilaal Committee is responsible for official moon sighting announcements.
-
-Key considerations:
-- Months can be 29 or 30 days based on moon sighting
-- Dates may vary by 1-2 days from calculated dates
-- Official dates for Ramadan, Eid, etc. depend on local moon sighting announcements
-
----
+```
+src/
+├── components/          # React components
+│   ├── ui/             # shadcn/ui components
+│   ├── LandingPage.tsx # Home page with countdown
+│   ├── DailyView.tsx   # Today's prayer times
+│   ├── WeekView.tsx    # Weekly schedule
+│   ├── MonthView.tsx   # Monthly schedule
+│   └── HijriCalendarView.tsx
+├── hooks/              # Custom React hooks
+│   ├── useAlarms.ts    # Notification scheduling
+│   ├── usePrayerTimes.ts
+│   ├── useHijriCalendar.ts
+│   └── useIslamicEvents.ts
+├── data/               # Static JSON data
+│   ├── prayerTimes.json
+│   ├── hijriCalendar.json
+│   └── islamicEvents.json
+└── lib/                # Utilities
+```
 
 ## License
 
@@ -129,3 +174,4 @@ MIT
 
 - [ACJU](https://www.acju.lk/) for prayer times and Islamic calendar data
 - [shadcn/ui](https://ui.shadcn.com/) for UI components
+- [Lucide](https://lucide.dev/) for icons
