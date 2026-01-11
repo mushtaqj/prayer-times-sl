@@ -141,7 +141,7 @@ function App() {
               element={
                 <>
                   {/* Sticky View Switcher */}
-                  <div className="sticky top-[calc(48px+env(safe-area-inset-top))] sm:top-[60px] z-30 bg-background/95 backdrop-blur-md px-4 py-3 border-b border-border/50 supports-[backdrop-filter]:bg-background/60 shadow-sm">
+                  <div className="sticky top-[calc(48px+env(safe-area-inset-top))] sm:top-[60px] z-30 mt-[calc(48px+env(safe-area-inset-top))] sm:mt-0 bg-background/95 backdrop-blur-md px-4 py-3 border-b border-border/50 supports-[backdrop-filter]:bg-background/60 shadow-sm">
                     <ViewSwitcher />
                   </div>
 
@@ -169,7 +169,7 @@ function App() {
               path="/prayer/week"
               element={
                 <>
-                  <div className="sticky top-[calc(48px+env(safe-area-inset-top))] sm:top-[60px] z-30 bg-background/95 backdrop-blur-md px-4 py-3 border-b border-border/50 supports-[backdrop-filter]:bg-background/60 shadow-sm">
+                  <div className="sticky top-[calc(48px+env(safe-area-inset-top))] sm:top-[60px] z-30 mt-[calc(48px+env(safe-area-inset-top))] sm:mt-0 bg-background/95 backdrop-blur-md px-4 py-3 border-b border-border/50 supports-[backdrop-filter]:bg-background/60 shadow-sm">
                     <ViewSwitcher />
                   </div>
 
@@ -189,7 +189,7 @@ function App() {
               path="/prayer/month"
               element={
                 <>
-                  <div className="sticky top-[calc(48px+env(safe-area-inset-top))] sm:top-[60px] z-30 bg-background/95 backdrop-blur-md px-4 py-3 border-b border-border/50 supports-[backdrop-filter]:bg-background/60 shadow-sm">
+                  <div className="sticky top-[calc(48px+env(safe-area-inset-top))] sm:top-[60px] z-30 mt-[calc(48px+env(safe-area-inset-top))] sm:mt-0 bg-background/95 backdrop-blur-md px-4 py-3 border-b border-border/50 supports-[backdrop-filter]:bg-background/60 shadow-sm">
                     <ViewSwitcher />
                   </div>
 
@@ -208,7 +208,7 @@ function App() {
             <Route
               path="/hijri"
               element={
-                <div className="p-4 pb-20 sm:pb-4 flex-1 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <div className="p-4 mt-[calc(48px+env(safe-area-inset-top))] sm:mt-0 pb-20 sm:pb-4 flex-1 animate-in fade-in slide-in-from-bottom-4 duration-500">
                   <HijriCalendarView location={locationName} />
                 </div>
               }

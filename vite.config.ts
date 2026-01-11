@@ -16,8 +16,8 @@ export default defineConfig({
         name: 'Prayer Times',
         short_name: 'Prayer',
         description: 'Prayer times for Sri Lanka districts',
-        theme_color: '#7C3AED',
-        background_color: '#FAF5FF',
+        theme_color: '#166534',
+        background_color: '#faf9f6',
         display: 'standalone',
         icons: [
           {
