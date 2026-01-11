@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link, useLocation } from 'react-router-dom'
 import { Moon, Sun, MapPin, Loader2, Clock, Calendar, HelpCircle } from 'lucide-react'
 import {
   Select,
@@ -9,10 +10,8 @@ import {
 } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
 import { AppInfoModal } from './AppInfoModal'
-import { useLocation } from '@/hooks/useLocation'
+import { useLocation as useGeoLocation } from '@/hooks/useLocation'
 import type { District } from '@/hooks/usePrayerTimes'
-
-export type MainSection = 'home' | 'prayer' | 'hijri'
 
 interface HeaderProps {
   districts: District[]
@@ -20,8 +19,6 @@ interface HeaderProps {
   onDistrictChange: (value: string) => void
   isDark: boolean
   onThemeToggle: () => void
-  mainSection: MainSection
-  onSectionChange: (section: MainSection) => void
 }
 
 export function Header({
@@ -30,11 +27,10 @@ export function Header({
   onDistrictChange,
   isDark,
   onThemeToggle,
-  mainSection,
-  onSectionChange,
 }: HeaderProps) {
-  const { detectLocation, isDetecting } = useLocation()
+  const { detectLocation, isDetecting } = useGeoLocation()
   const [showInfo, setShowInfo] = useState(false)
+  const location = useLocation()
 
   const handleDetectLocation = async () => {
     const district = await detectLocation()
@@ -43,14 +39,18 @@ export function Header({
     }
   }
 
+  // Determine which section is active based on current route
+  const isPrayerSection = location.pathname.startsWith('/prayer')
+  const isHijriSection = location.pathname === '/hijri'
+
   return (
     <header className="hidden sm:block border-b border-border bg-background/95 backdrop-blur-xl sticky top-0 z-40 shadow-sm supports-[backdrop-filter]:bg-background/60">
       {/* Top row: Section toggle + controls */}
       <div className="flex items-center justify-between gap-2 px-2 sm:px-4 py-2 sm:py-3">
 
         {/* Branding & Title - Clickable to go home */}
-        <button
-          onClick={() => onSectionChange('home')}
+        <Link
+          to="/"
           className="flex items-center gap-2 hover:opacity-80 transition-opacity shrink-0"
         >
           <img
@@ -62,30 +62,30 @@ export function Header({
             <h1 className="text-base font-bold leading-none tracking-tight">Prayer Times</h1>
             <span className="text-[10px] text-muted-foreground font-medium">Sri Lanka</span>
           </div>
-        </button>
+        </Link>
 
         {/* Section Toggle - Prayer & Hijri only (no Home button) */}
         <div className="flex items-center bg-muted/50 rounded-lg p-0.5 sm:p-1 border border-border/50">
-          <button
-            onClick={() => onSectionChange('prayer')}
-            className={`flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 rounded-md text-[11px] sm:text-xs font-medium transition-all ${mainSection === 'prayer'
+          <Link
+            to="/prayer"
+            className={`flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 rounded-md text-[11px] sm:text-xs font-medium transition-all ${isPrayerSection
               ? 'bg-background text-foreground shadow-sm ring-1 ring-black/5 dark:ring-white/10'
               : 'text-muted-foreground hover:text-foreground'
               }`}
           >
             <Clock className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
             <span>Prayer</span>
-          </button>
-          <button
-            onClick={() => onSectionChange('hijri')}
-            className={`flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 rounded-md text-[11px] sm:text-xs font-medium transition-all ${mainSection === 'hijri'
+          </Link>
+          <Link
+            to="/hijri"
+            className={`flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 rounded-md text-[11px] sm:text-xs font-medium transition-all ${isHijriSection
               ? 'bg-background text-foreground shadow-sm ring-1 ring-black/5 dark:ring-white/10'
               : 'text-muted-foreground hover:text-foreground'
               }`}
           >
             <Calendar className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
             <span>Hijri</span>
-          </button>
+          </Link>
         </div>
 
         {/* Right controls */}

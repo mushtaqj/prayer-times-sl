@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link, useLocation } from 'react-router-dom'
 import { Menu, X, Clock, Calendar, MapPin, Loader2, Moon, Sun, HelpCircle } from 'lucide-react'
 import {
   Select,
@@ -9,9 +10,8 @@ import {
 } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
 import { AppInfoModal } from './AppInfoModal'
-import { useLocation } from '@/hooks/useLocation'
+import { useLocation as useGeoLocation } from '@/hooks/useLocation'
 import type { District } from '@/hooks/usePrayerTimes'
-import type { MainSection } from './Header'
 
 interface MobileNavProps {
   districts: District[]
@@ -19,8 +19,6 @@ interface MobileNavProps {
   onDistrictChange: (value: string) => void
   isDark: boolean
   onThemeToggle: () => void
-  mainSection: MainSection
-  onSectionChange: (section: MainSection) => void
 }
 
 export function MobileNav({
@@ -29,12 +27,11 @@ export function MobileNav({
   onDistrictChange,
   isDark,
   onThemeToggle,
-  mainSection,
-  onSectionChange,
 }: MobileNavProps) {
   const [menuOpen, setMenuOpen] = useState(false)
   const [showInfo, setShowInfo] = useState(false)
-  const { detectLocation, isDetecting } = useLocation()
+  const { detectLocation, isDetecting } = useGeoLocation()
+  const location = useLocation()
 
   const handleDetectLocation = async () => {
     const district = await detectLocation()
@@ -44,8 +41,13 @@ export function MobileNav({
     }
   }
 
+  // Determine which section is active based on current route
+  const isPrayerSection = location.pathname.startsWith('/prayer')
+  const isHijriSection = location.pathname === '/hijri'
+  const isHomePage = location.pathname === '/'
+
   // Don't render anything on home page
-  if (mainSection === 'home') {
+  if (isHomePage) {
     return null
   }
 
@@ -55,8 +57,8 @@ export function MobileNav({
       <header className="fixed top-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-xl border-b border-border shadow-sm">
         <div className="flex items-center justify-between px-3 py-2">
           {/* Logo - tap to go home */}
-          <button
-            onClick={() => onSectionChange('home')}
+          <Link
+            to="/"
             className="flex items-center gap-2 hover:opacity-80 transition-opacity"
           >
             <img
@@ -65,7 +67,7 @@ export function MobileNav({
               className="w-8 h-8 rounded-xl shadow-sm"
             />
             <span className="text-sm font-bold text-foreground">Prayer Times</span>
-          </button>
+          </Link>
 
           {/* Hamburger Button */}
           <button
@@ -191,36 +193,36 @@ export function MobileNav({
       <nav className="fixed bottom-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-xl border-t border-border shadow-lg">
         <div className="flex items-stretch h-14">
           {/* Prayer Tab */}
-          <button
-            onClick={() => onSectionChange('prayer')}
+          <Link
+            to="/prayer"
             className={`flex-1 flex flex-col items-center justify-center gap-0.5 transition-colors relative ${
-              mainSection === 'prayer'
+              isPrayerSection
                 ? 'text-primary'
                 : 'text-muted-foreground hover:text-foreground'
             }`}
           >
-            {mainSection === 'prayer' && (
+            {isPrayerSection && (
               <div className="absolute top-0 left-4 right-4 h-0.5 bg-primary rounded-full" />
             )}
             <Clock className="w-5 h-5" />
             <span className="text-xs font-medium">Prayer</span>
-          </button>
+          </Link>
 
           {/* Hijri Tab */}
-          <button
-            onClick={() => onSectionChange('hijri')}
+          <Link
+            to="/hijri"
             className={`flex-1 flex flex-col items-center justify-center gap-0.5 transition-colors relative ${
-              mainSection === 'hijri'
+              isHijriSection
                 ? 'text-primary'
                 : 'text-muted-foreground hover:text-foreground'
             }`}
           >
-            {mainSection === 'hijri' && (
+            {isHijriSection && (
               <div className="absolute top-0 left-4 right-4 h-0.5 bg-primary rounded-full" />
             )}
             <Calendar className="w-5 h-5" />
             <span className="text-xs font-medium">Hijri</span>
-          </button>
+          </Link>
         </div>
         {/* Safe area padding for notched phones */}
         <div className="h-safe-area-inset-bottom bg-background" />

@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { VirtuesSheet } from '@/components/VirtuesSheet'
 import { gregorianToHijri, getMoonPhase } from '@/hooks/useHijriCalendar'
 import { useIslamicEvents } from '@/hooks/useIslamicEvents'
 import { parseTime, formatCountdown } from '@/lib/timeUtils'
-import { Clock, Calendar, CalendarSearch, Moon, Sun, Sunrise, Sunset, CloudSun } from 'lucide-react'
-import type { MainSection } from '@/components/Header'
+import { Clock, Calendar, CalendarSearch, Moon, Sun, Sunrise, Sunset, CloudSun, Bell, Download, X } from 'lucide-react'
 
 interface PrayerInfo {
   name: string
@@ -19,12 +19,28 @@ interface LandingPageProps {
   currentPrayer: PrayerInfo | null
   nextPrayer: PrayerInfo | null
   location: string
-  onNavigate: (section: MainSection) => void
   isDark: boolean
   onThemeToggle: () => void
+  hasNotificationPermission: boolean
+  onEnableNotifications: () => void
+  showInstallBanner: boolean
+  onInstall: () => void
+  onDismissInstall: () => void
 }
 
-export function LandingPage({ currentPrayer, nextPrayer, location, onNavigate, isDark, onThemeToggle }: LandingPageProps) {
+export function LandingPage({
+  currentPrayer,
+  nextPrayer,
+  location,
+  isDark,
+  onThemeToggle,
+  hasNotificationPermission,
+  onEnableNotifications,
+  showInstallBanner,
+  onInstall,
+  onDismissInstall
+}: LandingPageProps) {
+  const navigate = useNavigate()
   const [countdown, setCountdown] = useState('')
   const [progress, setProgress] = useState(0)
   const [virtuesSheet, setVirtuesSheet] = useState<{ isOpen: boolean; title: string; content: string }>({
@@ -289,10 +305,10 @@ export function LandingPage({ currentPrayer, nextPrayer, location, onNavigate, i
             </div>
 
             {/* Current Prayer indicator */}
-            <div className="flex items-center gap-1.5 sm:gap-2 bg-amber-400/20 backdrop-blur-sm rounded-full px-3 py-1.5 border border-amber-400/30">
-              <span className="text-[10px] sm:text-xs text-amber-200">Current:</span>
-              <span className="font-semibold text-amber-300 text-sm">{currentPrayer.displayName}</span>
-              <span className="text-[10px] sm:text-xs text-amber-200">({currentPrayer.time})</span>
+            <div className="flex items-center gap-1.5 sm:gap-2 bg-white/15 backdrop-blur-sm rounded-full px-3 py-1.5 border border-white/20">
+              <span className="text-[10px] sm:text-xs text-white/70">Current:</span>
+              <span className="font-semibold text-white text-sm">{currentPrayer.displayName}</span>
+              <span className="text-[10px] sm:text-xs text-white/70">({currentPrayer.time})</span>
             </div>
           </CardContent>
         </Card>
@@ -375,7 +391,7 @@ export function LandingPage({ currentPrayer, nextPrayer, location, onNavigate, i
         <div className="grid grid-cols-3 gap-2">
           {/* Prayer Times Button */}
           <button
-            onClick={() => onNavigate('prayer')}
+            onClick={() => navigate('/prayer')}
             className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-md shadow-emerald-500/20 hover:shadow-lg hover:scale-[1.02] transition-all active:scale-[0.98]"
           >
             <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-white/20 flex items-center justify-center">
@@ -386,7 +402,7 @@ export function LandingPage({ currentPrayer, nextPrayer, location, onNavigate, i
 
           {/* Hijri Calendar Button */}
           <button
-            onClick={() => onNavigate('hijri')}
+            onClick={() => navigate('/hijri')}
             className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-md shadow-emerald-500/20 hover:shadow-lg hover:scale-[1.02] transition-all active:scale-[0.98]"
           >
             <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-white/20 flex items-center justify-center">
@@ -423,8 +439,7 @@ export function LandingPage({ currentPrayer, nextPrayer, location, onNavigate, i
                   onClick={() => {
                     setShowMonthPicker(false)
                     // Navigate to hijri calendar with the selected month
-                    // We'll pass this through navigation state
-                    onNavigate('hijri')
+                    navigate('/hijri')
                   }}
                   className={`p-3 rounded-xl text-center transition-all hover:scale-[1.02] active:scale-[0.98] ${
                     hijriDate?.month === month.number

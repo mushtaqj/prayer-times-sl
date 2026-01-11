@@ -10,6 +10,7 @@ import type { PrayerName } from '@/hooks/useAlarms'
 interface DailyViewProps {
   prayers: PrayerTime | null
   nextPrayer: { name: string; time: string; displayName: string } | null
+  currentPrayer: { name: string; time: string; displayName: string } | null
   alarms: Record<string, boolean>
   onToggleAlarm: (prayer: PrayerName) => void
   location: string
@@ -24,7 +25,7 @@ const prayerInfo: { key: PrayerName; label: string }[] = [
   { key: 'isha', label: 'Isha' },
 ]
 
-export function DailyView({ prayers, nextPrayer, alarms, onToggleAlarm, location }: DailyViewProps) {
+export function DailyView({ prayers, nextPrayer, currentPrayer, alarms, onToggleAlarm, location }: DailyViewProps) {
   if (!prayers) {
     return (
       <Card>
@@ -53,6 +54,7 @@ export function DailyView({ prayers, nextPrayer, alarms, onToggleAlarm, location
         <NextPrayerBanner
           prayerName={nextPrayer.displayName}
           prayerTime={nextPrayer.time}
+          currentPrayerTime={currentPrayer?.time}
         />
       )}
 
