@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 import { Button } from '@/components/ui/button'
-import { Lock, Moon, CheckCircle, AlertCircle, Loader2, Calendar, ArrowRight } from 'lucide-react'
+import { Lock, Moon, AlertCircle, Loader2, Calendar, ArrowRight, Mail, Shield } from 'lucide-react'
 import hijriData from '@/data/hijriCalendar.json'
 
 const MONTH_NAMES = [
@@ -12,7 +12,8 @@ const MONTH_NAMES = [
 type SubmitStatus = 'idle' | 'loading' | 'success' | 'error'
 
 export function AdminPage() {
-  const [adminSecret, setAdminSecret] = useState('')
+  const [password, setPassword] = useState('')
+  const [email, setEmail] = useState('')
   const [days, setDays] = useState<29 | 30>(30)
   const [status, setStatus] = useState<SubmitStatus>('idle')
   const [message, setMessage] = useState('')
@@ -53,23 +54,22 @@ export function AdminPage() {
     setMessage('')
 
     try {
-      const response = await fetch('/api/trigger-hijri-update', {
+      const response = await fetch('/api/request-update', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-Admin-Secret': adminSecret,
         },
-        body: JSON.stringify({ days }),
+        body: JSON.stringify({ password, email, days }),
       })
 
       const data = await response.json()
 
       if (response.ok) {
         setStatus('success')
-        setMessage(data.message || 'Update triggered successfully!')
+        setMessage(data.message || 'Confirmation email sent!')
       } else {
         setStatus('error')
-        setMessage(data.error || 'Failed to trigger update')
+        setMessage(data.error || 'Request failed')
       }
     } catch (error) {
       setStatus('error')
@@ -90,18 +90,24 @@ export function AdminPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background p-4">
-      <div className="max-w-md mx-auto">
+    <div className="min-h-screen bg-background text-foreground p-4">
+      <div className="max-w-md mx-auto pt-8">
+        {/* Security Badge */}
+        <div className="flex items-center justify-center gap-2 text-muted-foreground text-sm mb-6">
+          <Shield className="w-4 h-4" />
+          <span>Secure Admin Portal</span>
+        </div>
+
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4 border border-primary/20">
             <Moon className="w-8 h-8 text-primary" />
           </div>
           <h1 className="text-2xl font-heading font-bold text-foreground">
             Complete Hijri Month
           </h1>
           <p className="text-sm text-muted-foreground mt-2">
-            Mark the current month as complete and start the next
+            Two-factor verification required
           </p>
         </div>
 
@@ -121,112 +127,153 @@ export function AdminPage() {
                 })}
               </p>
             </div>
-            <ArrowRight className="w-6 h-6 text-muted-foreground" />
+            <ArrowRight className="w-6 h-6 text-muted-foreground/50" />
             <div className="text-right">
               <p className="text-xs text-muted-foreground uppercase tracking-wide">Next Month</p>
               <p className="text-lg font-semibold text-primary">
                 {nextMonth.monthName} {nextMonth.hijriYear}
               </p>
               <p className="text-sm text-muted-foreground">
-                Will start {nextStartDate}
+                Starts {nextStartDate}
               </p>
             </div>
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Admin Secret */}
-          <div className="space-y-2">
-            <label className="flex items-center gap-2 text-sm font-medium text-foreground">
-              <Lock className="w-4 h-4" />
-              Admin Password
-            </label>
-            <input
-              type="password"
-              value={adminSecret}
-              onChange={(e) => setAdminSecret(e.target.value)}
-              required
-              className="w-full px-3 py-2 rounded-lg border border-border bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
-              placeholder="Enter admin password"
-            />
-          </div>
-
-          {/* Days Selection */}
-          <div className="space-y-3">
-            <label className="flex items-center gap-2 text-sm font-medium text-foreground">
-              <Calendar className="w-4 h-4" />
-              How many days was {currentMonth.monthName}?
-            </label>
-            <div className="grid grid-cols-2 gap-3">
-              <button
-                type="button"
-                onClick={() => setDays(29)}
-                className={`p-4 rounded-xl border-2 transition-all ${
-                  days === 29
-                    ? 'border-primary bg-primary/10 text-primary'
-                    : 'border-border bg-card text-foreground hover:border-primary/50'
-                }`}
-              >
-                <span className="text-2xl font-bold">29</span>
-                <span className="block text-sm opacity-70">days</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setDays(30)}
-                className={`p-4 rounded-xl border-2 transition-all ${
-                  days === 30
-                    ? 'border-primary bg-primary/10 text-primary'
-                    : 'border-border bg-card text-foreground hover:border-primary/50'
-                }`}
-              >
-                <span className="text-2xl font-bold">30</span>
-                <span className="block text-sm opacity-70">days</span>
-              </button>
+        {status === 'success' ? (
+          /* Success State - Email Sent */
+          <div className="bg-primary/5 border border-primary/20 rounded-xl p-6 text-center">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 mb-4">
+              <Mail className="w-6 h-6 text-primary" />
             </div>
-          </div>
-
-          {/* Status Message */}
-          {message && (
-            <div
-              className={`flex items-center gap-2 p-3 rounded-lg ${
-                status === 'success'
-                  ? 'bg-green-500/10 text-green-600 dark:text-green-400'
-                  : 'bg-red-500/10 text-red-600 dark:text-red-400'
-              }`}
+            <h2 className="text-lg font-semibold text-foreground mb-2">Check Your Email</h2>
+            <p className="text-muted-foreground text-sm mb-4">{message}</p>
+            <p className="text-muted-foreground/70 text-xs">
+              The confirmation link expires in 15 minutes.
+            </p>
+            <Button
+              variant="outline"
+              className="mt-4"
+              onClick={() => {
+                setStatus('idle')
+                setMessage('')
+              }}
             >
-              {status === 'success' ? (
-                <CheckCircle className="w-5 h-5 flex-shrink-0" />
-              ) : (
-                <AlertCircle className="w-5 h-5 flex-shrink-0" />
-              )}
-              <span className="text-sm">{message}</span>
+              Send Another Request
+            </Button>
+          </div>
+        ) : (
+          /* Form */
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Email */}
+            <div className="space-y-2">
+              <label className="flex items-center gap-2 text-sm font-medium text-foreground">
+                <Mail className="w-4 h-4" />
+                Authorized Email
+              </label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="w-full px-3 py-2.5 rounded-lg border border-border bg-card text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
+                placeholder="your@email.com"
+              />
             </div>
-          )}
 
-          {/* Submit Button */}
-          <Button
-            type="submit"
-            disabled={status === 'loading'}
-            className="w-full"
-            size="lg"
-          >
-            {status === 'loading' ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Updating...
-              </>
-            ) : (
-              <>
-                Complete {currentMonth.monthName} & Start {nextMonth.monthName}
-              </>
+            {/* Password */}
+            <div className="space-y-2">
+              <label className="flex items-center gap-2 text-sm font-medium text-foreground">
+                <Lock className="w-4 h-4" />
+                Admin Password
+              </label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="w-full px-3 py-2.5 rounded-lg border border-border bg-card text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
+                placeholder="Enter admin password"
+              />
+            </div>
+
+            {/* Days Selection */}
+            <div className="space-y-3">
+              <label className="flex items-center gap-2 text-sm font-medium text-foreground">
+                <Calendar className="w-4 h-4" />
+                Days in {currentMonth.monthName}
+              </label>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setDays(29)}
+                  className={`p-4 rounded-xl border-2 transition-all ${
+                    days === 29
+                      ? 'border-primary bg-primary/10 text-primary'
+                      : 'border-border bg-card text-foreground hover:border-primary/50'
+                  }`}
+                >
+                  <span className="text-2xl font-bold">29</span>
+                  <span className="block text-sm opacity-70">days</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setDays(30)}
+                  className={`p-4 rounded-xl border-2 transition-all ${
+                    days === 30
+                      ? 'border-primary bg-primary/10 text-primary'
+                      : 'border-border bg-card text-foreground hover:border-primary/50'
+                  }`}
+                >
+                  <span className="text-2xl font-bold">30</span>
+                  <span className="block text-sm opacity-70">days</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Error Message */}
+            {status === 'error' && message && (
+              <div className="flex items-center gap-2 p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive">
+                <AlertCircle className="w-5 h-5 flex-shrink-0" />
+                <span className="text-sm">{message}</span>
+              </div>
             )}
-          </Button>
-        </form>
 
-        <p className="text-xs text-muted-foreground text-center mt-6">
-          This will trigger an update and redeploy the app automatically.
-          Changes will be live in approximately 2 minutes.
-        </p>
+            {/* Submit Button */}
+            <Button
+              type="submit"
+              disabled={status === 'loading'}
+              className="w-full"
+              size="lg"
+            >
+              {status === 'loading' ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Sending Confirmation...
+                </>
+              ) : (
+                <>
+                  <Mail className="w-4 h-4 mr-2" />
+                  Send Confirmation Email
+                </>
+              )}
+            </Button>
+          </form>
+        )}
+
+        {/* Security Note */}
+        <div className="mt-8 p-4 bg-card/50 rounded-lg border border-border">
+          <h3 className="text-sm font-medium text-foreground mb-2 flex items-center gap-2">
+            <Shield className="w-4 h-4" />
+            Two-Factor Verification
+          </h3>
+          <ul className="text-xs text-muted-foreground space-y-1">
+            <li>1. Enter your authorized email and password</li>
+            <li>2. Receive confirmation link via email</li>
+            <li>3. Click link to confirm the update</li>
+            <li>4. Changes deploy automatically</li>
+          </ul>
+        </div>
       </div>
     </div>
   )

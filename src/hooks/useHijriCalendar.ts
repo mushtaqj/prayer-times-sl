@@ -1,39 +1,12 @@
 import { useMemo, useState, useCallback } from 'react'
 import hijriData from '@/data/hijriCalendar.json'
+import type { HijriDate, HijriMonth, HijriMonthInfo, CalendarDay, MoonPhase } from '@/lib/data/types'
 
-export interface HijriDate {
-  day: number
-  month: number
-  monthName: string
-  year: number
-  gregorianDate: Date
-}
-
-export interface HijriMonth {
-  hijriYear: number
-  hijriMonth: number
-  monthName: string
-  gregorianStart: string
-  days: number
-  status: 'completed' | 'ongoing' | 'upcoming'
-}
-
-export interface HijriMonthMaster {
-  number: number
-  name: string
-  nameArabic: string
-  meaning: string
-}
-
-interface CalendarDay {
-  hijriDay: number
-  gregorianDate: Date
-  isCurrentMonth: boolean
-  isToday: boolean
-}
+// Re-export types for backwards compatibility
+export type { HijriDate, HijriMonth, HijriMonthInfo as HijriMonthMaster, CalendarDay }
 
 // Get moon phase based on day of Hijri month (approximate)
-export function getMoonPhase(hijriDay: number): { phase: string; icon: string } {
+export function getMoonPhase(hijriDay: number): MoonPhase {
   if (hijriDay === 1) return { phase: 'New Moon', icon: '🌑' }
   if (hijriDay >= 2 && hijriDay <= 6) return { phase: 'Waxing Crescent', icon: '🌒' }
   if (hijriDay >= 7 && hijriDay <= 9) return { phase: 'First Quarter', icon: '🌓' }

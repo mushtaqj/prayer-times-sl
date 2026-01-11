@@ -2,78 +2,18 @@ import { useMemo } from 'react'
 import eventsData from '@/data/islamicEvents.json'
 import virtuesData from '@/data/virtues.json'
 import { gregorianToHijri } from './useHijriCalendar'
-import type { HijriDate } from './useHijriCalendar'
+import type {
+  HijriDate,
+  IslamicEvent,
+  HijriMonthInfo,
+  WeeklyFast,
+  AnnualFast,
+  MonthlyFast,
+  RecurringFasts,
+} from '@/lib/data/types'
 
-export interface IslamicEvent {
-  id: string
-  name: string
-  nameArabic: string
-  hijriMonth: number
-  hijriDay: number
-  type: 'holy' | 'eid' | 'fast' | 'recommended'
-  isFastingDay: boolean
-  fastingType?: 'obligatory' | 'recommended' | 'sunnah'
-  fastingForbidden?: boolean
-  description: string
-  details?: string
-  isRecurring?: boolean
-}
-
-export interface HijriMonthInfo {
-  number: number
-  name: string
-  nameArabic: string
-  meaning: string
-  details?: string
-}
-
-// Recurring fast types
-interface WeeklyFast {
-  id: string
-  name: string
-  nameArabic: string
-  dayOfWeek: number
-  type: string
-  description: string
-  details?: string
-}
-
-interface AnnualFast {
-  id: string
-  name: string
-  nameArabic: string
-  hijriMonth: number
-  startDay?: number
-  endDay?: number
-  duration?: number
-  type: string
-  description: string
-  timing?: 'fixed' | 'flexible'
-  details?: string
-}
-
-interface MonthlyFast {
-  ayyamAlBeed: {
-    name: string
-    nameArabic: string
-    days: number[]
-    type: string
-    description: string
-    details?: string
-  }
-}
-
-interface RecurringFasts {
-  weekly: WeeklyFast[]
-  monthly: MonthlyFast
-  annual: AnnualFast[]
-  friday?: {
-    id: string
-    name: string
-    nameArabic: string
-    details?: string
-  }
-}
+// Re-export types for backwards compatibility
+export type { IslamicEvent, HijriMonthInfo }
 
 export function useIslamicEvents() {
   // eslint-disable-next-line react-hooks/preserve-manual-memoization

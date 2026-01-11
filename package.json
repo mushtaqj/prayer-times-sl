@@ -9,10 +9,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run",
-    "test:watch": "vitest",
-    "db:setup": "node scripts/db-setup.cjs",
-    "db:generate": "node scripts/generate-json.cjs",
-    "db:refresh": "node scripts/db-setup.cjs && node scripts/generate-json.cjs"
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.15",
@@ -31,6 +28,7 @@
     "react-dom": "^19.2.0",
     "react-markdown": "^10.1.0",
     "react-router-dom": "^7.12.0",
+    "resend": "^6.7.0",
     "tailwind-merge": "^3.4.0",
     "vite-plugin-pwa": "^1.2.0",
     "workbox-window": "^7.4.0"
@@ -44,7 +42,6 @@
     "@types/react": "^19.2.5",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",
-    "better-sqlite3": "^12.6.0",
     "eslint": "^9.39.1",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",

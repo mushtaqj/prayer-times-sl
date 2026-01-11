@@ -55,10 +55,6 @@ dev-dist/
 sw.js
 workbox-*.js
 
-# SQLite database
-data/*.db
-data/*.db-journal
-
 # Vercel
 .vercel
 

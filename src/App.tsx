@@ -69,8 +69,9 @@ function App() {
   // Get location name from selected district
   const locationName = districts.find(d => d.id === selectedDistrict)?.name || 'Colombo'
 
-  // Determine if we're on the home page
+  // Determine if we're on the home page or admin page
   const isHomePage = location.pathname === '/'
+  const isAdminPage = location.pathname === '/admin'
 
   // Notification banner component (for prayer pages)
   const notificationBanner = !hasPermission && (
@@ -93,6 +94,11 @@ function App() {
       onSecondary={() => setShowInstallBanner(false)}
     />
   )
+
+  // Render admin page completely standalone (no header, no nav)
+  if (isAdminPage) {
+    return <AdminPage />
+  }
 
   return (
     <div className="min-h-screen bg-background text-foreground transition-colors duration-300">

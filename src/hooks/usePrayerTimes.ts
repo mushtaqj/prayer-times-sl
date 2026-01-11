@@ -1,29 +1,19 @@
 import { useMemo } from 'react'
 import prayerData from '@/data/prayerTimes.json'
 import { parseTimeToMinutes } from '@/lib/timeUtils'
+import type { District, DailyPrayerTimes, PrayerInfo } from '@/lib/data/types'
 
-export interface PrayerTime {
-  day: number
-  fajr: string
-  sunrise: string
-  dhuhr: string
-  asr: string
-  maghrib: string
-  isha: string
-}
-
-export interface District {
-  id: string
-  name: string
-  zone: string
-}
+// Re-export types for backwards compatibility
+export type { District, DailyPrayerTimes, PrayerInfo }
+// PrayerTime is an alias for DailyPrayerTimes for backwards compatibility
+export type PrayerTime = DailyPrayerTimes
 
 export function usePrayerTimes(districtId: string) {
   const district = useMemo(() => {
-    return prayerData.districts.find(d => d.id === districtId) || prayerData.districts[0]
+    return (prayerData.districts as District[]).find(d => d.id === districtId) || prayerData.districts[0] as District
   }, [districtId])
 
-  const getTodayPrayers = useMemo(() => {
+  const getTodayPrayers = useMemo((): DailyPrayerTimes | null => {
     const today = new Date()
     const month = (today.getMonth() + 1).toString()
     const day = today.getDate()
@@ -33,12 +23,12 @@ export function usePrayerTimes(districtId: string) {
 
     if (!monthData) return null
 
-    return (monthData as PrayerTime[]).find(p => p.day === day) || null
+    return (monthData as DailyPrayerTimes[]).find(p => p.day === day) || null
   }, [district])
 
   const getWeekPrayers = useMemo(() => {
     const today = new Date()
-    const prayers: (PrayerTime & { date: Date })[] = []
+    const prayers: (DailyPrayerTimes & { date: Date })[] = []
 
     for (let i = 0; i < 7; i++) {
       const date = new Date(today)
@@ -51,7 +41,7 @@ export function usePrayerTimes(districtId: string) {
       const monthData = prayerData.zones[zone]?.[month as keyof typeof prayerData.zones["01"]]
 
       if (monthData) {
-        const prayer = (monthData as PrayerTime[]).find(p => p.day === day)
+        const prayer = (monthData as DailyPrayerTimes[]).find(p => p.day === day)
         if (prayer) {
           prayers.push({ ...prayer, date })
         }
@@ -62,10 +52,10 @@ export function usePrayerTimes(districtId: string) {
   }, [district])
 
   const getMonthPrayers = useMemo(() => {
-    return (month: number) => {
+    return (month: number): DailyPrayerTimes[] => {
       const zone = district.zone as keyof typeof prayerData.zones
       const monthData = prayerData.zones[zone]?.[month.toString() as keyof typeof prayerData.zones["01"]]
-      return (monthData as PrayerTime[]) || []
+      return (monthData as DailyPrayerTimes[]) || []
     }
   }, [district])
 
@@ -75,7 +65,7 @@ export function usePrayerTimes(districtId: string) {
     const now = new Date()
     const currentTime = now.getHours() * 60 + now.getMinutes()
 
-    const prayers: { name: string; time: string; displayName: string; arabicName: string }[] = [
+    const prayers: PrayerInfo[] = [
       { name: 'fajr', time: getTodayPrayers.fajr, displayName: 'Fajr', arabicName: 'الفجر' },
       { name: 'sunrise', time: getTodayPrayers.sunrise, displayName: 'Sunrise', arabicName: 'الشروق' },
       { name: 'dhuhr', time: getTodayPrayers.dhuhr, displayName: 'Dhuhr', arabicName: 'الظهر' },
@@ -100,7 +90,7 @@ export function usePrayerTimes(districtId: string) {
     }
 
     // Determine current prayer (the active prayer period we're in)
-    let currentPrayer = null
+    let currentPrayer: PrayerInfo | null = null
     if (nextPrayerIndex === 0) {
       // After Isha, before Fajr - current is Isha
       currentPrayer = prayers[5] // Isha
