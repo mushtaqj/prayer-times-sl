@@ -2,6 +2,12 @@ import { useMemo } from 'react'
 import eventsData from '@/data/islamicEvents.json'
 import virtuesData from '@/data/virtues.json'
 import { gregorianToHijri } from './useHijriCalendar'
+import {
+  getFastingInfo,
+  getAllEventsForDay as getAllEventsForDayUtil,
+  hasEventOnDay,
+  getEventTypeColor,
+} from '@/lib/eventMatching'
 import type {
   HijriDate,
   IslamicEvent,
@@ -10,12 +16,15 @@ import type {
   AnnualFast,
   MonthlyFast,
   RecurringFasts,
+  FastingInfo,
+  DayEvent,
 } from '@/lib/data/types'
 
 // Re-export types for backwards compatibility
 export type { IslamicEvent, HijriMonthInfo }
 
 export function useIslamicEvents() {
+  // Load and enrich events with virtue details
   // eslint-disable-next-line react-hooks/preserve-manual-memoization
   const events: IslamicEvent[] = useMemo(() => {
     return (eventsData.events as IslamicEvent[]).map(e => ({
@@ -24,6 +33,7 @@ export function useIslamicEvents() {
     }))
   }, [])
 
+  // Load and enrich hijri months with virtue details
   const hijriMonths = useMemo(() => {
     return (eventsData.hijriMonths as HijriMonthInfo[]).map(m => ({
       ...m,
@@ -31,14 +41,16 @@ export function useIslamicEvents() {
     }))
   }, [])
 
+  // Load and enrich recurring fasts with virtue details
   const recurringFasts: RecurringFasts = useMemo(() => {
     const rf = eventsData.recurringFasts
-    // Inject details into recurring fasts
+
     const annual: AnnualFast[] = rf.annual.map(f => ({
       ...f,
       timing: f.timing as 'fixed' | 'flexible' | undefined,
       details: virtuesData.recurring[f.id as keyof typeof virtuesData.recurring]
     }))
+
     const monthly: MonthlyFast = {
       ...rf.monthly,
       ayyamAlBeed: {
@@ -46,12 +58,12 @@ export function useIslamicEvents() {
         details: virtuesData.recurring['ayyam-al-beed']
       }
     }
+
     const weekly: WeeklyFast[] = rf.weekly.map(f => ({
       ...f,
       details: virtuesData.recurring[f.id as keyof typeof virtuesData.recurring]
     }))
 
-    // Add Friday as a special recurring item
     const friday = {
       id: 'friday',
       name: 'Friday',
@@ -72,12 +84,12 @@ export function useIslamicEvents() {
     }
   }, [events])
 
-  // Get events for a specific Hijri month
+  // Get events for a specific Hijri month (including annual recurring)
   const getEventsForMonth = useMemo(() => {
     return (hijriMonth: number): IslamicEvent[] => {
       const monthEvents = events.filter(e => e.hijriMonth === hijriMonth)
 
-      // Add any annual recurring events for this month (e.g. Shawwal 6 days, Dhul Hijjah 1st 9 days)
+      // Add any annual recurring events for this month
       const annualEvents = recurringFasts.annual.filter(e => e.hijriMonth === hijriMonth)
 
       annualEvents.forEach(event => {
@@ -86,7 +98,7 @@ export function useIslamicEvents() {
           name: event.name,
           nameArabic: event.nameArabic,
           hijriMonth: event.hijriMonth,
-          hijriDay: 0, // 0 indicates general month event or range
+          hijriDay: 0,
           type: event.type as IslamicEvent['type'],
           isFastingDay: true,
           fastingType: event.type === 'recommended' ? 'recommended' : 'sunnah',
@@ -101,52 +113,22 @@ export function useIslamicEvents() {
     }
   }, [events, recurringFasts.annual])
 
-  // Check if a date is a fasting day
+  // Check if a date is a fasting day - uses eventMatching utility
   const isFastingDay = useMemo(() => {
-    return (hijriDate: HijriDate | null): { isFasting: boolean; type?: string; reason?: string } => {
+    return (hijriDate: HijriDate | null): FastingInfo => {
       if (!hijriDate) return { isFasting: false }
 
-      // Check fixed events
       const dayEvents = events.filter(
         e => e.hijriMonth === hijriDate.month && e.hijriDay === hijriDate.day
       )
 
-      // Priority 1: Check if ANY event forbids fasting (Eid, Tashreeq)
-      if (dayEvents.some(e => e.fastingForbidden)) {
-        const forbiddenEvent = dayEvents.find(e => e.fastingForbidden)
-        return { isFasting: false, type: 'forbidden', reason: forbiddenEvent?.name }
-      }
-
-      // Priority 2: Check for specific fasting events (e.g. Arafah)
-      // We check this AFTER forbidden to ensure we don't fast on Eid even if another event mistakenly says yes
-      for (const event of dayEvents) {
-        if (event.isFastingDay) {
-          return { isFasting: true, type: event.fastingType, reason: event.name }
-        }
-      }
-
-      // Check Ramadan (entire month)
-      if (hijriDate.month === 9) {
-        return { isFasting: true, type: 'obligatory', reason: 'Ramadan' }
-      }
-
-      // Check Ayyam al-Beed (13th, 14th, 15th of each month)
-      if (recurringFasts.monthly.ayyamAlBeed.days.includes(hijriDate.day)) {
-        return { isFasting: true, type: 'sunnah', reason: 'Ayyam al-Beed (White Days)' }
-      }
-
-      // Check Monday/Thursday
-      const dayOfWeek = hijriDate.gregorianDate.getDay()
-      if (dayOfWeek === 1) {
-        return { isFasting: true, type: 'sunnah', reason: 'Monday Fast' }
-      }
-      if (dayOfWeek === 4) {
-        return { isFasting: true, type: 'sunnah', reason: 'Thursday Fast' }
-      }
-
-      return { isFasting: false }
+      return getFastingInfo(
+        hijriDate,
+        dayEvents,
+        recurringFasts.monthly.ayyamAlBeed.days
+      )
     }
-  }, [events, recurringFasts])
+  }, [events, recurringFasts.monthly.ayyamAlBeed.days])
 
   // Get today's events
   const todayEvents = useMemo(() => {
@@ -155,7 +137,7 @@ export function useIslamicEvents() {
     return getEventsForDate(hijriToday)
   }, [getEventsForDate])
 
-  // Get upcoming events (next 30 days)
+  // Get upcoming events (next 60 days)
   // eslint-disable-next-line react-hooks/preserve-manual-memoization
   const upcomingEvents = useMemo(() => {
     const upcoming: { event: IslamicEvent; gregorianDate: Date; hijriDate: HijriDate }[] = []
@@ -164,7 +146,6 @@ export function useIslamicEvents() {
 
     if (!hijriToday) return []
 
-    // Look through next 60 days (covers ~2 Hijri months)
     for (let i = 0; i < 60; i++) {
       const checkDate = new Date(today)
       checkDate.setDate(today.getDate() + i)
@@ -192,125 +173,30 @@ export function useIslamicEvents() {
     }
   }, [hijriMonths])
 
-  // Check if a specific Hijri day has an event (including recurring)
+  // Check if a specific Hijri day has an event - uses eventMatching utility
   const hasEvent = useMemo(() => {
     return (hijriMonth: number, hijriDay: number): boolean => {
-      // Check fixed events
-      if (events.some(e => e.hijriMonth === hijriMonth && e.hijriDay === hijriDay)) {
-        return true
-      }
-      // Check Ayyam al-Beed (13, 14, 15 of each month)
-      if ([13, 14, 15].includes(hijriDay)) {
-        return true
-      }
-      // Check annual recurring events with 'fixed' timing (e.g. Dhul Hijjah)
-      const annualFixedEvents = recurringFasts.annual.filter(
-        e => e.hijriMonth === hijriMonth && e.timing === 'fixed'
-      )
-
-      for (const event of annualFixedEvents) {
-        if (event.startDay && event.endDay) {
-          if (hijriDay >= event.startDay && hijriDay <= event.endDay) return true
-        } else if (event.startDay && event.duration) {
-          if (hijriDay >= event.startDay && hijriDay < event.startDay + event.duration) return true
-        }
-      }
-      return false
+      return hasEventOnDay(hijriMonth, hijriDay, events, recurringFasts.annual)
     }
   }, [events, recurringFasts.annual])
 
-  // Get all events for a specific day including recurring
+  // Get all events for a specific day including recurring - uses eventMatching utility
   const getAllEventsForDay = useMemo(() => {
-    return (hijriMonth: number, hijriDay: number, gregorianDate?: Date): { name: string; type: string; isRecurring: boolean; details?: string }[] => {
-      const result: { name: string; type: string; isRecurring: boolean; details?: string }[] = []
-
-      // Add fixed events
-      const fixedEvents = events.filter(e => e.hijriMonth === hijriMonth && e.hijriDay === hijriDay)
-      let isFastingForbidden = false
-
-      for (const event of fixedEvents) {
-        result.push({ name: event.name, type: event.type, isRecurring: false, details: event.details })
-        if (event.fastingForbidden) {
-          isFastingForbidden = true
+    return (hijriMonth: number, hijriDay: number, gregorianDate?: Date): DayEvent[] => {
+      return getAllEventsForDayUtil(
+        hijriMonth,
+        hijriDay,
+        gregorianDate,
+        events,
+        recurringFasts.annual,
+        recurringFasts.monthly.ayyamAlBeed.details,
+        {
+          monday: recurringFasts.weekly.find(f => f.id === 'monday-fast')?.details,
+          thursday: recurringFasts.weekly.find(f => f.id === 'thursday-fast')?.details
         }
-      }
-
-      // ONLY add recurring fasts if fasting is NOT forbidden
-      if (!isFastingForbidden) {
-        // Add Ayyam al-Beed (13, 14, 15 of each month)
-        if ([13, 14, 15].includes(hijriDay)) {
-          result.push({
-            name: 'Ayyam al-Beed',
-            type: 'sunnah',
-            isRecurring: true,
-            details: virtuesData.recurring['ayyam-al-beed']
-          })
-        }
-
-        // Add fixed annual recurring events
-        const annualFixedEvents = recurringFasts.annual.filter(
-          e => e.hijriMonth === hijriMonth && e.timing === 'fixed'
-        )
-
-        for (const event of annualFixedEvents) {
-          let isMatch = false
-          if (event.startDay && event.endDay) {
-            if (hijriDay >= event.startDay && hijriDay <= event.endDay) isMatch = true
-          } else if (event.startDay && event.duration) {
-            if (hijriDay >= event.startDay && hijriDay < event.startDay + event.duration) isMatch = true
-          }
-
-          if (isMatch) {
-            result.push({
-              name: event.name,
-              type: event.type,
-              isRecurring: true,
-              details: event.details
-            })
-          }
-        }
-
-        // Add Monday/Thursday fasting if gregorianDate provided
-        if (gregorianDate) {
-          const dayOfWeek = gregorianDate.getDay()
-          if (dayOfWeek === 1) {
-            result.push({
-              name: 'Monday Fast',
-              type: 'sunnah',
-              isRecurring: true,
-              details: virtuesData.recurring['monday-fast']
-            })
-          }
-          if (dayOfWeek === 4) {
-            result.push({
-              name: 'Thursday Fast',
-              type: 'sunnah',
-              isRecurring: true,
-              details: virtuesData.recurring['thursday-fast']
-            })
-          }
-        }
-      }
-
-      return result
+      )
     }
-  }, [events, recurringFasts.annual])
-
-  // Get event type colors for styling
-  const getEventTypeColor = (type: string): string => {
-    switch (type) {
-      case 'eid':
-        return 'bg-green-500/20 text-green-600 dark:text-green-400'
-      case 'holy':
-        return 'bg-blue-500/20 text-blue-600 dark:text-blue-400'
-      case 'fast':
-        return 'bg-amber-500/20 text-amber-600 dark:text-amber-400'
-      case 'recommended':
-        return 'bg-purple-500/20 text-purple-600 dark:text-purple-400'
-      default:
-        return 'bg-muted text-muted-foreground'
-    }
-  }
+  }, [events, recurringFasts])
 
   return {
     events,
