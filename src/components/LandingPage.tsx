@@ -6,7 +6,7 @@ import { VirtuesSheet } from '@/components/VirtuesSheet'
 import { gregorianToHijri, getMoonPhase } from '@/hooks/useHijriCalendar'
 import { useIslamicEvents } from '@/hooks/useIslamicEvents'
 import { parseTime, formatCountdown } from '@/lib/timeUtils'
-import { Clock, Calendar, CalendarSearch, Moon, Sun, Sunrise, Sunset, CloudSun, Bell, Download, X } from 'lucide-react'
+import { Clock, Calendar, CalendarSearch, Moon, Sun, Sunrise, Sunset, CloudSun } from 'lucide-react'
 
 interface PrayerInfo {
   name: string
@@ -21,11 +21,6 @@ interface LandingPageProps {
   location: string
   isDark: boolean
   onThemeToggle: () => void
-  hasNotificationPermission: boolean
-  onEnableNotifications: () => void
-  showInstallBanner: boolean
-  onInstall: () => void
-  onDismissInstall: () => void
 }
 
 export function LandingPage({
@@ -34,11 +29,6 @@ export function LandingPage({
   location,
   isDark,
   onThemeToggle,
-  hasNotificationPermission,
-  onEnableNotifications,
-  showInstallBanner,
-  onInstall,
-  onDismissInstall
 }: LandingPageProps) {
   const navigate = useNavigate()
   const [countdown, setCountdown] = useState('')
@@ -422,6 +412,7 @@ export function LandingPage({
             <span className="text-[10px] sm:text-xs font-semibold">Jump to Month</span>
           </button>
         </div>
+
       </div>
 
       {/* Month Picker Modal */}

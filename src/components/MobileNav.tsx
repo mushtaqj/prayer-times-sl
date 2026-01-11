@@ -54,7 +54,7 @@ export function MobileNav({
   return (
     <div className="sm:hidden">
       {/* Mobile Header with Hamburger */}
-      <header className="fixed top-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-xl border-b border-border shadow-sm">
+      <header className="fixed top-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-xl border-b border-border shadow-sm pt-[env(safe-area-inset-top)]">
         <div className="flex items-center justify-between px-3 py-2">
           {/* Logo - tap to go home */}
           <Link
@@ -190,7 +190,7 @@ export function MobileNav({
       )}
 
       {/* Bottom Tab Bar */}
-      <nav className="fixed bottom-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-xl border-t border-border shadow-lg">
+      <nav className="fixed bottom-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-xl border-t border-border shadow-lg pb-[env(safe-area-inset-bottom)]">
         <div className="flex items-stretch h-14">
           {/* Prayer Tab */}
           <Link
@@ -224,8 +224,6 @@ export function MobileNav({
             <span className="text-xs font-medium">Hijri</span>
           </Link>
         </div>
-        {/* Safe area padding for notched phones */}
-        <div className="h-safe-area-inset-bottom bg-background" />
       </nav>
 
       {/* App Info Modal */}
