@@ -1,0 +1,40 @@
+name: Update Hijri Calendar
+
+on:
+  workflow_dispatch:
+    inputs:
+      days:
+        description: 'Number of days in the current month (29 or 30)'
+        required: true
+        type: choice
+        options:
+          - '29'
+          - '30'
+
+jobs:
+  update-hijri:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Update Hijri Calendar JSON
+        run: node scripts/update-hijri.js
+        env:
+          DAYS: ${{ github.event.inputs.days }}
+
+      - name: Commit and push changes
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add src/data/hijriCalendar.json
+          git diff --staged --quiet || git commit -m "Complete Hijri month (${{ github.event.inputs.days }} days) and start next month"
+          git push

@@ -7,6 +7,7 @@ import {DailyView} from '@/components/DailyView'
 import {WeekView} from '@/components/WeekView'
 import {MonthView} from '@/components/MonthView'
 import {HijriCalendarView} from '@/components/HijriCalendarView'
+import {AdminPage} from '@/components/AdminPage'
 import {ViewSwitcher} from '@/components/ViewSwitcher'
 import {ActionBanner} from '@/components/ActionBanner'
 import {useTheme} from '@/hooks/useTheme'
@@ -213,6 +214,9 @@ function App() {
                 </div>
               }
             />
+
+            {/* Admin Page - hidden route */}
+            <Route path="/admin" element={<AdminPage />} />
 
             {/* Redirect any unknown routes to home */}
             <Route path="*" element={<Navigate to="/" replace />} />
