@@ -8,12 +8,18 @@
 // ============================================================================
 export {
   districts,
+  prayerMetadata,
+  prayerNames,
+  PRAYER_INDEX,
   getDistricts,
   getDistrictById,
   getDistrictsByZone,
   getPrayerTimesForDay,
   getPrayerTimesForMonth,
   getTodayPrayerTimes,
+  getWeekPrayerTimes,
+  toPrayerInfoArray,
+  getCurrentAndNextPrayer,
 } from './prayerTimes'
 
 // ============================================================================
