@@ -1,5 +1,11 @@
 import { useState, useEffect } from 'react'
 import { parseTime, formatCountdown } from '@/lib/utils/time'
+import {
+  DEFAULT_UPDATE_INTERVAL_MS,
+  FALLBACK_PRAYER_DURATION_MS,
+  MIN_PROGRESS,
+  MAX_PROGRESS,
+} from '@/lib/utils/countdownConstants'
 
 interface UseCountdownOptions {
   /** Target prayer time in HH:MM format */
@@ -26,7 +32,7 @@ interface UseCountdownResult {
 export function useCountdown({
   targetTime,
   currentPrayerTime,
-  updateInterval = 60000,
+  updateInterval = DEFAULT_UPDATE_INTERVAL_MS,
 }: UseCountdownOptions): UseCountdownResult {
   const [countdown, setCountdown] = useState('')
   const [progress, setProgress] = useState(0)
@@ -58,13 +64,12 @@ export function useCountdown({
         }
 
         const elapsed = now.getTime() - currentTime.getTime()
-        const progressPercent = Math.max(0, Math.min(100, (elapsed / totalDuration) * 100))
+        const progressPercent = Math.max(MIN_PROGRESS, Math.min(MAX_PROGRESS, (elapsed / totalDuration) * MAX_PROGRESS))
         setProgress(progressPercent)
       } else {
         // Fallback: assume ~6 hours between prayers
-        const totalDuration = 6 * 60 * 60 * 1000
-        const elapsed = totalDuration - diff
-        const progressPercent = Math.max(0, Math.min(100, (elapsed / totalDuration) * 100))
+        const elapsed = FALLBACK_PRAYER_DURATION_MS - diff
+        const progressPercent = Math.max(MIN_PROGRESS, Math.min(MAX_PROGRESS, (elapsed / FALLBACK_PRAYER_DURATION_MS) * MAX_PROGRESS))
         setProgress(progressPercent)
       }
     }
