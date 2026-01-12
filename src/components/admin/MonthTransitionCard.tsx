@@ -1,4 +1,5 @@
 import { ArrowRight } from 'lucide-react'
+import { formatShortDateYear } from '@/lib/utils/date'
 
 interface MonthTransitionCardProps {
   currentMonth: {
@@ -27,11 +28,7 @@ export function MonthTransitionCard({
             {currentMonth.monthName} {currentMonth.hijriYear}
           </p>
           <p className="text-sm text-muted-foreground">
-            Started {new Date(currentMonth.gregorianStart).toLocaleDateString('en-US', {
-              month: 'short',
-              day: 'numeric',
-              year: 'numeric'
-            })}
+            Started {formatShortDateYear(new Date(currentMonth.gregorianStart))}
           </p>
         </div>
         <ArrowRight className="w-6 h-6 text-muted-foreground/50" />

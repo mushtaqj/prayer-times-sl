@@ -49,6 +49,53 @@ export function formatDate(
 }
 
 /**
+ * Format date as full date string (e.g., "Monday, January 13, 2025")
+ */
+export function formatFullDate(date: Date): string {
+  return date.toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  })
+}
+
+/**
+ * Format date as weekday name only (e.g., "Monday")
+ */
+export function formatWeekday(date: Date): string {
+  return date.toLocaleDateString('en-US', { weekday: 'long' })
+}
+
+/**
+ * Format date as short date (e.g., "Jan 13")
+ */
+export function formatShortDate(date: Date): string {
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+}
+
+/**
+ * Format date as month abbreviation only (e.g., "Jan")
+ */
+export function formatMonthShort(date: Date): string {
+  return date.toLocaleDateString('en-US', { month: 'short' })
+}
+
+/**
+ * Format date as weekday with date (e.g., "Monday, January 13")
+ */
+export function formatWeekdayDate(date: Date): string {
+  return date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
+}
+
+/**
+ * Format date as short date with year (e.g., "Jan 13, 2025")
+ */
+export function formatShortDateYear(date: Date): string {
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+}
+
+/**
  * Get the start of day for a given date
  */
 export function startOfDay(date: Date): Date {

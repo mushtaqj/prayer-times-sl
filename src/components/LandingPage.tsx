@@ -7,6 +7,7 @@ import { useIslamicEvents } from '@/hooks/useIslamicEvents'
 import { DAY_INDEX } from '@/lib/constants/dateConstants'
 import { AYYAM_AL_BEED_DAYS } from '@/lib/constants/hijriConstants'
 import { LOCATION_SUFFIX } from '@/lib/constants/appConstants'
+import { formatDate } from '@/lib/utils/date'
 import { useCountdown } from '@/hooks/useCountdown'
 import { Moon, Sun } from 'lucide-react'
 import {
@@ -169,12 +170,7 @@ export function LandingPage({
               </h2>
             )}
             <p className="text-xs sm:text-sm text-muted-foreground">
-              {today.toLocaleDateString('en-US', {
-                weekday: 'short',
-                day: 'numeric',
-                month: 'short',
-                year: 'numeric',
-              })}
+              {formatDate(today)}
             </p>
           </div>
           <div className="text-3xl sm:text-4xl">{moonPhase?.icon}</div>

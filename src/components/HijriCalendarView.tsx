@@ -18,6 +18,7 @@ import {
   WEEKDAY_LABELS,
 } from '@/components/calendar'
 import { RAMADAN_NAME } from '@/lib/constants/hijriConstants'
+import { formatMonthShort } from '@/lib/utils/date'
 
 interface HijriCalendarViewProps {
   location: string
@@ -136,10 +137,8 @@ export function HijriCalendarView({ location }: HijriCalendarViewProps) {
     const gregorianEnd = new Date(gregorianStart)
     gregorianEnd.setDate(gregorianEnd.getDate() + currentMonthData.days - 1)
 
-    const startMonth = gregorianStart.toLocaleDateString('en-US', {
-      month: 'short',
-    })
-    const endMonth = gregorianEnd.toLocaleDateString('en-US', { month: 'short' })
+    const startMonth = formatMonthShort(gregorianStart)
+    const endMonth = formatMonthShort(gregorianEnd)
     const startYear = gregorianStart.getFullYear()
     const endYear = gregorianEnd.getFullYear()
 

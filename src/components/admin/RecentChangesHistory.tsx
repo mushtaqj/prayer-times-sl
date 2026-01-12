@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { ChevronDown, ChevronUp, History } from 'lucide-react'
+import { formatShortDateYear } from '@/lib/utils/date'
 
 interface CompletedMonth {
   hijriYear: number
@@ -55,11 +56,7 @@ export function RecentChangesHistory({ recentMonths }: RecentChangesHistoryProps
                 </span>
               </div>
               <span className="text-xs text-muted-foreground">
-                {new Date(month.gregorianStart).toLocaleDateString('en-US', {
-                  month: 'short',
-                  day: 'numeric',
-                  year: 'numeric',
-                })}
+                {formatShortDateYear(new Date(month.gregorianStart))}
               </span>
             </div>
           ))}

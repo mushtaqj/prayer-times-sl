@@ -5,6 +5,7 @@ import { LocationBadge } from '@/components/common'
 import { cn } from '@/lib/tailwind'
 import type { DailyPrayerTimes } from '@/lib/data/types'
 import { gregorianToHijri, getMoonPhase } from '@/lib/data/hijriCalendar'
+import { formatFullDate, formatWeekday, formatShortDate } from '@/lib/utils/date'
 import { prayerNames } from '@/lib/data/prayerTimes'
 
 interface WeekViewProps {
@@ -16,12 +17,7 @@ export function WeekView({ prayers, location }: WeekViewProps) {
   const today = new Date()
   today.setHours(0, 0, 0, 0)
 
-  const todayDateString = today.toLocaleDateString('en-US', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  })
+  const todayDateString = formatFullDate(today)
 
   return (
     <Card className="border-border/50 bg-card/40 backdrop-blur-sm shadow-sm transition-all hover:bg-card/50">
@@ -35,11 +31,8 @@ export function WeekView({ prayers, location }: WeekViewProps) {
             const date = new Date(prayer.date)
             date.setHours(0, 0, 0, 0)
             const isToday = date.getTime() === today.getTime()
-            const dayName = prayer.date.toLocaleDateString('en-US', { weekday: 'long' })
-            const dateStr = prayer.date.toLocaleDateString('en-US', {
-              month: 'short',
-              day: 'numeric',
-            })
+            const dayName = formatWeekday(prayer.date)
+            const dateStr = formatShortDate(prayer.date)
             const hijriDate = gregorianToHijri(prayer.date)
             const moonPhase = hijriDate ? getMoonPhase(hijriDate.day) : null
 

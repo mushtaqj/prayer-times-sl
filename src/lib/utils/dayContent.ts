@@ -1,5 +1,6 @@
 import { RECURRING_FAST_IDS } from '@/lib/data/islamicEvents'
 import { RAMADAN_NAME } from '@/lib/constants/hijriConstants'
+import { formatWeekday } from '@/lib/utils/date'
 
 interface DayEvent {
   name: string
@@ -38,7 +39,7 @@ export function generateDayContent({
   isFriday,
   recurringFasts,
 }: GenerateDayContentParams): string {
-  const dayName = gregorianDate.toLocaleDateString('en-US', { weekday: 'long' })
+  const dayName = formatWeekday(gregorianDate)
   let content = `# ${dayName}, ${monthName} ${hijriDay}\n\n`
 
   // Add events with their full details

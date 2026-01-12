@@ -4,6 +4,7 @@ import { NextPrayerBanner } from '@/components/NextPrayerBanner'
 import { PrayerRow } from '@/components/PrayerRow'
 import { HijriDateDisplay } from '@/components/HijriDateDisplay'
 import { gregorianToHijri } from '@/lib/data/hijriCalendar'
+import { formatFullDate } from '@/lib/utils/date'
 import type { DailyPrayerTimes } from '@/lib/data/types'
 import type { PrayerName } from '@/lib/data/types'
 
@@ -39,12 +40,7 @@ export function DailyView({ prayers, nextPrayer, currentPrayer, alarms, onToggle
   }
 
   const today = new Date()
-  const dateString = today.toLocaleDateString('en-US', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  })
+  const dateString = formatFullDate(today)
   const hijriToday = gregorianToHijri(today)
 
   return (

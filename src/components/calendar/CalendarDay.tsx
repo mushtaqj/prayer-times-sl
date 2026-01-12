@@ -6,6 +6,7 @@ import {
 } from '@/components/ui/tooltip'
 import { getMoonPhase } from '@/lib/data/hijriCalendar'
 import { getPrimaryEventType } from '@/lib/utils/eventMatching'
+import { formatMonthShort, formatWeekdayDate } from '@/lib/utils/date'
 import { MOON_PHASE_DISPLAY_DAYS, RAMADAN_NAME } from '@/lib/constants/hijriConstants'
 import { EVENT_STYLES } from './calendarConstants'
 import type { CalendarDay as CalendarDayType, DayEvent, FastingInfo } from '@/lib/data/types'
@@ -33,7 +34,7 @@ export function CalendarDay({
 
   // Detect Gregorian Month Change
   const isGregorianStart = day.gregorianDate.getDate() === 1
-  const gregorianMonthName = day.gregorianDate.toLocaleDateString('en-US', { month: 'short' })
+  const gregorianMonthName = formatMonthShort(day.gregorianDate)
   const gregorianDayLabel = isGregorianStart
     ? `${gregorianMonthName} 1`
     : day.gregorianDate.getDate().toString()
@@ -133,7 +134,7 @@ export function CalendarDay({
         <TooltipContent className="max-w-xs p-2">
           <div className="space-y-1">
             <p className="text-xs text-muted-foreground font-semibold border-b border-border/20 pb-1 mb-1">
-              {day.gregorianDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+              {formatWeekdayDate(day.gregorianDate)}
             </p>
             {tooltipLines.map((line, i) => (
               <p key={i} className="text-sm">{line}</p>

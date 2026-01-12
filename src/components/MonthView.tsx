@@ -27,6 +27,7 @@ import {
   FIRST_GREGORIAN_MONTH,
   LAST_GREGORIAN_MONTH,
 } from '@/lib/constants/dateConstants'
+import { formatFullDate } from '@/lib/utils/date'
 import { prayerNames } from '@/lib/data/prayerTimes'
 
 interface MonthViewProps {
@@ -43,12 +44,7 @@ export function MonthView({ getMonthPrayers, location }: MonthViewProps) {
   const today = new Date()
   const isCurrentMonth = selectedMonth === today.getMonth() + 1
 
-  const todayDateString = today.toLocaleDateString('en-US', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  })
+  const todayDateString = formatFullDate(today)
 
   const prevMonth = useCallback(() => {
     setSelectedMonth((m) =>
