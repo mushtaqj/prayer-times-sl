@@ -1,8 +1,16 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { parseTime } from '@/lib/utils/time'
 import { getStorageItem, setStorageItem } from '@/lib/utils/storage'
-
-export type PrayerName = 'fajr' | 'sunrise' | 'dhuhr' | 'asr' | 'maghrib' | 'isha'
+import { playNotificationSound } from '@/lib/utils/audio'
+import {
+  ALARM_STORAGE_KEY,
+  REMINDER_BEFORE_MS,
+  REMINDER_BEFORE_MINUTES,
+  NOTIFICATION_ICON,
+  DEFAULT_ALARMS,
+} from '@/lib/utils/alarmConstants'
+import { prayerNames, prayerMetadata } from '@/lib/data/prayerTimes'
+import type { PrayerName } from '@/lib/data/types'
 
 interface AlarmSettings {
   [key: string]: boolean
@@ -16,80 +24,9 @@ interface UseAlarmsReturn {
   scheduleNotifications: (prayerTimes: Record<PrayerName, string>) => () => void
 }
 
-const prayerNames: Record<PrayerName, string> = {
-  fajr: 'Fajr',
-  sunrise: 'Sunrise',
-  dhuhr: 'Dhuhr',
-  asr: 'Asr',
-  maghrib: 'Maghrib',
-  isha: 'Isha',
-}
-
-const defaultAlarms: AlarmSettings = {
-  fajr: false,
-  sunrise: false,
-  dhuhr: false,
-  asr: false,
-  maghrib: false,
-  isha: false,
-}
-
-// Play notification sound
-function playNotificationSound() {
-  try {
-    const audioContext = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)()
-
-    // Create a pleasant notification sound
-    const oscillator = audioContext.createOscillator()
-    const gainNode = audioContext.createGain()
-
-    oscillator.connect(gainNode)
-    gainNode.connect(audioContext.destination)
-
-    // Use a pleasant frequency pattern (like a doorbell)
-    oscillator.frequency.setValueAtTime(830, audioContext.currentTime) // G#5
-    oscillator.frequency.setValueAtTime(659, audioContext.currentTime + 0.15) // E5
-
-    oscillator.type = 'sine'
-
-    // Fade in and out
-    gainNode.gain.setValueAtTime(0, audioContext.currentTime)
-    gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.05)
-    gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.2)
-    gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.4)
-
-    oscillator.start(audioContext.currentTime)
-    oscillator.stop(audioContext.currentTime + 0.4)
-
-    // Play second tone
-    setTimeout(() => {
-      const osc2 = audioContext.createOscillator()
-      const gain2 = audioContext.createGain()
-
-      osc2.connect(gain2)
-      gain2.connect(audioContext.destination)
-
-      osc2.frequency.setValueAtTime(830, audioContext.currentTime)
-      osc2.frequency.setValueAtTime(988, audioContext.currentTime + 0.15) // B5
-
-      osc2.type = 'sine'
-
-      gain2.gain.setValueAtTime(0, audioContext.currentTime)
-      gain2.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.05)
-      gain2.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.2)
-      gain2.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.4)
-
-      osc2.start(audioContext.currentTime)
-      osc2.stop(audioContext.currentTime + 0.4)
-    }, 400)
-  } catch (e) {
-    console.warn('Could not play notification sound:', e)
-  }
-}
-
 export function useAlarms(): UseAlarmsReturn {
   const [alarms, setAlarms] = useState<AlarmSettings>(() => {
-    return getStorageItem('prayerAlarms', defaultAlarms)
+    return getStorageItem(ALARM_STORAGE_KEY, DEFAULT_ALARMS)
   })
 
   const [hasPermission, setHasPermission] = useState(() => {
@@ -98,10 +35,11 @@ export function useAlarms(): UseAlarmsReturn {
     }
     return false
   })
+
   const scheduledTimeouts = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map())
 
   useEffect(() => {
-    setStorageItem('prayerAlarms', alarms)
+    setStorageItem(ALARM_STORAGE_KEY, alarms)
   }, [alarms])
 
   const toggleAlarm = useCallback((prayer: PrayerName) => {
@@ -111,7 +49,7 @@ export function useAlarms(): UseAlarmsReturn {
     }))
   }, [])
 
-  const requestNotificationPermission = async (): Promise<boolean> => {
+  const requestNotificationPermission = useCallback(async (): Promise<boolean> => {
     if (!('Notification' in window)) {
       console.warn('Notifications not supported')
       return false
@@ -130,7 +68,7 @@ export function useAlarms(): UseAlarmsReturn {
     }
 
     return false
-  }
+  }, [])
 
   const scheduleNotifications = useCallback((prayerTimes: Record<PrayerName, string>) => {
     // Clear any existing scheduled notifications
@@ -144,25 +82,25 @@ export function useAlarms(): UseAlarmsReturn {
     }
 
     const now = new Date()
-    const prayers: PrayerName[] = ['fajr', 'sunrise', 'dhuhr', 'asr', 'maghrib', 'isha']
 
-    prayers.forEach((prayer) => {
+    prayerNames.forEach((prayer) => {
       if (!alarms[prayer]) return
 
       const time = prayerTimes[prayer]
       if (!time) return
 
+      const displayName = prayerMetadata[prayer].displayName
       const targetTime = parseTime(time)
       const diff = targetTime.getTime() - now.getTime()
 
-      // Schedule 10-minute reminder
-      const reminderDiff = diff - (10 * 60 * 1000) // 10 minutes before
+      // Schedule reminder before prayer
+      const reminderDiff = diff - REMINDER_BEFORE_MS
       if (reminderDiff > 0) {
         const reminderTimeout = setTimeout(() => {
           playNotificationSound()
-          new Notification(`${prayerNames[prayer]} in 10 minutes`, {
-            body: `${prayerNames[prayer]} prayer will begin at ${time}`,
-            icon: '/icon-192x192.png',
+          new Notification(`${displayName} in ${REMINDER_BEFORE_MINUTES} minutes`, {
+            body: `${displayName} prayer will begin at ${time}`,
+            icon: NOTIFICATION_ICON,
             tag: `${prayer}-reminder`,
             requireInteraction: false,
           })
@@ -176,9 +114,9 @@ export function useAlarms(): UseAlarmsReturn {
       if (diff > 0) {
         const timeout = setTimeout(() => {
           playNotificationSound()
-          new Notification(`${prayerNames[prayer]} Prayer Time`, {
-            body: `It's time for ${prayerNames[prayer]} prayer (${time})`,
-            icon: '/icon-192x192.png',
+          new Notification(`${displayName} Prayer Time`, {
+            body: `It's time for ${displayName} prayer (${time})`,
+            icon: NOTIFICATION_ICON,
             tag: prayer,
             requireInteraction: true,
           })

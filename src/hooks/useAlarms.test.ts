@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
 import { renderHook, act } from '@testing-library/react'
-import { useAlarms, type PrayerName } from './useAlarms'
+import { useAlarms } from './useAlarms'
+import type { PrayerName } from '@/lib/data/types'
 
 // Mock localStorage
 let mockStore: Record<string, string> = {}

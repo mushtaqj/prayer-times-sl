@@ -5,7 +5,7 @@ import { PrayerRow } from '@/components/PrayerRow'
 import { HijriDateDisplay } from '@/components/HijriDateDisplay'
 import { gregorianToHijri } from '@/lib/data/hijriCalendar'
 import type { DailyPrayerTimes } from '@/lib/data/types'
-import type { PrayerName } from '@/hooks/useAlarms'
+import type { PrayerName } from '@/lib/data/types'
 
 interface DailyViewProps {
   prayers: DailyPrayerTimes | null
