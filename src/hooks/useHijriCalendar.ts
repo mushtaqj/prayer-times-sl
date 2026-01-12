@@ -5,7 +5,7 @@
 import { useMemo, useState, useCallback } from 'react'
 import type { CalendarDay } from '@/lib/data/types'
 import { parseDate, isSameDay, addDays } from '@/lib/utils/date'
-import { FIRST_HIJRI_MONTH, LAST_HIJRI_MONTH } from '@/lib/utils/hijriConstants'
+import { FIRST_HIJRI_MONTH, LAST_HIJRI_MONTH } from '@/lib/constants/hijriConstants'
 import {
   months,
   hijriMonths,

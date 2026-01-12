@@ -1,5 +1,5 @@
 import { Moon, Star, Gift, Sparkles } from 'lucide-react'
-import { SACRED_MONTH_NUMBERS, HIJRI_MONTHS } from '@/lib/utils/hijriConstants'
+import { SACRED_MONTH_NUMBERS, HIJRI_MONTHS } from '@/lib/constants/hijriConstants'
 
 export const WEEKDAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 

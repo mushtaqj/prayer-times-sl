@@ -5,7 +5,7 @@ import {
   FALLBACK_PRAYER_DURATION_MS,
   MIN_PROGRESS,
   MAX_PROGRESS,
-} from '@/lib/utils/countdownConstants'
+} from '@/lib/constants/countdownConstants'
 
 interface UseCountdownOptions {
   /** Target prayer time in HH:MM format */

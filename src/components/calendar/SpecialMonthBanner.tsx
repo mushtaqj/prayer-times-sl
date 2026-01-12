@@ -1,5 +1,5 @@
 import { Star, Sparkles } from 'lucide-react'
-import { SACRED_MONTH_NUMBERS, HIJRI_MONTHS } from '@/lib/utils/hijriConstants'
+import { SACRED_MONTH_NUMBERS, HIJRI_MONTHS } from '@/lib/constants/hijriConstants'
 
 interface SpecialMonthBannerProps {
   hijriMonth: number

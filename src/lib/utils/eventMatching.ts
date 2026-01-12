@@ -3,7 +3,8 @@
  */
 
 import type { IslamicEvent, AnnualFast, HijriDate, FastingInfo, DayEvent } from '@/lib/data/types'
-import { HIJRI_MONTHS, WEEKDAYS, AYYAM_AL_BEED_DAYS, RAMADAN_NAME } from '@/lib/utils/hijriConstants'
+import { HIJRI_MONTHS, AYYAM_AL_BEED_DAYS, RAMADAN_NAME } from '@/lib/constants/hijriConstants'
+import { DAY_INDEX } from '@/lib/constants/dateConstants'
 
 /**
  * Check if a specific Hijri day falls within an annual recurring event range
@@ -67,10 +68,10 @@ export function getFastingInfo(
 
   // Check Monday/Thursday
   const dayOfWeek = hijriDate.gregorianDate.getDay()
-  if (dayOfWeek === WEEKDAYS.MONDAY) {
+  if (dayOfWeek === DAY_INDEX.MONDAY) {
     return { isFasting: true, type: 'sunnah', reason: 'Monday Fast' }
   }
-  if (dayOfWeek === WEEKDAYS.THURSDAY) {
+  if (dayOfWeek === DAY_INDEX.THURSDAY) {
     return { isFasting: true, type: 'sunnah', reason: 'Thursday Fast' }
   }
 
@@ -140,7 +141,7 @@ export function getAllEventsForDay(
     // Add Monday/Thursday fasting if gregorianDate provided
     if (gregorianDate) {
       const dayOfWeek = gregorianDate.getDay()
-      if (dayOfWeek === WEEKDAYS.MONDAY) {
+      if (dayOfWeek === DAY_INDEX.MONDAY) {
         result.push({
           name: 'Monday Fast',
           type: 'sunnah',
@@ -148,7 +149,7 @@ export function getAllEventsForDay(
           details: weeklyFastDetails?.monday
         })
       }
-      if (dayOfWeek === WEEKDAYS.THURSDAY) {
+      if (dayOfWeek === DAY_INDEX.THURSDAY) {
         result.push({
           name: 'Thursday Fast',
           type: 'sunnah',

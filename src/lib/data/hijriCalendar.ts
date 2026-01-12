@@ -9,7 +9,7 @@ import type { HijriDate, HijriMonth, HijriMonthInfo, MoonPhase } from './types'
 
 // Import pure date utilities
 import { parseDate, addDays, daysBetween } from '@/lib/utils/date'
-import { NEW_MOON_DAY } from '@/lib/utils/hijriConstants'
+import { NEW_MOON_DAY } from '@/lib/constants/hijriConstants'
 
 // ============================================================================
 // Static Data - Computed once at module load

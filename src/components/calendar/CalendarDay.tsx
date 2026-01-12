@@ -6,7 +6,7 @@ import {
 } from '@/components/ui/tooltip'
 import { getMoonPhase } from '@/lib/data/hijriCalendar'
 import { getPrimaryEventType } from '@/lib/utils/eventMatching'
-import { MOON_PHASE_DISPLAY_DAYS, RAMADAN_NAME } from '@/lib/utils/hijriConstants'
+import { MOON_PHASE_DISPLAY_DAYS, RAMADAN_NAME } from '@/lib/constants/hijriConstants'
 import { EVENT_STYLES } from './calendarConstants'
 import type { CalendarDay as CalendarDayType, DayEvent, FastingInfo } from '@/lib/data/types'
 

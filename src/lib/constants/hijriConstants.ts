@@ -2,6 +2,8 @@
  * Hijri calendar constants - single source of truth for magic numbers
  */
 
+import { DAY_INDEX } from './dateConstants'
+
 // Hijri year structure
 export const MONTHS_IN_HIJRI_YEAR = 12
 export const FIRST_HIJRI_MONTH = 1
@@ -35,19 +37,8 @@ export const SACRED_MONTH_NUMBERS: readonly number[] = [
   HIJRI_MONTHS.DHUL_HIJJAH,
 ]
 
-// Days of the week (JavaScript Date.getDay() values)
-export const WEEKDAYS = {
-  SUNDAY: 0,
-  MONDAY: 1,
-  TUESDAY: 2,
-  WEDNESDAY: 3,
-  THURSDAY: 4,
-  FRIDAY: 5,
-  SATURDAY: 6,
-} as const
-
-// Sunnah fasting days
-export const SUNNAH_FASTING_DAYS = [WEEKDAYS.MONDAY, WEEKDAYS.THURSDAY] as const
+// Sunnah fasting days (uses DAY_INDEX from dateConstants)
+export const SUNNAH_FASTING_DAYS = [DAY_INDEX.MONDAY, DAY_INDEX.THURSDAY] as const
 
 // Ayyam al-Beed (White Days) - 13th, 14th, 15th of each Hijri month
 export const AYYAM_AL_BEED_DAYS: readonly number[] = [13, 14, 15]

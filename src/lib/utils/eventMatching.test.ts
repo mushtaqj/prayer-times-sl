@@ -10,7 +10,8 @@ import {
   getEventTypeColor,
 } from './eventMatching'
 import type { IslamicEvent, AnnualFast, HijriDate, DayEvent } from '@/lib/data/types'
-import { HIJRI_MONTHS, WEEKDAYS, AYYAM_AL_BEED_DAYS } from './hijriConstants'
+import { HIJRI_MONTHS, AYYAM_AL_BEED_DAYS } from '@/lib/constants/hijriConstants'
+import { DAY_INDEX } from '@/lib/constants/dateConstants'
 
 // Helper factory functions to create test data with required properties
 function createEvent(overrides: Partial<IslamicEvent> & Pick<IslamicEvent, 'id' | 'name' | 'type' | 'hijriMonth' | 'hijriDay'>): IslamicEvent {
@@ -228,7 +229,7 @@ describe('eventMatching utilities', () => {
     it('returns sunnah fasting for Monday', () => {
       // Create a date that falls on Monday (day = 1)
       const monday = new Date(2025, 5, 16) // June 16, 2025 is a Monday
-      expect(monday.getDay()).toBe(WEEKDAYS.MONDAY)
+      expect(monday.getDay()).toBe(DAY_INDEX.MONDAY)
 
       const hijriDate = createHijriDate(1, 20, monday) // Day 20 is not Ayyam al-Beed
 
@@ -242,7 +243,7 @@ describe('eventMatching utilities', () => {
     it('returns sunnah fasting for Thursday', () => {
       // Create a date that falls on Thursday (day = 4)
       const thursday = new Date(2025, 5, 19) // June 19, 2025 is a Thursday
-      expect(thursday.getDay()).toBe(WEEKDAYS.THURSDAY)
+      expect(thursday.getDay()).toBe(DAY_INDEX.THURSDAY)
 
       const hijriDate = createHijriDate(1, 20, thursday) // Day 20 is not Ayyam al-Beed
 
@@ -331,7 +332,7 @@ describe('eventMatching utilities', () => {
 
     it('adds Monday Fast when gregorianDate is Monday', () => {
       const monday = new Date(2025, 5, 16) // Monday
-      expect(monday.getDay()).toBe(WEEKDAYS.MONDAY)
+      expect(monday.getDay()).toBe(DAY_INDEX.MONDAY)
 
       const result = getAllEventsForDay(1, 20, monday, [], [], undefined, { monday: 'Monday details' })
 
@@ -345,7 +346,7 @@ describe('eventMatching utilities', () => {
 
     it('adds Thursday Fast when gregorianDate is Thursday', () => {
       const thursday = new Date(2025, 5, 19) // Thursday
-      expect(thursday.getDay()).toBe(WEEKDAYS.THURSDAY)
+      expect(thursday.getDay()).toBe(DAY_INDEX.THURSDAY)
 
       const result = getAllEventsForDay(1, 20, thursday, [], [], undefined, { thursday: 'Thursday details' })
 

@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { AppInfoModal } from './AppInfoModal'
 import { ThemeToggleButton, DistrictSelector } from '@/components/common'
 import { useLocation as useGeoLocation } from '@/hooks/useLocation'
-import { COUNTRY_NAME } from '@/lib/utils/appConstants'
+import { COUNTRY_NAME } from '@/lib/constants/appConstants'
 import type { District } from '@/lib/data/types'
 
 interface HeaderProps {

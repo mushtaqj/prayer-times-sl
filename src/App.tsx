@@ -14,7 +14,7 @@ import {useTheme} from '@/hooks/useTheme'
 import {useAlarms} from '@/hooks/useAlarms'
 import {usePrayerTimes} from '@/hooks/usePrayerTimes'
 import {getStorageString, setStorageString} from '@/lib/utils/storage'
-import {COUNTRY_NAME} from '@/lib/utils/appConstants'
+import {COUNTRY_NAME} from '@/lib/constants/appConstants'
 import {Bell, Download} from 'lucide-react'
 
 function App() {

@@ -5,7 +5,7 @@ import {
   THEME_DARK,
   THEME_LIGHT,
   DARK_CLASS,
-} from '@/lib/utils/themeConstants'
+} from '@/lib/constants/themeConstants'
 
 export function useTheme() {
   const [isDark, setIsDark] = useState(() => {

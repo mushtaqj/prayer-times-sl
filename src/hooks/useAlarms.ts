@@ -8,7 +8,7 @@ import {
   REMINDER_BEFORE_MINUTES,
   NOTIFICATION_ICON,
   DEFAULT_ALARMS,
-} from '@/lib/utils/alarmConstants'
+} from '@/lib/constants/alarmConstants'
 import { prayerNames, prayerMetadata } from '@/lib/data/prayerTimes'
 import type { PrayerName } from '@/lib/data/types'
 

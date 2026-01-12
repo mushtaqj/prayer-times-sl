@@ -26,7 +26,7 @@ import {
   GREGORIAN_MONTHS,
   FIRST_GREGORIAN_MONTH,
   LAST_GREGORIAN_MONTH,
-} from '@/lib/utils/dateConstants'
+} from '@/lib/constants/dateConstants'
 import { prayerNames } from '@/lib/data/prayerTimes'
 
 interface MonthViewProps {

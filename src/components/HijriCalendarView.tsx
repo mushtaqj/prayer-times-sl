@@ -17,7 +17,7 @@ import {
   getMonthTheme,
   WEEKDAY_LABELS,
 } from '@/components/calendar'
-import { RAMADAN_NAME } from '@/lib/utils/hijriConstants'
+import { RAMADAN_NAME } from '@/lib/constants/hijriConstants'
 
 interface HijriCalendarViewProps {
   location: string

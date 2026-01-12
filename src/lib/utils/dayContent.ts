@@ -1,5 +1,5 @@
 import { RECURRING_FAST_IDS } from '@/lib/data/islamicEvents'
-import { RAMADAN_NAME } from '@/lib/utils/hijriConstants'
+import { RAMADAN_NAME } from '@/lib/constants/hijriConstants'
 
 interface DayEvent {
   name: string
