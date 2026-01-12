@@ -57,17 +57,18 @@ export function LandingPage({
     currentPrayerTime: currentPrayer?.time,
   })
 
-  const today = new Date()
-  const hijriDate = gregorianToHijri(today)
+  const today = useMemo(() => new Date(), [])
+  const hijriDate = useMemo(() => gregorianToHijri(today), [today])
   const moonPhase = hijriDate ? getMoonPhase(hijriDate.day) : null
   const dayOfWeek = today.getDay()
   const isFriday = dayOfWeek === DAY_INDEX.FRIDAY
 
   const { isFastingDay, recurringFasts, getMonthName, hijriMonths } =
     useIslamicEvents()
-  const fastingInfo = hijriDate
-    ? isFastingDay(hijriDate)
-    : { isFasting: false }
+  const fastingInfo = useMemo(
+    () => (hijriDate ? isFastingDay(hijriDate) : { isFasting: false }),
+    [hijriDate, isFastingDay]
+  )
   const monthInfo = hijriDate ? getMonthName(hijriDate.month) ?? null : null
 
   const openVirtuesSheet = useCallback((title: string, content: string) => {

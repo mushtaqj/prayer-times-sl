@@ -46,6 +46,7 @@ export function LocationProvider({ children }: LocationProviderProps) {
   )
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useLocationContext(): LocationContextValue {
   const context = useContext(LocationContext)
   if (!context) {
