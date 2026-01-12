@@ -1,3 +1,4 @@
+export { CalendarHeader } from './CalendarHeader'
 export { CalendarLegend } from './CalendarLegend'
 export { MonthEventsCard } from './MonthEventsCard'
 export { CalendarDay, EmptyCalendarCell, UncertainDay30Cell } from './CalendarDay'

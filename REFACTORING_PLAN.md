@@ -344,11 +344,16 @@ export function SectionToggle({ items, selected, onChange }): JSX.Element
 
 ## Refactoring Priority Order
 
-### Phase 4: Component Extraction (HIGH)
-- [ ] Split `AdminPage.tsx` into smaller components
-- [ ] Split `LandingPage.tsx` into smaller components
-- [ ] Split `HijriCalendarView.tsx` into smaller components
-- [ ] Create `ThemeContext` and `LocationContext`
+### Phase 4: Component Extraction (HIGH) ✅
+- [x] Split `AdminPage.tsx` into smaller components (407 → 212 lines, 48% reduction)
+  - Created `AdminForm.tsx`, `AdminSuccessState.tsx`, `MonthTransitionCard.tsx`, `RecentChangesHistory.tsx`, `SecurityNote.tsx`
+- [x] Split `LandingPage.tsx` into smaller components (369 → 228 lines, 38% reduction)
+  - Created `NextPrayerCard.tsx`, `TodayBlessingsCard.tsx`, `NavigationButtons.tsx`, `MonthPickerModal.tsx`
+  - Created `lib/utils/prayerIcons.tsx` utility
+- [x] Split `HijriCalendarView.tsx` into smaller components (375 → 307 lines, 18% reduction)
+  - Created `CalendarHeader.tsx`
+  - Created `lib/utils/dayContent.ts` utility
+- [x] Create `ThemeContext` and `LocationContext` (in `src/contexts/`)
 
 ### Phase 5: Deduplication (MEDIUM)
 - [ ] Create `<LocationBadge>` component
@@ -365,7 +370,7 @@ export function SectionToggle({ items, selected, onChange }): JSX.Element
 ### Phase 7: Constants & Cleanup (LOW)
 - [ ] Extract remaining hardcoded values to constants
 - [ ] Create Tailwind utility classes for repeated patterns
-- [ ] Extract `getPrayerIcon` utility function
+- [x] Extract `getPrayerIcon` utility function (moved to `lib/utils/prayerIcons.tsx`)
 
 ---
 

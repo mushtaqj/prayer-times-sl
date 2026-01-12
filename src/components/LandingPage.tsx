@@ -1,15 +1,19 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { VirtuesSheet } from '@/components/VirtuesSheet'
-import { CircleProgress } from '@/components/common/CircleProgress'
 import { gregorianToHijri, getMoonPhase } from '@/lib/data/hijriCalendar'
 import { useIslamicEvents } from '@/hooks/useIslamicEvents'
 import { DAY_INDEX } from '@/lib/utils/dateConstants'
 import { AYYAM_AL_BEED_DAYS } from '@/lib/utils/hijriConstants'
 import { useCountdown } from '@/hooks/useCountdown'
-import { Clock, Calendar, CalendarSearch, Moon, Sun, Sunrise, Sunset, CloudSun } from 'lucide-react'
+import { Moon, Sun } from 'lucide-react'
+import {
+  NextPrayerCard,
+  TodayBlessingsCard,
+  NavigationButtons,
+  MonthPickerModal,
+} from '@/components/landing'
 
 interface PrayerInfo {
   name: string
@@ -36,14 +40,17 @@ export function LandingPage({
   installBanner,
 }: LandingPageProps) {
   const navigate = useNavigate()
-  const [virtuesSheet, setVirtuesSheet] = useState<{ isOpen: boolean; title: string; content: string }>({
+  const [virtuesSheet, setVirtuesSheet] = useState<{
+    isOpen: boolean
+    title: string
+    content: string
+  }>({
     isOpen: false,
     title: '',
-    content: ''
+    content: '',
   })
   const [showMonthPicker, setShowMonthPicker] = useState(false)
 
-  // Use the countdown hook
   const { countdown, progress } = useCountdown({
     targetTime: nextPrayer?.time || '00:00',
     currentPrayerTime: currentPrayer?.time,
@@ -55,28 +62,34 @@ export function LandingPage({
   const dayOfWeek = today.getDay()
   const isFriday = dayOfWeek === DAY_INDEX.FRIDAY
 
-  const { isFastingDay, recurringFasts, getMonthName, hijriMonths } = useIslamicEvents()
-  const fastingInfo = hijriDate ? isFastingDay(hijriDate) : { isFasting: false }
-  const monthInfo = hijriDate ? getMonthName(hijriDate.month) : null
+  const { isFastingDay, recurringFasts, getMonthName, hijriMonths } =
+    useIslamicEvents()
+  const fastingInfo = hijriDate
+    ? isFastingDay(hijriDate)
+    : { isFasting: false }
+  const monthInfo = hijriDate ? getMonthName(hijriDate.month) ?? null : null
 
   const openVirtuesSheet = (title: string, content: string) => {
     setVirtuesSheet({ isOpen: true, title, content })
   }
 
-  // Determine recommended Ibadah pills based on the day
   const getRecommendedPills = () => {
     const pills: { label: string; content: string; type: string }[] = []
 
     if (isFriday) {
       pills.push({
         label: 'Surat al-Kahf',
-        content: recurringFasts.friday?.details || '# Friday\n\nRecite Surah Al-Kahf for blessings.',
-        type: 'recommended'
+        content:
+          recurringFasts.friday?.details ||
+          '# Friday\n\nRecite Surah Al-Kahf for blessings.',
+        type: 'recommended',
       })
       pills.push({
         label: 'Durud',
-        content: recurringFasts.friday?.details || '# Friday\n\nSend abundant blessings upon the Prophet (ﷺ).',
-        type: 'recommended'
+        content:
+          recurringFasts.friday?.details ||
+          '# Friday\n\nSend abundant blessings upon the Prophet (ﷺ).',
+        type: 'recommended',
       })
     }
 
@@ -84,18 +97,19 @@ export function LandingPage({
       pills.push({
         label: 'Fast Today',
         content: `# ${fastingInfo.reason}\n\nToday is a recommended day for fasting (${fastingInfo.type}).`,
-        type: 'fast'
+        type: 'fast',
       })
     }
 
-    // Add Ayyam al-Beed if applicable
     if (hijriDate && AYYAM_AL_BEED_DAYS.includes(hijriDate.day)) {
-      const existingFast = pills.find(p => p.label === 'Fast Today')
+      const existingFast = pills.find((p) => p.label === 'Fast Today')
       if (!existingFast) {
         pills.push({
           label: 'Ayyam al-Beed',
-          content: recurringFasts.monthly?.ayyamAlBeed?.details || '# Ayyam al-Beed\n\nThe White Days - 13th, 14th, 15th of the lunar month.',
-          type: 'fast'
+          content:
+            recurringFasts.monthly?.ayyamAlBeed?.details ||
+            '# Ayyam al-Beed\n\nThe White Days - 13th, 14th, 15th of the lunar month.',
+          type: 'fast',
         })
       }
     }
@@ -104,25 +118,9 @@ export function LandingPage({
   }
 
   const recommendedPills = getRecommendedPills()
-
-  // Get prayer icon based on prayer name
-  const getPrayerIcon = (prayerName: string) => {
-    const iconClass = "w-8 h-8 sm:w-12 sm:h-12 drop-shadow-lg"
-    switch (prayerName.toLowerCase()) {
-      case 'fajr':
-      case 'sunrise':
-        return <Sunrise className={iconClass} />
-      case 'dhuhr':
-        return <Sun className={iconClass} />
-      case 'asr':
-        return <CloudSun className={iconClass} />
-      case 'maghrib':
-        return <Sunset className={iconClass} />
-      case 'isha':
-      default:
-        return <Moon className={iconClass} />
-    }
-  }
+  const isAyyamAlBeed = hijriDate
+    ? AYYAM_AL_BEED_DAYS.includes(hijriDate.day)
+    : false
 
   if (!currentPrayer || !nextPrayer) {
     return (
@@ -143,8 +141,12 @@ export function LandingPage({
             className="w-8 h-8 rounded-lg shadow-md"
           />
           <div>
-            <h1 className="text-base font-bold text-foreground leading-tight">Prayer Times</h1>
-            <p className="text-[10px] text-muted-foreground">{location}, Sri Lanka</p>
+            <h1 className="text-base font-bold text-foreground leading-tight">
+              Prayer Times
+            </h1>
+            <p className="text-[10px] text-muted-foreground">
+              {location}, Sri Lanka
+            </p>
           </div>
         </div>
         <Button
@@ -167,200 +169,57 @@ export function LandingPage({
               </h2>
             )}
             <p className="text-xs sm:text-sm text-muted-foreground">
-              {today.toLocaleDateString('en-US', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
+              {today.toLocaleDateString('en-US', {
+                weekday: 'short',
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric',
+              })}
             </p>
           </div>
           <div className="text-3xl sm:text-4xl">{moonPhase?.icon}</div>
         </div>
 
-        {/* Hero Section - Next Prayer */}
-        <Card className="relative overflow-hidden border-none shadow-lg bg-gradient-to-br from-primary via-primary to-accent text-primary-foreground">
-          <div className="absolute inset-0 opacity-10">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-white rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-            <div className="absolute bottom-0 left-0 w-24 h-24 bg-white rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
-          </div>
+        <NextPrayerCard
+          nextPrayer={nextPrayer}
+          currentPrayer={currentPrayer}
+          countdown={countdown}
+          progress={progress}
+        />
 
-          <CardContent className="relative z-10 p-3 sm:p-4 flex flex-col items-center">
-            <div className="mb-1 sm:mb-2 text-white/90">
-              {getPrayerIcon(nextPrayer.displayName)}
-            </div>
+        <TodayBlessingsCard
+          isFriday={isFriday}
+          isFasting={fastingInfo.isFasting}
+          fastingReason={fastingInfo.reason}
+          isAyyamAlBeed={isAyyamAlBeed}
+          recommendedPills={recommendedPills}
+          monthInfo={monthInfo}
+          onPillClick={openVirtuesSheet}
+        />
 
-            <p className="text-[10px] sm:text-xs uppercase tracking-[0.2em] opacity-70">Next Prayer</p>
-            <h1 className="text-2xl sm:text-3xl font-bold font-heading">{nextPrayer.displayName}</h1>
-            <p className="text-sm opacity-80 font-arabic">{nextPrayer.arabicName}</p>
-
-            {/* Circular Progress Timer - Responsive */}
-            <div className="my-2 sm:my-3">
-              {/* Mobile size */}
-              <CircleProgress progress={progress} size={140} className="sm:hidden">
-                <span className="text-2xl font-bold">{nextPrayer.time}</span>
-                <span className="text-xs opacity-80">in {countdown}</span>
-              </CircleProgress>
-              {/* Desktop size */}
-              <CircleProgress progress={progress} size={180} className="hidden sm:block">
-                <span className="text-3xl font-bold">{nextPrayer.time}</span>
-                <span className="text-sm opacity-80">in {countdown}</span>
-              </CircleProgress>
-            </div>
-
-            {/* Current Prayer indicator */}
-            <div className="flex items-center gap-1.5 sm:gap-2 bg-white/15 backdrop-blur-sm rounded-full px-3 py-1.5 border border-white/20">
-              <span className="text-[10px] sm:text-xs text-white/70">Current:</span>
-              <span className="font-semibold text-white text-sm">{currentPrayer.displayName}</span>
-              <span className="text-[10px] sm:text-xs text-white/70">({currentPrayer.time})</span>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Today's Blessings Card - Compact */}
-        <Card className="border-border/50 bg-card/80 backdrop-blur-sm shadow-sm overflow-hidden">
-          <CardContent className="p-3">
-            {(isFriday || fastingInfo.isFasting || (hijriDate && AYYAM_AL_BEED_DAYS.includes(hijriDate.day))) ? (
-              <>
-                <div className="flex flex-wrap gap-1.5 mb-2">
-                  {isFriday && (
-                    <span className="px-2.5 py-1 text-xs font-semibold rounded-full bg-gradient-to-r from-emerald-500/20 to-teal-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
-                      Jumu'ah
-                    </span>
-                  )}
-                  {fastingInfo.isFasting && (
-                    <span className="px-2.5 py-1 text-xs font-semibold rounded-full bg-gradient-to-r from-amber-500/20 to-orange-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30">
-                      {fastingInfo.reason}
-                    </span>
-                  )}
-                  {hijriDate && AYYAM_AL_BEED_DAYS.includes(hijriDate.day) && !fastingInfo.isFasting && (
-                    <span className="px-2.5 py-1 text-xs font-semibold rounded-full bg-gradient-to-r from-sky-500/20 to-blue-500/20 text-sky-600 dark:text-sky-400 border border-sky-500/30">
-                      Ayyam al-Beed
-                    </span>
-                  )}
-                </div>
-
-                {recommendedPills.length > 0 && (
-                  <div className="flex flex-wrap gap-1.5">
-                    {recommendedPills.map((pill, index) => (
-                      <button
-                        key={index}
-                        onClick={() => openVirtuesSheet(pill.label, pill.content)}
-                        className="px-2.5 py-1.5 text-xs font-medium rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-all active:scale-[0.98] border border-primary/20"
-                      >
-                        {pill.label}
-                      </button>
-                    ))}
-                    {monthInfo?.details && (
-                      <button
-                        onClick={() => openVirtuesSheet(monthInfo.name, monthInfo.details || '')}
-                        className="px-2.5 py-1.5 text-xs font-medium rounded-lg bg-muted/50 text-muted-foreground hover:bg-muted transition-all"
-                      >
-                        About {monthInfo.name} →
-                      </button>
-                    )}
-                  </div>
-                )}
-              </>
-            ) : (
-              monthInfo?.details && (
-                <button
-                  onClick={() => openVirtuesSheet(monthInfo.name, monthInfo.details || '')}
-                  className="w-full text-left group"
-                >
-                  <div className="p-2.5 rounded-lg bg-gradient-to-br from-primary/5 via-primary/10 to-accent/5 border border-primary/10 hover:border-primary/20 transition-all">
-                    <h3 className="text-xs font-semibold text-primary mb-1">
-                      The Month of {monthInfo.name}
-                    </h3>
-                    <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
-                      {monthInfo.details
-                        .split('\n')
-                        .filter(line => line.trim() && !line.startsWith('#') && !line.startsWith('>'))
-                        .join(' ')
-                        .replace(/\*\*/g, '')
-                        .substring(0, 120)}...
-                    </p>
-                  </div>
-                </button>
-              )
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Navigation Buttons - Compact */}
-        <div className="grid grid-cols-3 gap-2">
-          <button
-            onClick={() => navigate('/prayer')}
-            className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-md shadow-emerald-500/20 hover:shadow-lg hover:scale-[1.02] transition-all active:scale-[0.98]"
-          >
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-white/20 flex items-center justify-center">
-              <Clock className="w-5 h-5" />
-            </div>
-            <span className="text-[10px] sm:text-xs font-semibold">Prayer Times</span>
-          </button>
-
-          <button
-            onClick={() => navigate('/hijri')}
-            className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-md shadow-emerald-500/20 hover:shadow-lg hover:scale-[1.02] transition-all active:scale-[0.98]"
-          >
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-white/20 flex items-center justify-center">
-              <Calendar className="w-5 h-5" />
-            </div>
-            <span className="text-[10px] sm:text-xs font-semibold">Hijri Calendar</span>
-          </button>
-
-          <button
-            onClick={() => setShowMonthPicker(true)}
-            className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-md shadow-emerald-500/20 hover:shadow-lg hover:scale-[1.02] transition-all active:scale-[0.98]"
-          >
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-white/20 flex items-center justify-center">
-              <CalendarSearch className="w-5 h-5" />
-            </div>
-            <span className="text-[10px] sm:text-xs font-semibold">Jump to Month</span>
-          </button>
-        </div>
+        <NavigationButtons
+          onPrayerTimesClick={() => navigate('/prayer')}
+          onHijriCalendarClick={() => navigate('/hijri')}
+          onJumpToMonthClick={() => setShowMonthPicker(true)}
+        />
 
         {installBanner}
       </div>
 
-      {/* Month Picker Modal */}
-      {showMonthPicker && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-end sm:items-center justify-center p-4">
-          <div className="bg-card w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden animate-in slide-in-from-bottom-4 duration-300">
-            <div className="p-4 border-b border-border bg-muted/30">
-              <h3 className="text-lg font-semibold">Jump to Hijri Month</h3>
-              <p className="text-xs text-muted-foreground">Select a month to view in the calendar</p>
-            </div>
-            <div className="p-4 grid grid-cols-3 gap-2 max-h-[50vh] overflow-y-auto">
-              {hijriMonths.map((month) => (
-                <button
-                  key={month.number}
-                  onClick={() => {
-                    setShowMonthPicker(false)
-                    navigate('/hijri')
-                  }}
-                  className={`p-3 rounded-xl text-center transition-all hover:scale-[1.02] active:scale-[0.98] ${
-                    hijriDate?.month === month.number
-                      ? 'bg-primary text-primary-foreground shadow-md'
-                      : 'bg-muted/50 hover:bg-muted text-foreground'
-                  }`}
-                >
-                  <span className="text-sm font-medium block">{month.name}</span>
-                  <span className="text-[10px] opacity-70">{month.nameArabic}</span>
-                </button>
-              ))}
-            </div>
-            <div className="p-4 border-t border-border">
-              <Button
-                variant="outline"
-                className="w-full"
-                onClick={() => setShowMonthPicker(false)}
-              >
-                Cancel
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+      <MonthPickerModal
+        isOpen={showMonthPicker}
+        currentMonth={hijriDate?.month ?? null}
+        hijriMonths={hijriMonths}
+        onMonthSelect={() => {
+          setShowMonthPicker(false)
+          navigate('/hijri')
+        }}
+        onClose={() => setShowMonthPicker(false)}
+      />
 
       <VirtuesSheet
         isOpen={virtuesSheet.isOpen}
-        onClose={() => setVirtuesSheet(prev => ({ ...prev, isOpen: false }))}
+        onClose={() => setVirtuesSheet((prev) => ({ ...prev, isOpen: false }))}
         title={virtuesSheet.title}
         content={virtuesSheet.content}
       />
