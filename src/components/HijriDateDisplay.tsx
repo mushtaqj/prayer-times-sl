@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
-import { formatHijriDate, getMoonPhase, type HijriDate } from '@/hooks/useHijriCalendar'
+import { formatHijriDate, getMoonPhase } from '@/hooks/useHijriCalendar'
 import { useIslamicEvents } from '@/hooks/useIslamicEvents'
+import type { HijriDate } from '@/lib/data/types'
 
 interface HijriDateDisplayProps {
   hijriDate: HijriDate | null

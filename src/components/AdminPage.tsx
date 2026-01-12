@@ -1,13 +1,9 @@
 import { useState, useMemo } from 'react'
 import { Button } from '@/components/ui/button'
 import { Lock, Moon, AlertCircle, Loader2, Calendar, ArrowRight, Mail, Shield } from 'lucide-react'
-import hijriData from '@/data/hijriCalendar.json'
-
-const MONTH_NAMES = [
-  'Muharram', 'Safar', 'Rabi al-Awwal', 'Rabi al-Thani',
-  'Jumada al-Awwal', 'Jumada al-Akhirah', 'Rajab', 'Shaban',
-  'Ramadan', 'Shawwal', 'Dhul Qadah', 'Dhul Hijjah'
-]
+import { months, hijriMonths } from '@/lib/hijriCalendar'
+import { addDays, formatDate, parseDate } from '@/lib/dateUtils'
+import { LAST_HIJRI_MONTH, FIRST_HIJRI_MONTH } from '@/lib/hijriConstants'
 
 type SubmitStatus = 'idle' | 'loading' | 'success' | 'error'
 
@@ -20,27 +16,29 @@ export function AdminPage() {
 
   // Find current ongoing month
   const currentMonth = useMemo(() => {
-    return hijriData.months.find(m => m.status === 'ongoing')
+    return months.find(m => m.status === 'ongoing')
   }, [])
 
   // Calculate what the next month will be
   const nextMonth = useMemo(() => {
     if (!currentMonth) return null
-    const nextHijriMonth = currentMonth.hijriMonth === 12 ? 1 : currentMonth.hijriMonth + 1
-    const nextHijriYear = currentMonth.hijriMonth === 12 ? currentMonth.hijriYear + 1 : currentMonth.hijriYear
+    const isLastMonth = currentMonth.hijriMonth === LAST_HIJRI_MONTH
+    const nextHijriMonth = isLastMonth ? FIRST_HIJRI_MONTH : currentMonth.hijriMonth + 1
+    const nextHijriYear = isLastMonth ? currentMonth.hijriYear + 1 : currentMonth.hijriYear
+    const monthInfo = hijriMonths.find(m => m.number === nextHijriMonth)
     return {
       hijriMonth: nextHijriMonth,
       hijriYear: nextHijriYear,
-      monthName: MONTH_NAMES[nextHijriMonth - 1]
+      monthName: monthInfo?.name ?? `Month ${nextHijriMonth}`
     }
   }, [currentMonth])
 
   // Calculate next month's start date based on selected days
   const nextStartDate = useMemo(() => {
     if (!currentMonth) return null
-    const start = new Date(currentMonth.gregorianStart)
-    start.setDate(start.getDate() + days)
-    return start.toLocaleDateString('en-US', {
+    const start = parseDate(currentMonth.gregorianStart)
+    const nextStart = addDays(start, days)
+    return formatDate(nextStart, {
       weekday: 'long',
       year: 'numeric',
       month: 'long',

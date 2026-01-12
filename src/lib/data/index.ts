@@ -76,59 +76,35 @@ export function getTodayPrayerTimes(districtId: string): DailyPrayerTimes | unde
 // HIJRI CALENDAR
 // ============================================
 
+// Re-export from hijriCalendar utility for backwards compatibility
+export {
+  hijriMonths as getHijriMonthsInfoData,
+  months as getAllHijriMonthsData,
+  gregorianToHijri as getHijriDateForGregorian,
+} from '@/lib/hijriCalendar'
+
+import { hijriMonths, months } from '@/lib/hijriCalendar'
+
 export function getHijriMonthsInfo(): HijriMonthInfo[] {
-  return hijriCalendarData.hijriMonths
+  return hijriMonths
 }
 
 export function getHijriMonthInfo(monthNumber: number): HijriMonthInfo | undefined {
-  return hijriCalendarData.hijriMonths.find(m => m.number === monthNumber)
+  return hijriMonths.find(m => m.number === monthNumber)
 }
 
 export function getAllHijriMonths(): HijriMonth[] {
-  return hijriCalendarData.months
+  return months
 }
 
 export function getOngoingHijriMonth(): HijriMonth | undefined {
-  return hijriCalendarData.months.find(m => m.status === 'ongoing')
+  return months.find(m => m.status === 'ongoing')
 }
 
 export function getHijriMonth(year: number, month: number): HijriMonth | undefined {
-  return hijriCalendarData.months.find(
+  return months.find(
     m => m.hijriYear === year && m.hijriMonth === month
   )
-}
-
-export function getHijriDateForGregorian(gregorianDate: Date): {
-  day: number
-  month: number
-  monthName: string
-  year: number
-} | null {
-  const targetDate = new Date(gregorianDate)
-  targetDate.setHours(0, 0, 0, 0)
-
-  for (const month of hijriCalendarData.months) {
-    const startDate = new Date(month.gregorianStart)
-    startDate.setHours(0, 0, 0, 0)
-
-    const endDate = new Date(startDate)
-    endDate.setDate(endDate.getDate() + month.days)
-
-    if (targetDate >= startDate && targetDate < endDate) {
-      const dayDiff = Math.floor(
-        (targetDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
-      )
-
-      return {
-        day: dayDiff + 1,
-        month: month.hijriMonth,
-        monthName: month.monthName,
-        year: month.hijriYear,
-      }
-    }
-  }
-
-  return null
 }
 
 export function getHijriCalendarMetadata() {
