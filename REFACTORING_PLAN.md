@@ -84,35 +84,33 @@ src/
 
 ---
 
-## Pending Refactoring
+## Completed Refactoring (Components)
 
-### Components
+### High Priority - Data Duplication ✅
 
-#### High Priority - Data Duplication
+| File | Issue | Solution | Status |
+|------|-------|----------|--------|
+| `MonthView.tsx` | `monthNames` array hardcoded | Import `GREGORIAN_MONTHS` from `dateConstants.ts` | ✅ Done |
+| `MonthView.tsx` | `prayerKeys` duplicated | Import `prayerNames` from `prayerTimes.ts` | ✅ Done |
+| `WeekView.tsx` | `prayerKeys` duplicated | Import `prayerNames` from `prayerTimes.ts` | ✅ Done |
 
-| File | Line(s) | Issue | Solution |
-|------|---------|-------|----------|
-| `MonthView.tsx` | 30-33 | `monthNames` array hardcoded | Create `GREGORIAN_MONTHS` in `lib/utils/dateConstants.ts` |
-| `MonthView.tsx` | 35 | `prayerKeys` duplicated | Import `prayerNames` from `@/lib/data/prayerTimes` |
-| `WeekView.tsx` | 14 | `prayerKeys` duplicated | Import `prayerNames` from `@/lib/data/prayerTimes` |
+### Medium Priority - Magic Numbers/Strings ✅
 
-#### Medium Priority - Magic Numbers/Strings
+| File | Issue | Solution | Status |
+|------|-------|----------|--------|
+| `LandingPage.tsx` | `dayOfWeek === 5` for Friday | Use `DAY_INDEX.FRIDAY` | ✅ Done |
+| `LandingPage.tsx` | `[13, 14, 15]` Ayyam al-Beed days | Use `AYYAM_AL_BEED_DAYS` | ✅ Done |
+| `CalendarDay.tsx` | `day.hijriDay === 1 \|\| day.hijriDay === 15` | Use `MOON_PHASE_DISPLAY_DAYS` | ✅ Done |
+| `CalendarDay.tsx` | `'Ramadan'` magic string | Use `RAMADAN_NAME` | ✅ Done |
+| `HijriCalendarView.tsx` | `'Ramadan'` magic string | Use `RAMADAN_NAME` | ✅ Done |
+| `HijriCalendarView.tsx` | `'monday-fast'`, `'thursday-fast'` IDs | Use `RECURRING_FAST_IDS` | ✅ Done |
 
-| File | Line(s) | Issue | Solution |
-|------|---------|-------|----------|
-| `LandingPage.tsx` | 54 | `dayOfWeek === 5` for Friday | Create `FRIDAY_INDEX = 5` constant |
-| `LandingPage.tsx` | 90, 216, 229 | `[13, 14, 15]` Ayyam al-Beed days (3x) | Create `AYYAM_AL_BEED_DAYS` constant |
-| `CalendarDay.tsx` | 31 | `day.hijriDay === 1 \|\| day.hijriDay === 15` | Create `MOON_PHASE_DISPLAY_DAYS` constant |
-| `CalendarDay.tsx` | 74 | `'Ramadan'` magic string | Import from hijri constants |
-| `HijriCalendarView.tsx` | 133, 144 | `'Ramadan'` magic string | Import from hijri constants |
-| `HijriCalendarView.tsx` | 135, 140 | `'monday-fast'`, `'thursday-fast'` IDs | Create `RECURRING_FAST_IDS` constant |
+### Low Priority - Labels/Strings (Pending)
 
-#### Low Priority - Labels/Strings
-
-| File | Line(s) | Issue | Solution |
-|------|---------|-------|----------|
-| `HijriDateDisplay.tsx` | 84-86 | Fasting type labels inline | Create fasting label constants (optional) |
-| `PrayerRow.tsx` | 39 | `'Upcoming'` label | Consider constant (optional) |
+| File | Issue | Solution | Status |
+|------|-------|----------|--------|
+| `HijriDateDisplay.tsx` | Fasting type labels inline | Create fasting label constants | Optional |
+| `PrayerRow.tsx` | `'Upcoming'` label | Consider constant | Optional |
 
 ---
 
@@ -167,35 +165,36 @@ export const RECURRING_FAST_IDS = {
 
 ## Refactoring Checklist
 
-### Phase 1: Create New Constants
-- [ ] Create `lib/utils/dateConstants.ts` with `GREGORIAN_MONTHS` and `DAY_INDEX`
-- [ ] Add `AYYAM_AL_BEED_DAYS` and `MOON_PHASE_DISPLAY_DAYS` to `hijriConstants.ts`
-- [ ] Add `RAMADAN_NAME` to `hijriConstants.ts`
-- [ ] Add `RECURRING_FAST_IDS` to `islamicEvents.ts`
-- [ ] Update `lib/utils/index.ts` to export new constants
+### Phase 1: Create New Constants ✅
+- [x] Create `lib/utils/dateConstants.ts` with `GREGORIAN_MONTHS` and `DAY_INDEX`
+- [x] Add `MOON_PHASE_DISPLAY_DAYS` to `hijriConstants.ts` (AYYAM_AL_BEED_DAYS already existed)
+- [x] Add `RAMADAN_NAME` to `hijriConstants.ts`
+- [x] Add `RECURRING_FAST_IDS` to `islamicEvents.ts`
 
-### Phase 2: Update Components
-- [ ] `MonthView.tsx` - Use `GREGORIAN_MONTHS` and `prayerNames`
-- [ ] `WeekView.tsx` - Use `prayerNames`
-- [ ] `LandingPage.tsx` - Use `DAY_INDEX.FRIDAY` and `AYYAM_AL_BEED_DAYS`
-- [ ] `CalendarDay.tsx` - Use `MOON_PHASE_DISPLAY_DAYS` and `RAMADAN_NAME`
-- [ ] `HijriCalendarView.tsx` - Use `RAMADAN_NAME` and `RECURRING_FAST_IDS`
+### Phase 2: Update Components ✅
+- [x] `MonthView.tsx` - Use `GREGORIAN_MONTHS` and `prayerNames`
+- [x] `WeekView.tsx` - Use `prayerNames`
+- [x] `LandingPage.tsx` - Use `DAY_INDEX.FRIDAY` and `AYYAM_AL_BEED_DAYS`
+- [x] `CalendarDay.tsx` - Use `MOON_PHASE_DISPLAY_DAYS` and `RAMADAN_NAME`
+- [x] `HijriCalendarView.tsx` - Use `RAMADAN_NAME` and `RECURRING_FAST_IDS`
 
-### Phase 3: Verify & Test
-- [ ] Run all tests (`npm test`)
-- [ ] Run build (`npm run build`)
-- [ ] Manual smoke test of affected views
+### Phase 3: Verify & Test ✅
+- [x] Run all tests (`npm test`) - 322 passing
+- [x] Run build (`npm run build`) - Success
 
 ---
 
 ## Test Coverage
 
-Current test status: **188 tests passing**
+Current test status: **322 tests passing**
 
 | Test File | Tests |
 |-----------|-------|
 | `lib/utils/storage.test.ts` | 14 |
 | `lib/utils/time.test.ts` | 20 |
+| `lib/utils/date.test.ts` | 34 |
+| `lib/utils/geo.test.ts` | 21 |
+| `lib/utils/eventMatching.test.ts` | 48 |
 | `lib/data/hijriCalendar.test.ts` | 37 |
 | `hooks/useTheme.test.ts` | 15 |
 | `hooks/useCountdown.test.ts` | 19 |
@@ -203,6 +202,7 @@ Current test status: **188 tests passing**
 | `hooks/useLocation.test.ts` | 15 |
 | `hooks/useAlarms.test.ts` | 18 |
 | `hooks/useIslamicEvents.test.ts` | 31 |
+| `hooks/useHijriCalendar.test.ts` | 31 |
 
 ---
 

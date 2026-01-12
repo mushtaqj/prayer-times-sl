@@ -6,6 +6,8 @@ import { VirtuesSheet } from '@/components/VirtuesSheet'
 import { CircleProgress } from '@/components/common/CircleProgress'
 import { gregorianToHijri, getMoonPhase } from '@/lib/data/hijriCalendar'
 import { useIslamicEvents } from '@/hooks/useIslamicEvents'
+import { DAY_INDEX } from '@/lib/utils/dateConstants'
+import { AYYAM_AL_BEED_DAYS } from '@/lib/utils/hijriConstants'
 import { useCountdown } from '@/hooks/useCountdown'
 import { Clock, Calendar, CalendarSearch, Moon, Sun, Sunrise, Sunset, CloudSun } from 'lucide-react'
 
@@ -51,7 +53,7 @@ export function LandingPage({
   const hijriDate = gregorianToHijri(today)
   const moonPhase = hijriDate ? getMoonPhase(hijriDate.day) : null
   const dayOfWeek = today.getDay()
-  const isFriday = dayOfWeek === 5
+  const isFriday = dayOfWeek === DAY_INDEX.FRIDAY
 
   const { isFastingDay, recurringFasts, getMonthName, hijriMonths } = useIslamicEvents()
   const fastingInfo = hijriDate ? isFastingDay(hijriDate) : { isFasting: false }
@@ -87,7 +89,7 @@ export function LandingPage({
     }
 
     // Add Ayyam al-Beed if applicable
-    if (hijriDate && [13, 14, 15].includes(hijriDate.day)) {
+    if (hijriDate && AYYAM_AL_BEED_DAYS.includes(hijriDate.day)) {
       const existingFast = pills.find(p => p.label === 'Fast Today')
       if (!existingFast) {
         pills.push({
@@ -213,7 +215,7 @@ export function LandingPage({
         {/* Today's Blessings Card - Compact */}
         <Card className="border-border/50 bg-card/80 backdrop-blur-sm shadow-sm overflow-hidden">
           <CardContent className="p-3">
-            {(isFriday || fastingInfo.isFasting || (hijriDate && [13, 14, 15].includes(hijriDate.day))) ? (
+            {(isFriday || fastingInfo.isFasting || (hijriDate && AYYAM_AL_BEED_DAYS.includes(hijriDate.day))) ? (
               <>
                 <div className="flex flex-wrap gap-1.5 mb-2">
                   {isFriday && (
@@ -226,7 +228,7 @@ export function LandingPage({
                       {fastingInfo.reason}
                     </span>
                   )}
-                  {hijriDate && [13, 14, 15].includes(hijriDate.day) && !fastingInfo.isFasting && (
+                  {hijriDate && AYYAM_AL_BEED_DAYS.includes(hijriDate.day) && !fastingInfo.isFasting && (
                     <span className="px-2.5 py-1 text-xs font-semibold rounded-full bg-gradient-to-r from-sky-500/20 to-blue-500/20 text-sky-600 dark:text-sky-400 border border-sky-500/30">
                       Ayyam al-Beed
                     </span>

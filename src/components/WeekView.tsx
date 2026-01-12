@@ -5,13 +5,12 @@ import { Separator } from '@/components/ui/separator'
 import { cn } from '@/lib/tailwind'
 import type { DailyPrayerTimes } from '@/lib/data/types'
 import { gregorianToHijri, getMoonPhase } from '@/lib/data/hijriCalendar'
+import { prayerNames } from '@/lib/data/prayerTimes'
 
 interface WeekViewProps {
   prayers: (DailyPrayerTimes & { date: Date })[]
   location: string
 }
-
-const prayerKeys = ['fajr', 'sunrise', 'dhuhr', 'asr', 'maghrib', 'isha'] as const
 
 export function WeekView({ prayers, location }: WeekViewProps) {
   const today = new Date()
@@ -74,7 +73,7 @@ export function WeekView({ prayers, location }: WeekViewProps) {
 
                 {/* Prayer Times */}
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                  {prayerKeys.map((key) => (
+                  {prayerNames.map((key) => (
                     <div key={key} className="flex flex-col items-center p-2 rounded-lg bg-background/50 border border-border/50 shadow-sm hover:border-primary/30 transition-colors">
                       <span className="text-xs text-muted-foreground uppercase tracking-wider mb-1">{key}</span>
                       <span className="font-medium font-heading text-lg">{prayer[key]}</span>

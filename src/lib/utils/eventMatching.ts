@@ -41,7 +41,7 @@ export function getFastingEvent(events: IslamicEvent[]): IslamicEvent | null {
 export function getFastingInfo(
   hijriDate: HijriDate,
   fixedEvents: IslamicEvent[],
-  ayyamAlBeedDays: number[]
+  ayyamAlBeedDays: readonly number[]
 ): FastingInfo {
   // Priority 1: Check if ANY event forbids fasting (Eid, Tashreeq)
   const forbiddenEvent = isFastingForbidden(fixedEvents)

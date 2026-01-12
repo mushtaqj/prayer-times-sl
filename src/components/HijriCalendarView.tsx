@@ -9,6 +9,8 @@ import {
 import { VirtuesSheet } from '@/components/VirtuesSheet'
 import { useHijriCalendar } from '@/hooks/useHijriCalendar'
 import { useIslamicEvents } from '@/hooks/useIslamicEvents'
+import { RECURRING_FAST_IDS } from '@/lib/data/islamicEvents'
+import { RAMADAN_NAME } from '@/lib/utils/hijriConstants'
 import {
   TooltipProvider,
 } from '@/components/ui/tooltip'
@@ -130,14 +132,14 @@ export function HijriCalendarView({ location }: HijriCalendarViewProps) {
     }
 
     // Add fasting info with details
-    if (fastingInfo.isFasting && fastingInfo.reason !== 'Ramadan') {
+    if (fastingInfo.isFasting && fastingInfo.reason !== RAMADAN_NAME) {
       if (fastingInfo.reason === 'Monday Fast') {
-        const mondayDetails = recurringFasts.weekly.find(f => f.id === 'monday-fast')?.details
+        const mondayDetails = recurringFasts.weekly.find(f => f.id === RECURRING_FAST_IDS.MONDAY)?.details
         if (mondayDetails) {
           content += mondayDetails + `\n\n`
         }
       } else if (fastingInfo.reason === 'Thursday Fast') {
-        const thursdayDetails = recurringFasts.weekly.find(f => f.id === 'thursday-fast')?.details
+        const thursdayDetails = recurringFasts.weekly.find(f => f.id === RECURRING_FAST_IDS.THURSDAY)?.details
         if (thursdayDetails) {
           content += thursdayDetails + `\n\n`
         }

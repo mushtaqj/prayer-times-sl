@@ -21,18 +21,13 @@ import { PrayerRow } from '@/components/PrayerRow'
 import { ChevronLeft, ChevronRight, ChevronRight as ChevronIcon, MapPin } from 'lucide-react'
 import { cn } from '@/lib/tailwind'
 import type { DailyPrayerTimes } from '@/lib/data/types'
+import { GREGORIAN_MONTHS } from '@/lib/utils/dateConstants'
+import { prayerNames } from '@/lib/data/prayerTimes'
 
 interface MonthViewProps {
   getMonthPrayers: (month: number) => DailyPrayerTimes[]
   location: string
 }
-
-const monthNames = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December'
-]
-
-const prayerKeys = ['fajr', 'sunrise', 'dhuhr', 'asr', 'maghrib', 'isha'] as const
 
 export function MonthView({ getMonthPrayers, location }: MonthViewProps) {
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1)
@@ -76,7 +71,7 @@ export function MonthView({ getMonthPrayers, location }: MonthViewProps) {
                 <ChevronLeft className="w-4 h-4" />
               </Button>
               <span className="w-24 text-center font-bold text-sm text-foreground">
-                {monthNames[selectedMonth - 1]}
+                {GREGORIAN_MONTHS[selectedMonth - 1]}
               </span>
               <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-background rounded-md" onClick={nextMonth}>
                 <ChevronRight className="w-4 h-4" />
@@ -114,7 +109,7 @@ export function MonthView({ getMonthPrayers, location }: MonthViewProps) {
                         <TableCell className="font-medium">
                           <div className="flex items-center gap-2">
                             <span className={cn(isToday && "text-primary font-bold")}>{prayer.day}</span>
-                            <span className="text-xs text-muted-foreground">{monthNames[selectedMonth - 1].slice(0, 3)}</span>
+                            <span className="text-xs text-muted-foreground">{GREGORIAN_MONTHS[selectedMonth - 1].slice(0, 3)}</span>
                             {isToday && <Badge variant="default" className="text-[10px] h-5 ml-1 bg-primary hover:bg-primary">Today</Badge>}
                           </div>
                         </TableCell>
@@ -149,7 +144,7 @@ export function MonthView({ getMonthPrayers, location }: MonthViewProps) {
                     <div className="flex flex-col">
                       <div className="flex items-center gap-2">
                         <span className={cn("text-lg font-heading font-medium", isToday && "text-primary font-bold")}>
-                          {monthNames[selectedMonth - 1].slice(0, 3)} {prayer.day}
+                          {GREGORIAN_MONTHS[selectedMonth - 1].slice(0, 3)} {prayer.day}
                         </span>
                         {isToday && (
                           <Badge variant="default" className="text-[10px] h-5 bg-primary rounded-full px-2">Today</Badge>
@@ -178,12 +173,12 @@ export function MonthView({ getMonthPrayers, location }: MonthViewProps) {
             <>
               <SheetHeader>
                 <SheetTitle>
-                  {monthNames[selectedMonth - 1]} {selectedDay.day}
+                  {GREGORIAN_MONTHS[selectedMonth - 1]} {selectedDay.day}
                 </SheetTitle>
               </SheetHeader>
               <Separator className="my-4" />
               <div className="space-y-1">
-                {prayerKeys.map((key) => (
+                {prayerNames.map((key) => (
                   <PrayerRow
                     key={key}
                     name={key.charAt(0).toUpperCase() + key.slice(1)}

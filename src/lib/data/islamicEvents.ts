@@ -28,6 +28,18 @@ import {
 } from '@/lib/utils/eventMatching'
 
 // ============================================================================
+// Constants
+// ============================================================================
+
+/** Recurring fast IDs for lookups */
+export const RECURRING_FAST_IDS = {
+  MONDAY: 'monday-fast',
+  THURSDAY: 'thursday-fast',
+  AYYAM_AL_BEED: 'ayyam-al-beed',
+  FRIDAY: 'friday',
+} as const
+
+// ============================================================================
 // Enriched Static Data - Computed once at module load
 // ============================================================================
 

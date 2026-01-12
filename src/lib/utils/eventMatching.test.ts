@@ -12,10 +12,28 @@ import {
 import type { IslamicEvent, AnnualFast, HijriDate, DayEvent } from '@/lib/data/types'
 import { HIJRI_MONTHS, WEEKDAYS, AYYAM_AL_BEED_DAYS } from './hijriConstants'
 
+// Helper factory functions to create test data with required properties
+function createEvent(overrides: Partial<IslamicEvent> & Pick<IslamicEvent, 'id' | 'name' | 'type' | 'hijriMonth' | 'hijriDay'>): IslamicEvent {
+  return {
+    nameArabic: '',
+    isFastingDay: false,
+    description: '',
+    ...overrides,
+  }
+}
+
+function createAnnualFast(overrides: Partial<AnnualFast> & Pick<AnnualFast, 'id' | 'name' | 'hijriMonth' | 'type'>): AnnualFast {
+  return {
+    nameArabic: '',
+    description: '',
+    ...overrides,
+  }
+}
+
 describe('eventMatching utilities', () => {
   describe('isInAnnualEventRange', () => {
     it('returns true when day is within startDay and endDay range', () => {
-      const event: AnnualFast = {
+      const event = createAnnualFast({
         id: 'test-fast',
         name: 'Test Fast',
         hijriMonth: 1,
@@ -23,7 +41,7 @@ describe('eventMatching utilities', () => {
         timing: 'fixed',
         startDay: 9,
         endDay: 11,
-      }
+      })
 
       expect(isInAnnualEventRange(9, event)).toBe(true)
       expect(isInAnnualEventRange(10, event)).toBe(true)
@@ -31,7 +49,7 @@ describe('eventMatching utilities', () => {
     })
 
     it('returns false when day is outside startDay and endDay range', () => {
-      const event: AnnualFast = {
+      const event = createAnnualFast({
         id: 'test-fast',
         name: 'Test Fast',
         hijriMonth: 1,
@@ -39,14 +57,14 @@ describe('eventMatching utilities', () => {
         timing: 'fixed',
         startDay: 9,
         endDay: 11,
-      }
+      })
 
       expect(isInAnnualEventRange(8, event)).toBe(false)
       expect(isInAnnualEventRange(12, event)).toBe(false)
     })
 
     it('returns true when day is within startDay and duration range', () => {
-      const event: AnnualFast = {
+      const event = createAnnualFast({
         id: 'test-fast',
         name: 'Test Fast',
         hijriMonth: 1,
@@ -54,7 +72,7 @@ describe('eventMatching utilities', () => {
         timing: 'fixed',
         startDay: 13,
         duration: 6,
-      }
+      })
 
       // Days 13-18 (13 + 6 = 19, so < 19)
       expect(isInAnnualEventRange(13, event)).toBe(true)
@@ -63,7 +81,7 @@ describe('eventMatching utilities', () => {
     })
 
     it('returns false when day is outside startDay and duration range', () => {
-      const event: AnnualFast = {
+      const event = createAnnualFast({
         id: 'test-fast',
         name: 'Test Fast',
         hijriMonth: 1,
@@ -71,20 +89,20 @@ describe('eventMatching utilities', () => {
         timing: 'fixed',
         startDay: 13,
         duration: 6,
-      }
+      })
 
       expect(isInAnnualEventRange(12, event)).toBe(false)
       expect(isInAnnualEventRange(19, event)).toBe(false)
     })
 
     it('returns false when event has neither endDay nor duration', () => {
-      const event: AnnualFast = {
+      const event = createAnnualFast({
         id: 'test-fast',
         name: 'Test Fast',
         hijriMonth: 1,
         type: 'recommended',
         timing: 'fixed',
-      }
+      })
 
       expect(isInAnnualEventRange(10, event)).toBe(false)
     })
@@ -93,8 +111,8 @@ describe('eventMatching utilities', () => {
   describe('isFastingForbidden', () => {
     it('returns the event when fasting is forbidden', () => {
       const events: IslamicEvent[] = [
-        { id: '1', name: 'Regular Event', type: 'holy', hijriMonth: 1, hijriDay: 1 },
-        { id: '2', name: 'Eid al-Fitr', type: 'eid', hijriMonth: 10, hijriDay: 1, fastingForbidden: true },
+        createEvent({ id: '1', name: 'Regular Event', type: 'holy', hijriMonth: 1, hijriDay: 1 }),
+        createEvent({ id: '2', name: 'Eid al-Fitr', type: 'eid', hijriMonth: 10, hijriDay: 1, fastingForbidden: true }),
       ]
 
       const result = isFastingForbidden(events)
@@ -104,8 +122,8 @@ describe('eventMatching utilities', () => {
 
     it('returns null when no event forbids fasting', () => {
       const events: IslamicEvent[] = [
-        { id: '1', name: 'Regular Event', type: 'holy', hijriMonth: 1, hijriDay: 1 },
-        { id: '2', name: 'Another Event', type: 'recommended', hijriMonth: 1, hijriDay: 10 },
+        createEvent({ id: '1', name: 'Regular Event', type: 'holy', hijriMonth: 1, hijriDay: 1 }),
+        createEvent({ id: '2', name: 'Another Event', type: 'recommended', hijriMonth: 1, hijriDay: 10 }),
       ]
 
       expect(isFastingForbidden(events)).toBeNull()
@@ -117,8 +135,8 @@ describe('eventMatching utilities', () => {
 
     it('returns first forbidden event if multiple exist', () => {
       const events: IslamicEvent[] = [
-        { id: '1', name: 'First Forbidden', type: 'eid', hijriMonth: 10, hijriDay: 1, fastingForbidden: true },
-        { id: '2', name: 'Second Forbidden', type: 'eid', hijriMonth: 12, hijriDay: 10, fastingForbidden: true },
+        createEvent({ id: '1', name: 'First Forbidden', type: 'eid', hijriMonth: 10, hijriDay: 1, fastingForbidden: true }),
+        createEvent({ id: '2', name: 'Second Forbidden', type: 'eid', hijriMonth: 12, hijriDay: 10, fastingForbidden: true }),
       ]
 
       const result = isFastingForbidden(events)
@@ -129,8 +147,8 @@ describe('eventMatching utilities', () => {
   describe('getFastingEvent', () => {
     it('returns the fasting event when present', () => {
       const events: IslamicEvent[] = [
-        { id: '1', name: 'Regular Event', type: 'holy', hijriMonth: 1, hijriDay: 1 },
-        { id: '2', name: 'Day of Arafah', type: 'fast', hijriMonth: 12, hijriDay: 9, isFastingDay: true, fastingType: 'recommended' },
+        createEvent({ id: '1', name: 'Regular Event', type: 'holy', hijriMonth: 1, hijriDay: 1 }),
+        createEvent({ id: '2', name: 'Day of Arafah', type: 'fast', hijriMonth: 12, hijriDay: 9, isFastingDay: true, fastingType: 'recommended' }),
       ]
 
       const result = getFastingEvent(events)
@@ -140,7 +158,7 @@ describe('eventMatching utilities', () => {
 
     it('returns null when no fasting event exists', () => {
       const events: IslamicEvent[] = [
-        { id: '1', name: 'Regular Event', type: 'holy', hijriMonth: 1, hijriDay: 1 },
+        createEvent({ id: '1', name: 'Regular Event', type: 'holy', hijriMonth: 1, hijriDay: 1 }),
       ]
 
       expect(getFastingEvent(events)).toBeNull()
@@ -163,7 +181,7 @@ describe('eventMatching utilities', () => {
     it('returns forbidden when event forbids fasting', () => {
       const hijriDate = createHijriDate(10, 1, new Date(2025, 5, 15)) // Shawwal 1 (Eid)
       const events: IslamicEvent[] = [
-        { id: '1', name: 'Eid al-Fitr', type: 'eid', hijriMonth: 10, hijriDay: 1, fastingForbidden: true },
+        createEvent({ id: '1', name: 'Eid al-Fitr', type: 'eid', hijriMonth: 10, hijriDay: 1, fastingForbidden: true }),
       ]
 
       const result = getFastingInfo(hijriDate, events, AYYAM_AL_BEED_DAYS)
@@ -176,7 +194,7 @@ describe('eventMatching utilities', () => {
     it('returns fasting event info when fasting day', () => {
       const hijriDate = createHijriDate(12, 9, new Date(2025, 5, 15))
       const events: IslamicEvent[] = [
-        { id: '1', name: 'Day of Arafah', type: 'fast', hijriMonth: 12, hijriDay: 9, isFastingDay: true, fastingType: 'recommended' },
+        createEvent({ id: '1', name: 'Day of Arafah', type: 'fast', hijriMonth: 12, hijriDay: 9, isFastingDay: true, fastingType: 'recommended' }),
       ]
 
       const result = getFastingInfo(hijriDate, events, AYYAM_AL_BEED_DAYS)
@@ -253,7 +271,7 @@ describe('eventMatching utilities', () => {
       // Ramadan 1 but fasting is forbidden (hypothetical)
       const hijriDate = createHijriDate(HIJRI_MONTHS.RAMADAN, 1, new Date(2025, 5, 16))
       const events: IslamicEvent[] = [
-        { id: '1', name: 'Forbidden Day', type: 'eid', hijriMonth: 9, hijriDay: 1, fastingForbidden: true },
+        createEvent({ id: '1', name: 'Forbidden Day', type: 'eid', hijriMonth: 9, hijriDay: 1, fastingForbidden: true }),
       ]
 
       const result = getFastingInfo(hijriDate, events, AYYAM_AL_BEED_DAYS)
@@ -265,12 +283,12 @@ describe('eventMatching utilities', () => {
 
   describe('getAllEventsForDay', () => {
     const fixedEvents: IslamicEvent[] = [
-      { id: '1', name: 'Ashura', type: 'holy', hijriMonth: 1, hijriDay: 10, details: 'Day of Ashura' },
-      { id: '2', name: 'Eid al-Fitr', type: 'eid', hijriMonth: 10, hijriDay: 1, fastingForbidden: true },
+      createEvent({ id: '1', name: 'Ashura', type: 'holy', hijriMonth: 1, hijriDay: 10, details: 'Day of Ashura' }),
+      createEvent({ id: '2', name: 'Eid al-Fitr', type: 'eid', hijriMonth: 10, hijriDay: 1, fastingForbidden: true }),
     ]
 
     const annualFasts: AnnualFast[] = [
-      {
+      createAnnualFast({
         id: 'muharram-fasting',
         name: 'Muharram Fasting',
         hijriMonth: 1,
@@ -278,7 +296,7 @@ describe('eventMatching utilities', () => {
         timing: 'fixed',
         startDay: 9,
         endDay: 11,
-      },
+      }),
     ]
 
     it('returns fixed events for the day', () => {
@@ -359,7 +377,7 @@ describe('eventMatching utilities', () => {
     it('does NOT add Ayyam al-Beed when fasting is forbidden', () => {
       // Make an event that forbids fasting on day 13
       const forbiddenEvents: IslamicEvent[] = [
-        { id: '1', name: 'Forbidden Day', type: 'eid', hijriMonth: 1, hijriDay: 13, fastingForbidden: true },
+        createEvent({ id: '1', name: 'Forbidden Day', type: 'eid', hijriMonth: 1, hijriDay: 13, fastingForbidden: true }),
       ]
 
       const result = getAllEventsForDay(1, 13, undefined, forbiddenEvents, [])
@@ -392,11 +410,11 @@ describe('eventMatching utilities', () => {
 
   describe('hasEventOnDay', () => {
     const fixedEvents: IslamicEvent[] = [
-      { id: '1', name: 'Ashura', type: 'holy', hijriMonth: 1, hijriDay: 10 },
+      createEvent({ id: '1', name: 'Ashura', type: 'holy', hijriMonth: 1, hijriDay: 10 }),
     ]
 
     const annualFasts: AnnualFast[] = [
-      {
+      createAnnualFast({
         id: 'shaban-fasting',
         name: 'Shaban Fasting',
         hijriMonth: 8,
@@ -404,7 +422,7 @@ describe('eventMatching utilities', () => {
         timing: 'fixed',
         startDay: 1,
         endDay: 15,
-      },
+      }),
     ]
 
     it('returns true for fixed event day', () => {

@@ -6,6 +6,7 @@ import {
 } from '@/components/ui/tooltip'
 import { getMoonPhase } from '@/lib/data/hijriCalendar'
 import { getPrimaryEventType } from '@/lib/utils/eventMatching'
+import { MOON_PHASE_DISPLAY_DAYS, RAMADAN_NAME } from '@/lib/utils/hijriConstants'
 import { EVENT_STYLES } from './calendarConstants'
 import type { CalendarDay as CalendarDayType, DayEvent, FastingInfo } from '@/lib/data/types'
 
@@ -28,7 +29,7 @@ export function CalendarDay({
   onDayClick,
 }: CalendarDayProps) {
   const moonPhase = getMoonPhase(day.hijriDay)
-  const showMoon = day.hijriDay === 1 || day.hijriDay === 15
+  const showMoon = (MOON_PHASE_DISPLAY_DAYS as readonly number[]).includes(day.hijriDay)
 
   // Detect Gregorian Month Change
   const isGregorianStart = day.gregorianDate.getDate() === 1
@@ -71,7 +72,7 @@ export function CalendarDay({
   const hasTooltip = tooltipLines.length > 0
 
   // Determine if clickable
-  const hasSpecialFasting = fastingInfo.isFasting && fastingInfo.reason !== 'Ramadan'
+  const hasSpecialFasting = fastingInfo.isFasting && fastingInfo.reason !== RAMADAN_NAME
   const isClickable = (dayEvents.length > 0 || hasSpecialFasting || fastingInfo.type === 'forbidden' || isFriday) && onDayClick
 
   const cellContent = (

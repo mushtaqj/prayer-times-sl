@@ -55,3 +55,9 @@ export const AYYAM_AL_BEED_DAYS: readonly number[] = [13, 14, 15]
 // Moon phase days
 export const NEW_MOON_DAY = 1
 export const FULL_MOON_DAY = 15
+
+// Days to display moon phase icon (new moon on 1st, full moon on 15th)
+export const MOON_PHASE_DISPLAY_DAYS = [NEW_MOON_DAY, FULL_MOON_DAY] as const
+
+// Ramadan month name for string comparisons
+export const RAMADAN_NAME = 'Ramadan'
