@@ -3,7 +3,7 @@
  */
 
 import type { IslamicEvent, AnnualFast, HijriDate, FastingInfo, DayEvent } from '@/lib/data/types'
-import { HIJRI_MONTHS, WEEKDAYS, AYYAM_AL_BEED_DAYS } from '@/lib/utils/hijriConstants'
+import { HIJRI_MONTHS, WEEKDAYS, AYYAM_AL_BEED_DAYS, RAMADAN_NAME } from '@/lib/utils/hijriConstants'
 
 /**
  * Check if a specific Hijri day falls within an annual recurring event range
@@ -57,7 +57,7 @@ export function getFastingInfo(
 
   // Check Ramadan (entire month)
   if (hijriDate.month === HIJRI_MONTHS.RAMADAN) {
-    return { isFasting: true, type: 'obligatory', reason: 'Ramadan' }
+    return { isFasting: true, type: 'obligatory', reason: RAMADAN_NAME }
   }
 
   // Check Ayyam al-Beed (13th, 14th, 15th of each month)

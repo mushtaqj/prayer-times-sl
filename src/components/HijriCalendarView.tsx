@@ -17,6 +17,7 @@ import {
   getMonthTheme,
   WEEKDAY_LABELS,
 } from '@/components/calendar'
+import { RAMADAN_NAME } from '@/lib/utils/hijriConstants'
 
 interface HijriCalendarViewProps {
   location: string
@@ -241,7 +242,7 @@ export function HijriCalendarView({ location }: HijriCalendarViewProps) {
                 })
 
                 const hasSpecialFasting =
-                  fastingInfo.isFasting && fastingInfo.reason !== 'Ramadan'
+                  fastingInfo.isFasting && fastingInfo.reason !== RAMADAN_NAME
                 const isClickable =
                   dayEvents.length > 0 ||
                   hasSpecialFasting ||
