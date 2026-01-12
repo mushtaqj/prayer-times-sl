@@ -4,7 +4,7 @@ import {
   hijriToGregorian,
   getMoonPhase,
   formatHijriDate,
-} from '@/lib/hijriCalendar'
+} from '@/lib/data/hijriCalendar'
 
 describe('gregorianToHijri', () => {
   it('converts first day of a known month correctly', () => {

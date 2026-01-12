@@ -3,7 +3,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { NextPrayerBanner } from '@/components/NextPrayerBanner'
 import { PrayerRow } from '@/components/PrayerRow'
 import { HijriDateDisplay } from '@/components/HijriDateDisplay'
-import { gregorianToHijri } from '@/lib/hijriCalendar'
+import { gregorianToHijri } from '@/lib/data/hijriCalendar'
 import type { DailyPrayerTimes } from '@/lib/data/types'
 import type { PrayerName } from '@/hooks/useAlarms'
 

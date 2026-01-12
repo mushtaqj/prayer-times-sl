@@ -4,7 +4,7 @@ import { Separator } from '@/components/ui/separator'
 
 import { cn } from '@/lib/utils'
 import type { DailyPrayerTimes } from '@/lib/data/types'
-import { gregorianToHijri, getMoonPhase } from '@/lib/hijriCalendar'
+import { gregorianToHijri, getMoonPhase } from '@/lib/data/hijriCalendar'
 
 interface WeekViewProps {
   prayers: (DailyPrayerTimes & { date: Date })[]

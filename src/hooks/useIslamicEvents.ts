@@ -12,7 +12,7 @@ import {
   getTodayEvents,
   getUpcomingEvents,
   getEventTypeColor,
-} from '@/lib/islamicEvents'
+} from '@/lib/data/islamicEvents'
 import type { HijriDate, IslamicEvent, FastingInfo, DayEvent } from '@/lib/data/types'
 
 /**

@@ -12,7 +12,7 @@ import {
   availableYears,
   todayHijri,
   gregorianToHijri,
-} from '@/lib/hijriCalendar'
+} from '@/lib/data/hijriCalendar'
 
 export function useHijriCalendar() {
   const [currentHijriYear, setCurrentHijriYear] = useState<number>(

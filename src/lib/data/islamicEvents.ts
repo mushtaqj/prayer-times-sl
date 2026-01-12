@@ -1,18 +1,12 @@
 /**
- * Islamic events data layer
+ * Islamic Events Data Access Layer
  * Provides enriched static data and utility functions for Islamic events
  */
 
 import eventsData from '@/data/islamicEvents.json'
-import hijriCalendarData from '@/data/hijriCalendar.json'
-import virtuesData from '@/data/virtues.json'
-import { gregorianToHijri } from '@/lib/hijriCalendar'
-import {
-  getFastingInfo as getFastingInfoUtil,
-  getAllEventsForDay as getAllEventsForDayUtil,
-  hasEventOnDay as hasEventOnDayUtil,
-  getEventTypeColor,
-} from '@/lib/eventMatching'
+import { gregorianToHijri } from './hijriCalendar'
+import { enrichedHijriMonths } from './hijriCalendar'
+import { eventVirtues, recurringVirtues } from './virtues'
 import type {
   HijriDate,
   IslamicEvent,
@@ -23,23 +17,28 @@ import type {
   RecurringFasts,
   FastingInfo,
   DayEvent,
-} from '@/lib/data/types'
+} from './types'
+
+// Import event matching utilities
+import {
+  getFastingInfo as getFastingInfoUtil,
+  getAllEventsForDay as getAllEventsForDayUtil,
+  hasEventOnDay as hasEventOnDayUtil,
+  getEventTypeColor,
+} from '@/lib/eventMatching'
 
 // ============================================================================
 // Enriched Static Data - Computed once at module load
 // ============================================================================
 
-/** Events enriched with virtue details from virtues.json */
+/** Events enriched with virtue details */
 export const events: IslamicEvent[] = (eventsData.events as IslamicEvent[]).map(e => ({
   ...e,
-  details: virtuesData.events[e.id as keyof typeof virtuesData.events]
+  details: eventVirtues[e.id as keyof typeof eventVirtues]
 }))
 
-/** Hijri months enriched with virtue details */
-export const hijriMonths: HijriMonthInfo[] = (hijriCalendarData.hijriMonths as HijriMonthInfo[]).map(m => ({
-  ...m,
-  details: virtuesData.months[String(m.number) as keyof typeof virtuesData.months]
-}))
+/** Hijri months (re-exported from hijriCalendar for convenience) */
+export const hijriMonths: HijriMonthInfo[] = enrichedHijriMonths
 
 /** Recurring fasts enriched with virtue details */
 export const recurringFasts: RecurringFasts = (() => {
@@ -49,7 +48,7 @@ export const recurringFasts: RecurringFasts = (() => {
   const annual: AnnualFast[] = rf.annual.map(f => ({
     ...f,
     timing: f.timing as 'fixed' | 'flexible' | undefined,
-    details: virtuesData.recurring[f.id as keyof typeof virtuesData.recurring]
+    details: recurringVirtues[f.id as keyof typeof recurringVirtues]
   }))
 
   // Enrich monthly fast (Ayyam al-Beed)
@@ -58,14 +57,14 @@ export const recurringFasts: RecurringFasts = (() => {
     ...rf.monthly,
     ayyamAlBeed: {
       ...rf.monthly.ayyamAlBeed,
-      details: virtuesData.recurring[ayyamAlBeedId as keyof typeof virtuesData.recurring]
+      details: recurringVirtues[ayyamAlBeedId as keyof typeof recurringVirtues]
     }
   }
 
   // Enrich weekly fasts
   const weekly: WeeklyFast[] = rf.weekly.map(f => ({
     ...f,
-    details: virtuesData.recurring[f.id as keyof typeof virtuesData.recurring]
+    details: recurringVirtues[f.id as keyof typeof recurringVirtues]
   }))
 
   // Friday data from virtues (special day, not a fast)
@@ -74,7 +73,7 @@ export const recurringFasts: RecurringFasts = (() => {
     id: fridayId,
     name: 'Friday',
     nameArabic: 'يوم الجمعة',
-    details: virtuesData.recurring[fridayId as keyof typeof virtuesData.recurring]
+    details: recurringVirtues[fridayId as keyof typeof recurringVirtues]
   }
 
   return { annual, monthly, weekly, friday }
@@ -84,13 +83,7 @@ export const recurringFasts: RecurringFasts = (() => {
 // Derived Constants - From the data itself
 // ============================================================================
 
-/** IDs of weekly fasts, derived from the data */
-export const weeklyFastIds = {
-  monday: recurringFasts.weekly.find(f => f.dayOfWeek === 1)?.id,
-  thursday: recurringFasts.weekly.find(f => f.dayOfWeek === 4)?.id,
-} as const
-
-/** Weekly fast details lookup */
+/** Weekly fast details lookup (derived from data) */
 export const weeklyFastDetails = {
   monday: recurringFasts.weekly.find(f => f.dayOfWeek === 1)?.details,
   thursday: recurringFasts.weekly.find(f => f.dayOfWeek === 4)?.details,
