@@ -21,9 +21,6 @@ import type {
   DayEvent,
 } from '@/lib/data/types'
 
-// Re-export types for backwards compatibility
-export type { IslamicEvent, HijriMonthInfo }
-
 export function useIslamicEvents() {
   // Load and enrich events with virtue details
   // eslint-disable-next-line react-hooks/preserve-manual-memoization

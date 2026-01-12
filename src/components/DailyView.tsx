@@ -4,11 +4,11 @@ import { NextPrayerBanner } from '@/components/NextPrayerBanner'
 import { PrayerRow } from '@/components/PrayerRow'
 import { HijriDateDisplay } from '@/components/HijriDateDisplay'
 import { gregorianToHijri } from '@/lib/hijriCalendar'
-import type { PrayerTime } from '@/hooks/usePrayerTimes'
+import type { DailyPrayerTimes } from '@/lib/data/types'
 import type { PrayerName } from '@/hooks/useAlarms'
 
 interface DailyViewProps {
-  prayers: PrayerTime | null
+  prayers: DailyPrayerTimes | null
   nextPrayer: { name: string; time: string; displayName: string } | null
   currentPrayer: { name: string; time: string; displayName: string } | null
   alarms: Record<string, boolean>

@@ -3,11 +3,11 @@ import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 
 import { cn } from '@/lib/utils'
-import type { PrayerTime } from '@/hooks/usePrayerTimes'
+import type { DailyPrayerTimes } from '@/lib/data/types'
 import { gregorianToHijri, getMoonPhase } from '@/lib/hijriCalendar'
 
 interface WeekViewProps {
-  prayers: (PrayerTime & { date: Date })[]
+  prayers: (DailyPrayerTimes & { date: Date })[]
   location: string
 }
 

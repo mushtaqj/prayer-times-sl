@@ -1,7 +1,7 @@
 import { Card, CardContent } from '@/components/ui/card'
 import { Moon, Info } from 'lucide-react'
 import { EVENT_STYLES } from './calendarConstants'
-import type { IslamicEvent } from '@/hooks/useIslamicEvents'
+import type { IslamicEvent } from '@/lib/data/types'
 
 interface RecurringFastsMonthly {
   ayyamAlBeed: {

@@ -20,10 +20,10 @@ import { Separator } from '@/components/ui/separator'
 import { PrayerRow } from '@/components/PrayerRow'
 import { ChevronLeft, ChevronRight, ChevronRight as ChevronIcon, MapPin } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import type { PrayerTime } from '@/hooks/usePrayerTimes'
+import type { DailyPrayerTimes } from '@/lib/data/types'
 
 interface MonthViewProps {
-  getMonthPrayers: (month: number) => PrayerTime[]
+  getMonthPrayers: (month: number) => DailyPrayerTimes[]
   location: string
 }
 
@@ -36,7 +36,7 @@ const prayerKeys = ['fajr', 'sunrise', 'dhuhr', 'asr', 'maghrib', 'isha'] as con
 
 export function MonthView({ getMonthPrayers, location }: MonthViewProps) {
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1)
-  const [selectedDay, setSelectedDay] = useState<PrayerTime | null>(null)
+  const [selectedDay, setSelectedDay] = useState<DailyPrayerTimes | null>(null)
   const [sheetOpen, setSheetOpen] = useState(false)
 
   const prayers = getMonthPrayers(selectedMonth)
@@ -53,7 +53,7 @@ export function MonthView({ getMonthPrayers, location }: MonthViewProps) {
   const prevMonth = () => setSelectedMonth(m => m === 1 ? 12 : m - 1)
   const nextMonth = () => setSelectedMonth(m => m === 12 ? 1 : m + 1)
 
-  const handleDayClick = (prayer: PrayerTime) => {
+  const handleDayClick = (prayer: DailyPrayerTimes) => {
     setSelectedDay(prayer)
     setSheetOpen(true)
   }

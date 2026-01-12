@@ -84,7 +84,7 @@ export function useLocation(): UseLocationReturn {
   const [error, setError] = useState<string | null>(null)
 
   const detectLocation = useCallback(async (): Promise<DistrictId | null> => {
-    if (!('geolocation' in navigator)) {
+    if (!navigator.geolocation) {
       setError('Geolocation is not supported by your browser')
       return null
     }

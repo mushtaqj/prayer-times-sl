@@ -3,11 +3,6 @@ import prayerData from '@/data/prayerTimes.json'
 import { parseTimeToMinutes } from '@/lib/timeUtils'
 import type { District, DailyPrayerTimes, PrayerInfo } from '@/lib/data/types'
 
-// Re-export types for backwards compatibility
-export type { District, DailyPrayerTimes, PrayerInfo }
-// PrayerTime is an alias for DailyPrayerTimes for backwards compatibility
-export type PrayerTime = DailyPrayerTimes
-
 export function usePrayerTimes(districtId: string) {
   const district = useMemo(() => {
     return (prayerData.districts as District[]).find(d => d.id === districtId) || prayerData.districts[0] as District
