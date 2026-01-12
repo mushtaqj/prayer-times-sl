@@ -14,14 +14,6 @@ import {
   gregorianToHijri,
 } from '@/lib/hijriCalendar'
 
-// Re-export utility functions for backwards compatibility
-export {
-  gregorianToHijri,
-  hijriToGregorian,
-  formatHijriDate,
-  getMoonPhase,
-} from '@/lib/hijriCalendar'
-
 export function useHijriCalendar() {
   const [currentHijriYear, setCurrentHijriYear] = useState<number>(
     todayHijri?.year ?? availableYears[0]

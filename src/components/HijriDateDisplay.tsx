@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { formatHijriDate, getMoonPhase } from '@/hooks/useHijriCalendar'
+import { formatHijriDate, getMoonPhase } from '@/lib/hijriCalendar'
 import { useIslamicEvents } from '@/hooks/useIslamicEvents'
 import type { HijriDate } from '@/lib/data/types'
 

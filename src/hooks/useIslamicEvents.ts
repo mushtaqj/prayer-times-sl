@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import eventsData from '@/data/islamicEvents.json'
 import hijriCalendarData from '@/data/hijriCalendar.json'
 import virtuesData from '@/data/virtues.json'
-import { gregorianToHijri } from './useHijriCalendar'
+import { gregorianToHijri } from '@/lib/hijriCalendar'
 import {
   getFastingInfo,
   getAllEventsForDay as getAllEventsForDayUtil,
