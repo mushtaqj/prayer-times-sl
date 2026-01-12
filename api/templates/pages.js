@@ -32,41 +32,62 @@ const baseStyles = `
   .note { font-size: 14px; color: #999; }
 `
 
-export function successPage({ email, days }) {
+export function successPage({ email, days, isRollback }) {
+  const title = isRollback ? 'Rollback Confirmed!' : 'Update Confirmed!'
+  const description = isRollback
+    ? 'The Hijri calendar rollback has been triggered.'
+    : 'The Hijri calendar update has been triggered.'
+  const details = isRollback
+    ? 'Previous month restored to ongoing status'
+    : `Current month completed with ${days} days`
+  const bgGradient = isRollback
+    ? 'linear-gradient(135deg, #fefce8 0%, #fef3c7 100%)'
+    : 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)'
+  const iconBg = isRollback ? '#fef3c7' : '#dcfce7'
+  const textColor = isRollback ? '#b45309' : '#166534'
+  const detailsBg = isRollback ? '#fefce8' : '#f0fdf4'
+
   return `
     <!DOCTYPE html>
     <html lang="en">
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Update Confirmed - Prayer Times</title>
+      <title>${title} - Prayer Times</title>
       <style>
         ${baseStyles}
-        body { background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); }
-        .icon { background: #dcfce7; }
-        .icon svg { color: #166534; }
-        h1 { color: #166534; }
+        body { background: ${bgGradient}; }
+        .icon { background: ${iconBg}; }
+        .icon svg { color: ${textColor}; }
+        h1 { color: ${textColor}; }
         .details {
-          background: #f0fdf4;
+          background: ${detailsBg};
           border-radius: 8px;
           padding: 16px;
           margin: 20px 0;
         }
-        .details p { margin: 0; color: #166534; font-weight: 500; }
+        .details p { margin: 0; color: ${textColor}; font-weight: 500; }
       </style>
     </head>
     <body>
       <div class="card">
         <div class="icon">
+          ${isRollback ? `
+          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+            <path d="M3 3v5h5"/>
+          </svg>
+          ` : `
           <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
             <polyline points="22 4 12 14.01 9 11.01"/>
           </svg>
+          `}
         </div>
-        <h1>Update Confirmed!</h1>
-        <p>The Hijri calendar update has been triggered.</p>
+        <h1>${title}</h1>
+        <p>${description}</p>
         <div class="details">
-          <p>Current month completed with ${days} days</p>
+          <p>${details}</p>
         </div>
         <p class="note">Confirmed by: ${email}</p>
         <p class="note">Changes will be live in ~2 minutes.</p>
