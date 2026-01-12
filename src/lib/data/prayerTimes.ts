@@ -6,10 +6,23 @@
 import prayerTimesJson from '@/data/prayerTimes.json'
 import { parseTimeToMinutes } from '@/lib/utils/time'
 import { findNearest } from '@/lib/utils/geo'
-import type { District, DailyPrayerTimes, PrayerTimesData, PrayerName, PrayerInfo } from './types'
+import {
+  PRAYER_INDEX,
+  PRAYER_NAMES,
+  PRAYER_METADATA,
+  DEFAULT_DISTRICT_ID,
+} from '@/lib/constants/prayerConstants'
+import type { District, DailyPrayerTimes, PrayerTimesData, PrayerInfo } from './types'
 
 // Type assertion for imported JSON
 const prayerTimesData = prayerTimesJson as PrayerTimesData
+
+// Re-export constants for backwards compatibility
+export { PRAYER_INDEX, PRAYER_NAMES, PRAYER_METADATA, DEFAULT_DISTRICT_ID }
+
+// Aliases for backwards compatibility
+export const prayerMetadata = PRAYER_METADATA
+export const prayerNames = PRAYER_NAMES
 
 // ============================================================================
 // Static Data
@@ -17,29 +30,6 @@ const prayerTimesData = prayerTimesJson as PrayerTimesData
 
 /** All districts */
 export const districts: District[] = prayerTimesData.districts
-
-/** Prayer metadata - display names and Arabic names */
-export const prayerMetadata: Record<PrayerName, { displayName: string; arabicName: string }> = {
-  fajr: { displayName: 'Fajr', arabicName: 'الفجر' },
-  sunrise: { displayName: 'Sunrise', arabicName: 'الشروق' },
-  dhuhr: { displayName: 'Dhuhr', arabicName: 'الظهر' },
-  asr: { displayName: 'Asr', arabicName: 'العصر' },
-  maghrib: { displayName: 'Maghrib', arabicName: 'المغرب' },
-  isha: { displayName: 'Isha', arabicName: 'العشاء' },
-}
-
-/** Ordered list of prayer names */
-export const prayerNames: PrayerName[] = ['fajr', 'sunrise', 'dhuhr', 'asr', 'maghrib', 'isha']
-
-/** Prayer indices for lookup */
-export const PRAYER_INDEX = {
-  FAJR: 0,
-  SUNRISE: 1,
-  DHUHR: 2,
-  ASR: 3,
-  MAGHRIB: 4,
-  ISHA: 5,
-} as const
 
 /** District coordinates (approximate centers) for geolocation */
 export const districtCoordinates: Record<string, { lat: number; lng: number }> = {
@@ -83,9 +73,6 @@ export const districtCoordinates: Record<string, { lat: number; lng: number }> =
   // Zone 13
   hambantota: { lat: 6.1241, lng: 81.1185 },
 }
-
-/** Default district ID */
-export const DEFAULT_DISTRICT_ID = 'colombo'
 
 // ============================================================================
 // Query Functions

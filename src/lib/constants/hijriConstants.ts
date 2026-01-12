@@ -88,9 +88,28 @@ export const EVENT_TYPE = {
   FAST: 'fast',
   RECOMMENDED: 'recommended',
   SUNNAH: 'sunnah',
+  HISTORICAL: 'historical',
 } as const
+
+/** Derived EventType from constants */
+export type EventType = typeof EVENT_TYPE[keyof typeof EVENT_TYPE]
+
+/** Derived FastingType from constants */
+export type FastingType = typeof FASTING_TYPE[keyof typeof FASTING_TYPE]
 
 /** Event timing values */
 export const EVENT_TIMING = {
   FIXED: 'fixed',
+} as const
+
+// ============================================================================
+// Recurring Fast IDs
+// ============================================================================
+
+/** Recurring fast IDs for lookups */
+export const RECURRING_FAST_IDS = {
+  MONDAY: 'monday-fast',
+  THURSDAY: 'thursday-fast',
+  AYYAM_AL_BEED: 'ayyam-al-beed',
+  FRIDAY: 'friday',
 } as const

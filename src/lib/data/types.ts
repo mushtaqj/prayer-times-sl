@@ -3,6 +3,13 @@
 // All data contracts for the Prayer Times app
 // ============================================
 
+// Import derived types from constants
+import type { PrayerName } from '@/lib/constants/prayerConstants'
+import type { EventType, FastingType } from '@/lib/constants/hijriConstants'
+
+// Re-export types for convenience
+export type { PrayerName, EventType, FastingType }
+
 // ============================================
 // PRAYER TIMES
 // ============================================
@@ -22,8 +29,6 @@ export interface DailyPrayerTimes {
   maghrib: string
   isha: string
 }
-
-export type PrayerName = 'fajr' | 'sunrise' | 'dhuhr' | 'asr' | 'maghrib' | 'isha'
 
 export interface PrayerInfo {
   name: string
@@ -76,9 +81,6 @@ export interface MoonPhase {
 // ============================================
 // ISLAMIC EVENTS
 // ============================================
-
-export type EventType = 'holy' | 'eid' | 'fast' | 'recommended' | 'historical'
-export type FastingType = 'obligatory' | 'recommended' | 'sunnah'
 
 export interface IslamicEvent {
   id: string

@@ -4,6 +4,7 @@
 
 export * from './dateConstants'
 export * from './hijriConstants'
+export * from './prayerConstants'
 export * from './appConstants'
 export * from './alarmConstants'
 export * from './themeConstants'

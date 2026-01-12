@@ -7,6 +7,7 @@ import eventsData from '@/data/islamicEvents.json'
 import { gregorianToHijri } from './hijriCalendar'
 import { enrichedHijriMonths } from './hijriCalendar'
 import { eventVirtues, recurringVirtues } from './virtues'
+import { RECURRING_FAST_IDS } from '@/lib/constants/hijriConstants'
 import type {
   HijriDate,
   IslamicEvent,
@@ -27,17 +28,8 @@ import {
   getEventTypeColor,
 } from '@/lib/utils/eventMatching'
 
-// ============================================================================
-// Constants
-// ============================================================================
-
-/** Recurring fast IDs for lookups */
-export const RECURRING_FAST_IDS = {
-  MONDAY: 'monday-fast',
-  THURSDAY: 'thursday-fast',
-  AYYAM_AL_BEED: 'ayyam-al-beed',
-  FRIDAY: 'friday',
-} as const
+// Re-export constant for backwards compatibility
+export { RECURRING_FAST_IDS }
 
 // ============================================================================
 // Enriched Static Data - Computed once at module load
