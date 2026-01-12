@@ -5,12 +5,12 @@ export { CalendarDay, EmptyCalendarCell, UncertainDay30Cell } from './CalendarDa
 export { JumpToDateDialog } from './JumpToDateDialog'
 export { SpecialMonthBanner } from './SpecialMonthBanner'
 export {
-  WEEKDAY_LABELS,
   EVENT_STYLES,
   getMonthTheme,
   type EventStyleKey,
   type MonthThemeData
 } from './calendarConstants'
+export { WEEKDAY_LABELS } from '@/lib/constants/dateConstants'
 // Re-export from central constants for convenience
 export { SACRED_MONTH_NUMBERS, HIJRI_MONTHS } from '@/lib/constants/hijriConstants'
 export { DAY_INDEX } from '@/lib/constants/dateConstants'

@@ -24,3 +24,6 @@ export const DAY_INDEX = {
   FRIDAY: 5,
   SATURDAY: 6,
 } as const
+
+/** Abbreviated weekday labels for UI display (ordered Sun-Sat) */
+export const WEEKDAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as const

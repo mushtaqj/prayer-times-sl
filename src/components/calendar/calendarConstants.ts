@@ -1,8 +1,6 @@
 import { Moon, Star, Gift, Sparkles } from 'lucide-react'
 import { SACRED_MONTH_NUMBERS, HIJRI_MONTHS } from '@/lib/constants/hijriConstants'
 
-export const WEEKDAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-
 export const EVENT_STYLES = {
   eid: {
     bg: 'bg-emerald-500/15',
