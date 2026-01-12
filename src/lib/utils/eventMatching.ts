@@ -3,7 +3,15 @@
  */
 
 import type { IslamicEvent, AnnualFast, HijriDate, FastingInfo, DayEvent } from '@/lib/data/types'
-import { HIJRI_MONTHS, AYYAM_AL_BEED_DAYS, RAMADAN_NAME } from '@/lib/constants/hijriConstants'
+import {
+  HIJRI_MONTHS,
+  AYYAM_AL_BEED_DAYS,
+  RAMADAN_NAME,
+  FASTING_TYPE,
+  FAST_NAMES,
+  EVENT_TYPE,
+  EVENT_TIMING,
+} from '@/lib/constants/hijriConstants'
 import { DAY_INDEX } from '@/lib/constants/dateConstants'
 
 /**
@@ -47,7 +55,7 @@ export function getFastingInfo(
   // Priority 1: Check if ANY event forbids fasting (Eid, Tashreeq)
   const forbiddenEvent = isFastingForbidden(fixedEvents)
   if (forbiddenEvent) {
-    return { isFasting: false, type: 'forbidden', reason: forbiddenEvent.name }
+    return { isFasting: false, type: FASTING_TYPE.FORBIDDEN, reason: forbiddenEvent.name }
   }
 
   // Priority 2: Check for specific fasting events (e.g. Arafah)
@@ -58,21 +66,21 @@ export function getFastingInfo(
 
   // Check Ramadan (entire month)
   if (hijriDate.month === HIJRI_MONTHS.RAMADAN) {
-    return { isFasting: true, type: 'obligatory', reason: RAMADAN_NAME }
+    return { isFasting: true, type: FASTING_TYPE.OBLIGATORY, reason: RAMADAN_NAME }
   }
 
   // Check Ayyam al-Beed (13th, 14th, 15th of each month)
   if (ayyamAlBeedDays.includes(hijriDate.day)) {
-    return { isFasting: true, type: 'sunnah', reason: 'Ayyam al-Beed (White Days)' }
+    return { isFasting: true, type: FASTING_TYPE.SUNNAH, reason: FAST_NAMES.AYYAM_AL_BEED_FULL }
   }
 
   // Check Monday/Thursday
   const dayOfWeek = hijriDate.gregorianDate.getDay()
   if (dayOfWeek === DAY_INDEX.MONDAY) {
-    return { isFasting: true, type: 'sunnah', reason: 'Monday Fast' }
+    return { isFasting: true, type: FASTING_TYPE.SUNNAH, reason: FAST_NAMES.MONDAY_FAST }
   }
   if (dayOfWeek === DAY_INDEX.THURSDAY) {
-    return { isFasting: true, type: 'sunnah', reason: 'Thursday Fast' }
+    return { isFasting: true, type: FASTING_TYPE.SUNNAH, reason: FAST_NAMES.THURSDAY_FAST }
   }
 
   return { isFasting: false }
@@ -115,8 +123,8 @@ export function getAllEventsForDay(
     // Add Ayyam al-Beed (13, 14, 15 of each month)
     if (AYYAM_AL_BEED_DAYS.includes(hijriDay)) {
       result.push({
-        name: 'Ayyam al-Beed',
-        type: 'sunnah',
+        name: FAST_NAMES.AYYAM_AL_BEED,
+        type: EVENT_TYPE.SUNNAH,
         isRecurring: true,
         details: ayyamAlBeedDetails
       })
@@ -124,7 +132,7 @@ export function getAllEventsForDay(
 
     // Add fixed annual recurring events
     const annualFixedEvents = annualFasts.filter(
-      e => e.hijriMonth === hijriMonth && e.timing === 'fixed'
+      e => e.hijriMonth === hijriMonth && e.timing === EVENT_TIMING.FIXED
     )
 
     for (const event of annualFixedEvents) {
@@ -143,16 +151,16 @@ export function getAllEventsForDay(
       const dayOfWeek = gregorianDate.getDay()
       if (dayOfWeek === DAY_INDEX.MONDAY) {
         result.push({
-          name: 'Monday Fast',
-          type: 'sunnah',
+          name: FAST_NAMES.MONDAY_FAST,
+          type: EVENT_TYPE.SUNNAH,
           isRecurring: true,
           details: weeklyFastDetails?.monday
         })
       }
       if (dayOfWeek === DAY_INDEX.THURSDAY) {
         result.push({
-          name: 'Thursday Fast',
-          type: 'sunnah',
+          name: FAST_NAMES.THURSDAY_FAST,
+          type: EVENT_TYPE.SUNNAH,
           isRecurring: true,
           details: weeklyFastDetails?.thursday
         })
@@ -184,7 +192,7 @@ export function hasEventOnDay(
 
   // Check annual recurring events with 'fixed' timing
   const annualFixedEvents = annualFasts.filter(
-    e => e.hijriMonth === hijriMonth && e.timing === 'fixed'
+    e => e.hijriMonth === hijriMonth && e.timing === EVENT_TIMING.FIXED
   )
 
   for (const event of annualFixedEvents) {
@@ -202,10 +210,10 @@ export function hasEventOnDay(
 export function getPrimaryEventType(
   dayEvents: DayEvent[]
 ): 'eid' | 'holy' | 'ayyamAlBeed' | 'recommended' | null {
-  if (dayEvents.some(e => e.type === 'eid')) return 'eid'
-  if (dayEvents.some(e => e.type === 'holy')) return 'holy'
-  if (dayEvents.some(e => e.isRecurring && e.name === 'Ayyam al-Beed')) return 'ayyamAlBeed'
-  if (dayEvents.some(e => e.type === 'recommended')) return 'recommended'
+  if (dayEvents.some(e => e.type === EVENT_TYPE.EID)) return EVENT_TYPE.EID
+  if (dayEvents.some(e => e.type === EVENT_TYPE.HOLY)) return EVENT_TYPE.HOLY
+  if (dayEvents.some(e => e.isRecurring && e.name === FAST_NAMES.AYYAM_AL_BEED)) return 'ayyamAlBeed'
+  if (dayEvents.some(e => e.type === EVENT_TYPE.RECOMMENDED)) return EVENT_TYPE.RECOMMENDED
   return null
 }
 
@@ -214,13 +222,13 @@ export function getPrimaryEventType(
  */
 export function getEventTypeColor(type: string): string {
   switch (type) {
-    case 'eid':
+    case EVENT_TYPE.EID:
       return 'bg-green-500/20 text-green-600 dark:text-green-400'
-    case 'holy':
+    case EVENT_TYPE.HOLY:
       return 'bg-blue-500/20 text-blue-600 dark:text-blue-400'
-    case 'fast':
+    case EVENT_TYPE.FAST:
       return 'bg-amber-500/20 text-amber-600 dark:text-amber-400'
-    case 'recommended':
+    case EVENT_TYPE.RECOMMENDED:
       return 'bg-purple-500/20 text-purple-600 dark:text-purple-400'
     default:
       return 'bg-muted text-muted-foreground'

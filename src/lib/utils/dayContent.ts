@@ -1,5 +1,5 @@
 import { RECURRING_FAST_IDS } from '@/lib/data/islamicEvents'
-import { RAMADAN_NAME } from '@/lib/constants/hijriConstants'
+import { RAMADAN_NAME, FAST_NAMES, FASTING_TYPE } from '@/lib/constants/hijriConstants'
 import { formatWeekday } from '@/lib/utils/date'
 
 interface DayEvent {
@@ -70,21 +70,21 @@ export function generateDayContent({
 
   // Add fasting info with details
   if (fastingInfo.isFasting && fastingInfo.reason !== RAMADAN_NAME) {
-    if (fastingInfo.reason === 'Monday Fast') {
+    if (fastingInfo.reason === FAST_NAMES.MONDAY_FAST) {
       const mondayDetails = recurringFasts.weekly.find(
         (f) => f.id === RECURRING_FAST_IDS.MONDAY
       )?.details
       if (mondayDetails) {
         content += mondayDetails + `\n\n`
       }
-    } else if (fastingInfo.reason === 'Thursday Fast') {
+    } else if (fastingInfo.reason === FAST_NAMES.THURSDAY_FAST) {
       const thursdayDetails = recurringFasts.weekly.find(
         (f) => f.id === RECURRING_FAST_IDS.THURSDAY
       )?.details
       if (thursdayDetails) {
         content += thursdayDetails + `\n\n`
       }
-    } else if (fastingInfo.reason === 'Ayyam al-Beed (White Days)') {
+    } else if (fastingInfo.reason === FAST_NAMES.AYYAM_AL_BEED_FULL) {
       const ayyamDetails = recurringFasts.monthly.ayyamAlBeed.details
       if (ayyamDetails) {
         content += ayyamDetails + `\n\n`
@@ -93,7 +93,7 @@ export function generateDayContent({
       content += `## Fasting\n`
       content += `- **${fastingInfo.reason}** (${fastingInfo.type})\n\n`
     }
-  } else if (fastingInfo.type === 'forbidden') {
+  } else if (fastingInfo.type === FASTING_TYPE.FORBIDDEN) {
     content += `## Fasting Forbidden\n`
     content += `- **${fastingInfo.reason}**: Fasting is prohibited on this day\n\n`
   }

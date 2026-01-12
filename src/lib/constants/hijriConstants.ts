@@ -52,3 +52,45 @@ export const MOON_PHASE_DISPLAY_DAYS = [NEW_MOON_DAY, FULL_MOON_DAY] as const
 
 // Ramadan month name for string comparisons
 export const RAMADAN_NAME = 'Ramadan'
+
+// ============================================================================
+// Fasting Types
+// ============================================================================
+
+/** Fasting type values */
+export const FASTING_TYPE = {
+  OBLIGATORY: 'obligatory',
+  SUNNAH: 'sunnah',
+  RECOMMENDED: 'recommended',
+  FORBIDDEN: 'forbidden',
+} as const
+
+// ============================================================================
+// Fast Names (for recurring fasts)
+// ============================================================================
+
+/** Recurring fast names */
+export const FAST_NAMES = {
+  AYYAM_AL_BEED: 'Ayyam al-Beed',
+  AYYAM_AL_BEED_FULL: 'Ayyam al-Beed (White Days)',
+  MONDAY_FAST: 'Monday Fast',
+  THURSDAY_FAST: 'Thursday Fast',
+} as const
+
+// ============================================================================
+// Event Types
+// ============================================================================
+
+/** Event type values */
+export const EVENT_TYPE = {
+  EID: 'eid',
+  HOLY: 'holy',
+  FAST: 'fast',
+  RECOMMENDED: 'recommended',
+  SUNNAH: 'sunnah',
+} as const
+
+/** Event timing values */
+export const EVENT_TIMING = {
+  FIXED: 'fixed',
+} as const
