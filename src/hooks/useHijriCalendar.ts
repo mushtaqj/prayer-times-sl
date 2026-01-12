@@ -34,6 +34,9 @@ export function useHijriCalendar() {
 
   const months = useMemo(() => hijriData.months as HijriMonth[], [])
 
+  // Hijri month metadata (names, meanings) - single source of truth
+  const hijriMonths = useMemo(() => hijriData.hijriMonths as HijriMonthInfo[], [])
+
   // Convert Gregorian date to Hijri
   const gregorianToHijriMemo = useCallback((date: Date): HijriDate | null => {
     return gregorianToHijri(date)
@@ -158,6 +161,7 @@ export function useHijriCalendar() {
     currentHijriYear,
     currentHijriMonth,
     calendarDays,
+    hijriMonths,
     previousMonth,
     nextMonth,
     goToToday,

@@ -2,12 +2,6 @@ import { Moon, Star, Gift, Sparkles } from 'lucide-react'
 
 export const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
-export const HIJRI_MONTH_NAMES = [
-  'Muharram', 'Safar', 'Rabi al-Awwal', 'Rabi al-Thani',
-  'Jumada al-Awwal', 'Jumada al-Akhirah', 'Rajab', 'Shaban',
-  'Ramadan', 'Shawwal', 'Dhul Qadah', 'Dhul Hijjah'
-]
-
 export const SACRED_MONTHS = [1, 7, 11, 12] // Muharram, Rajab, Dhul Qadah, Dhul Hijjah
 
 export const EVENT_STYLES = {

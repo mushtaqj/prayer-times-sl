@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import eventsData from '@/data/islamicEvents.json'
+import hijriCalendarData from '@/data/hijriCalendar.json'
 import virtuesData from '@/data/virtues.json'
 import { gregorianToHijri } from './useHijriCalendar'
 import {
@@ -33,9 +34,9 @@ export function useIslamicEvents() {
     }))
   }, [])
 
-  // Load and enrich hijri months with virtue details
+  // Load and enrich hijri months with virtue details (from hijriCalendar.json - single source of truth)
   const hijriMonths = useMemo(() => {
-    return (eventsData.hijriMonths as HijriMonthInfo[]).map(m => ({
+    return (hijriCalendarData.hijriMonths as HijriMonthInfo[]).map(m => ({
       ...m,
       details: virtuesData.months[String(m.number) as keyof typeof virtuesData.months]
     }))

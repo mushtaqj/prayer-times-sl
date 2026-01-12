@@ -2,8 +2,7 @@
   "metadata": {
     "source": "ACJU Sri Lanka (All Ceylon Jamiyyathul Ulama)",
     "description": "Historical Hijri calendar data based on official moon sighting in Sri Lanka",
-    "lastUpdated": "2026-01-10",
-    "generatedFrom": "SQLite database"
+    "lastUpdated": "2026-01-10"
   },
   "hijriMonths": [
     {

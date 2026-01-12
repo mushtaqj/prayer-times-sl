@@ -37,6 +37,7 @@ export function HijriCalendarView({ location }: HijriCalendarViewProps) {
     currentHijriYear,
     currentHijriMonth,
     calendarDays,
+    hijriMonths,
     previousMonth,
     nextMonth,
     goToToday,
@@ -265,6 +266,7 @@ export function HijriCalendarView({ location }: HijriCalendarViewProps) {
               )}
               <JumpToDateDialog
                 availableYears={availableYears || []}
+                hijriMonths={hijriMonths}
                 onJump={goToMonth}
               />
             </div>

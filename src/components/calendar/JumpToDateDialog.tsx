@@ -15,14 +15,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { HIJRI_MONTH_NAMES } from './calendarConstants'
+import type { HijriMonthInfo } from '@/lib/data/types'
 
 interface JumpToDateDialogProps {
   availableYears: number[]
+  hijriMonths: HijriMonthInfo[]
   onJump: (year: number, month: number) => void
 }
 
-export function JumpToDateDialog({ availableYears, onJump }: JumpToDateDialogProps) {
+export function JumpToDateDialog({ availableYears, hijriMonths, onJump }: JumpToDateDialogProps) {
   const [open, setOpen] = useState(false)
   const [jumpMode, setJumpMode] = useState<'hijri' | 'gregorian'>('hijri')
   const [selectedMonth, setSelectedMonth] = useState<string>('')
@@ -79,9 +80,9 @@ export function JumpToDateDialog({ availableYears, onJump }: JumpToDateDialogPro
                   <SelectValue placeholder="Select month" />
                 </SelectTrigger>
                 <SelectContent>
-                  {HIJRI_MONTH_NAMES.map((name, idx) => (
-                    <SelectItem key={idx + 1} value={String(idx + 1)}>
-                      {name}
+                  {hijriMonths.map((month) => (
+                    <SelectItem key={month.number} value={String(month.number)}>
+                      {month.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
