@@ -203,5 +203,4 @@ export interface IslamicEventsData {
     monthly: MonthlyFast
     annual: AnnualFast[]
   }
-  hijriMonths: HijriMonthInfo[]
 }

@@ -1,25 +1,8 @@
 import { join, dirname } from 'path'
 import { fileURLToPath } from 'url'
 import { JSONFilePreset } from 'lowdb/node'
-import {addDays} from "../src/lib/dateUtils.ts";
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
-
-// Month names mapping
-const MONTH_NAMES = [
-  'Muharram',
-  'Safar',
-  'Rabi al-Awwal',
-  'Rabi al-Thani',
-  'Jumada al-Awwal',
-  'Jumada al-Akhirah',
-  'Rajab',
-  'Shaban',
-  'Ramadan',
-  'Shawwal',
-  'Dhul Qadah',
-  'Dhul Hijjah'
-]
 
 // Read environment variable
 const days = parseInt(process.env.DAYS, 10)
@@ -51,7 +34,10 @@ console.log(`Completed: ${currentMonth.monthName} ${currentMonth.hijriYear} (${d
 // Calculate next month
 const nextHijriMonth = currentMonth.hijriMonth === 12 ? 1 : currentMonth.hijriMonth + 1
 const nextHijriYear = currentMonth.hijriMonth === 12 ? currentMonth.hijriYear + 1 : currentMonth.hijriYear
-const nextMonthName = MONTH_NAMES[nextHijriMonth - 1]
+
+// Get month name from hijriMonths (single source of truth)
+const monthInfo = db.data.hijriMonths.find(m => m.number === nextHijriMonth)
+const nextMonthName = monthInfo?.name || `Month ${nextHijriMonth}`
 
 // Calculate gregorian start date for next month
 const currentStart = new Date(currentMonth.gregorianStart)
