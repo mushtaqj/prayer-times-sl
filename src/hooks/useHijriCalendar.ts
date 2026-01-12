@@ -2,13 +2,18 @@ import { useMemo, useState, useCallback } from 'react'
 import hijriData from '@/data/hijriCalendar.json'
 import type { HijriDate, HijriMonth, HijriMonthInfo, CalendarDay, MoonPhase } from '@/lib/data/types'
 import { parseDate, isSameDay, addDays, daysBetween } from '@/lib/dateUtils'
+import {
+  FIRST_HIJRI_MONTH,
+  LAST_HIJRI_MONTH,
+  NEW_MOON_DAY,
+} from '@/lib/hijriConstants'
 
 // Re-export types for backwards compatibility
 export type { HijriDate, HijriMonth, HijriMonthInfo as HijriMonthMaster, CalendarDay }
 
 // Get moon phase based on day of Hijri month (approximate)
 export function getMoonPhase(hijriDay: number): MoonPhase {
-  if (hijriDay === 1) return { phase: 'New Moon', icon: '🌑' }
+  if (hijriDay === NEW_MOON_DAY) return { phase: 'New Moon', icon: '🌑' }
   if (hijriDay >= 2 && hijriDay <= 6) return { phase: 'Waxing Crescent', icon: '🌒' }
   if (hijriDay >= 7 && hijriDay <= 9) return { phase: 'First Quarter', icon: '🌓' }
   if (hijriDay >= 10 && hijriDay <= 13) return { phase: 'Waxing Gibbous', icon: '🌔' }
@@ -29,7 +34,7 @@ export function useHijriCalendar() {
   const [currentHijriMonth, setCurrentHijriMonth] = useState<number>(() => {
     const today = new Date()
     const hijri = gregorianToHijri(today)
-    return hijri?.month || 1
+    return hijri?.month || FIRST_HIJRI_MONTH
   })
 
   const months = useMemo(() => hijriData.months as HijriMonth[], [])
@@ -78,12 +83,12 @@ export function useHijriCalendar() {
 
   // Navigate to previous month
   const previousMonth = useCallback(() => {
-    if (currentHijriMonth === 1) {
+    if (currentHijriMonth === FIRST_HIJRI_MONTH) {
       // Go to Dhul Hijjah of previous year
       const prevYearExists = months.some(m => m.hijriYear === currentHijriYear - 1)
       if (prevYearExists) {
         setCurrentHijriYear(currentHijriYear - 1)
-        setCurrentHijriMonth(12)
+        setCurrentHijriMonth(LAST_HIJRI_MONTH)
       }
     } else {
       setCurrentHijriMonth(currentHijriMonth - 1)
@@ -92,12 +97,12 @@ export function useHijriCalendar() {
 
   // Navigate to next month
   const nextMonth = useCallback(() => {
-    if (currentHijriMonth === 12) {
+    if (currentHijriMonth === LAST_HIJRI_MONTH) {
       // Go to Muharram of next year
       const nextYearExists = months.some(m => m.hijriYear === currentHijriYear + 1)
       if (nextYearExists) {
         setCurrentHijriYear(currentHijriYear + 1)
-        setCurrentHijriMonth(1)
+        setCurrentHijriMonth(FIRST_HIJRI_MONTH)
       }
     } else {
       setCurrentHijriMonth(currentHijriMonth + 1)
@@ -114,9 +119,9 @@ export function useHijriCalendar() {
 
   // Check if we can navigate to previous month
   const canGoPrevious = useMemo(() => {
-    if (currentHijriMonth === 1) {
+    if (currentHijriMonth === FIRST_HIJRI_MONTH) {
       // Check if Dhul Hijjah of previous year exists
-      return months.some(m => m.hijriYear === currentHijriYear - 1 && m.hijriMonth === 12)
+      return months.some(m => m.hijriYear === currentHijriYear - 1 && m.hijriMonth === LAST_HIJRI_MONTH)
     }
     // Check if previous month of current year exists
     return months.some(m => m.hijriYear === currentHijriYear && m.hijriMonth === currentHijriMonth - 1)
@@ -124,9 +129,9 @@ export function useHijriCalendar() {
 
   // Check if we can navigate to next month
   const canGoNext = useMemo(() => {
-    if (currentHijriMonth === 12) {
+    if (currentHijriMonth === LAST_HIJRI_MONTH) {
       // Check if Muharram of next year exists
-      return months.some(m => m.hijriYear === currentHijriYear + 1 && m.hijriMonth === 1)
+      return months.some(m => m.hijriYear === currentHijriYear + 1 && m.hijriMonth === FIRST_HIJRI_MONTH)
     }
     // Check if next month of current year exists
     return months.some(m => m.hijriYear === currentHijriYear && m.hijriMonth === currentHijriMonth + 1)

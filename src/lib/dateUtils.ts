@@ -63,3 +63,10 @@ export function startOfDay(date: Date): Date {
 export function isToday(date: Date): boolean {
   return isSameDay(date, new Date())
 }
+
+/**
+ * Format a date to ISO date string (YYYY-MM-DD)
+ */
+export function formatDateISO(date: Date): string {
+  return date.toISOString().split('T')[0]
+}

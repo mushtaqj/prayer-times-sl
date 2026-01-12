@@ -1,5 +1,5 @@
 import { Star, Sparkles } from 'lucide-react'
-import { SACRED_MONTHS } from './calendarConstants'
+import { SACRED_MONTH_NUMBERS, HIJRI_MONTHS } from '@/lib/hijriConstants'
 
 interface SpecialMonthBannerProps {
   hijriMonth: number
@@ -9,8 +9,8 @@ interface SpecialMonthBannerProps {
  * Component to render special month banners (Ramadan, Sacred months)
  */
 export function SpecialMonthBanner({ hijriMonth }: SpecialMonthBannerProps) {
-  const isRamadan = hijriMonth === 9
-  const isSacredMonth = SACRED_MONTHS.includes(hijriMonth)
+  const isRamadan = hijriMonth === HIJRI_MONTHS.RAMADAN
+  const isSacredMonth = SACRED_MONTH_NUMBERS.includes(hijriMonth)
 
   if (isRamadan) {
     return (

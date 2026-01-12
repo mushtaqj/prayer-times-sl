@@ -21,7 +21,7 @@ import {
   JumpToDateDialog,
   getMonthTheme,
   SpecialMonthBanner,
-  WEEKDAYS,
+  WEEKDAY_LABELS,
 } from '@/components/calendar'
 
 interface HijriCalendarViewProps {
@@ -273,7 +273,7 @@ export function HijriCalendarView({ location }: HijriCalendarViewProps) {
 
             {/* Weekday Headers */}
             <div className="grid grid-cols-7 bg-muted/50">
-              {WEEKDAYS.map((day, idx) => (
+              {WEEKDAY_LABELS.map((day, idx) => (
                 <div
                   key={day}
                   className={`py-3 text-center text-[10px] font-bold uppercase tracking-wider text-muted-foreground border-b border-border ${idx < 6 ? 'border-r border-border/50' : ''} ${day === 'Fri' ? 'text-primary bg-primary/10' : ''}`}

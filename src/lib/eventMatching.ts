@@ -3,6 +3,7 @@
  */
 
 import type { IslamicEvent, AnnualFast, HijriDate, FastingInfo, DayEvent } from '@/lib/data/types'
+import { HIJRI_MONTHS, WEEKDAYS, AYYAM_AL_BEED_DAYS } from '@/lib/hijriConstants'
 
 /**
  * Check if a specific Hijri day falls within an annual recurring event range
@@ -55,7 +56,7 @@ export function getFastingInfo(
   }
 
   // Check Ramadan (entire month)
-  if (hijriDate.month === 9) {
+  if (hijriDate.month === HIJRI_MONTHS.RAMADAN) {
     return { isFasting: true, type: 'obligatory', reason: 'Ramadan' }
   }
 
@@ -66,10 +67,10 @@ export function getFastingInfo(
 
   // Check Monday/Thursday
   const dayOfWeek = hijriDate.gregorianDate.getDay()
-  if (dayOfWeek === 1) {
+  if (dayOfWeek === WEEKDAYS.MONDAY) {
     return { isFasting: true, type: 'sunnah', reason: 'Monday Fast' }
   }
-  if (dayOfWeek === 4) {
+  if (dayOfWeek === WEEKDAYS.THURSDAY) {
     return { isFasting: true, type: 'sunnah', reason: 'Thursday Fast' }
   }
 
@@ -111,7 +112,7 @@ export function getAllEventsForDay(
   // ONLY add recurring fasts if fasting is NOT forbidden
   if (!isFastingForbiddenToday) {
     // Add Ayyam al-Beed (13, 14, 15 of each month)
-    if ([13, 14, 15].includes(hijriDay)) {
+    if (AYYAM_AL_BEED_DAYS.includes(hijriDay)) {
       result.push({
         name: 'Ayyam al-Beed',
         type: 'sunnah',
@@ -139,7 +140,7 @@ export function getAllEventsForDay(
     // Add Monday/Thursday fasting if gregorianDate provided
     if (gregorianDate) {
       const dayOfWeek = gregorianDate.getDay()
-      if (dayOfWeek === 1) {
+      if (dayOfWeek === WEEKDAYS.MONDAY) {
         result.push({
           name: 'Monday Fast',
           type: 'sunnah',
@@ -147,7 +148,7 @@ export function getAllEventsForDay(
           details: weeklyFastDetails?.monday
         })
       }
-      if (dayOfWeek === 4) {
+      if (dayOfWeek === WEEKDAYS.THURSDAY) {
         result.push({
           name: 'Thursday Fast',
           type: 'sunnah',
@@ -176,7 +177,7 @@ export function hasEventOnDay(
   }
 
   // Check Ayyam al-Beed (13, 14, 15 of each month)
-  if ([13, 14, 15].includes(hijriDay)) {
+  if (AYYAM_AL_BEED_DAYS.includes(hijriDay)) {
     return true
   }
 

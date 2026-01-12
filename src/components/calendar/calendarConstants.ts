@@ -1,8 +1,7 @@
 import { Moon, Star, Gift, Sparkles } from 'lucide-react'
+import { SACRED_MONTH_NUMBERS, HIJRI_MONTHS } from '@/lib/hijriConstants'
 
-export const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-
-export const SACRED_MONTHS = [1, 7, 11, 12] // Muharram, Rajab, Dhul Qadah, Dhul Hijjah
+export const WEEKDAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
 export const EVENT_STYLES = {
   eid: {
@@ -67,8 +66,8 @@ export interface MonthThemeData {
  * Get theme configuration for special months (Ramadan, Sacred months)
  */
 export function getMonthTheme(hijriMonth: number): MonthThemeData {
-  const isRamadan = hijriMonth === 9
-  const isSacredMonth = SACRED_MONTHS.includes(hijriMonth)
+  const isRamadan = hijriMonth === HIJRI_MONTHS.RAMADAN
+  const isSacredMonth = SACRED_MONTH_NUMBERS.includes(hijriMonth)
 
   if (isRamadan) {
     return {

@@ -4,10 +4,11 @@ export { CalendarDay, EmptyCalendarCell, UncertainDay30Cell } from './CalendarDa
 export { JumpToDateDialog } from './JumpToDateDialog'
 export { SpecialMonthBanner } from './SpecialMonthBanner'
 export {
-  WEEKDAYS,
-  SACRED_MONTHS,
+  WEEKDAY_LABELS,
   EVENT_STYLES,
   getMonthTheme,
   type EventStyleKey,
   type MonthThemeData
 } from './calendarConstants'
+// Re-export from central constants for convenience
+export { SACRED_MONTH_NUMBERS, HIJRI_MONTHS, WEEKDAYS } from '@/lib/hijriConstants'
