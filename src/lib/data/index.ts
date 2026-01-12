@@ -8,6 +8,8 @@
 // ============================================================================
 export {
   districts,
+  districtCoordinates,
+  DEFAULT_DISTRICT_ID,
   prayerMetadata,
   prayerNames,
   PRAYER_INDEX,
@@ -20,6 +22,7 @@ export {
   getWeekPrayerTimes,
   toPrayerInfoArray,
   getCurrentAndNextPrayer,
+  findNearestDistrict,
 } from './prayerTimes'
 
 // ============================================================================

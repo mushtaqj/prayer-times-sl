@@ -17,3 +17,6 @@ export * from './eventMatching'
 
 // Hijri constants
 export * from './hijriConstants'
+
+// Geo utilities
+export * from './geo'
