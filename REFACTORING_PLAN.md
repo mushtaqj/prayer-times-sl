@@ -206,6 +206,169 @@ Current test status: **322 tests passing**
 
 ---
 
+## Pending: React Best Practices Refactoring
+
+### 1. Large Components to Split
+
+#### AdminPage.tsx (407 lines) - HIGH PRIORITY
+| Extract To | Responsibility |
+|------------|----------------|
+| `<AdminForm>` | Form fields (email, password, days selection) |
+| `<MonthTransitionCard>` | Current → Next month info display |
+| `<RecentChangesHistory>` | Collapsible history section |
+| `<SubmitStatus>` | Success/error state rendering |
+| `useAdminForm()` hook | Form state, validation, submission |
+
+#### LandingPage.tsx (369 lines) - HIGH PRIORITY
+| Extract To | Responsibility |
+|------------|----------------|
+| `<NextPrayerCard>` | Hero section with countdown circle |
+| `<TodayBlessingsCard>` | Fasting/Friday pills and blessings |
+| `<NavigationButtons>` | Three navigation buttons grid |
+| `<MonthPickerModal>` | Month picker overlay |
+| `useRecommendedPills()` hook | Compute recommended Ibadah pills |
+| `getPrayerIcon()` utility | Prayer name → icon mapping |
+
+#### HijriCalendarView.tsx (375 lines) - HIGH PRIORITY
+| Extract To | Responsibility |
+|------------|----------------|
+| `<CalendarHeader>` | Month name, navigation, Gregorian range |
+| `<CalendarQuickActions>` | Today button, legend toggle, jump to date |
+| `useCalendarGrid()` hook | Grid generation with empty cell padding |
+| `useDayClickHandler()` hook | Day click content generation |
+
+#### MonthView.tsx (195 lines) - MEDIUM PRIORITY
+| Extract To | Responsibility |
+|------------|----------------|
+| `<DesktopMonthTable>` | Full table view for desktop |
+| `<MobileMonthList>` | Simplified list for mobile |
+| `<DayDetailsSheet>` | Bottom sheet with prayer times |
+
+---
+
+### 2. Code Duplication to Extract
+
+#### Theme Toggle Button
+- **Files:** `LandingPage.tsx:150-157`, `Header.tsx:108`
+- **Issue:** Inline button instead of using existing `ThemeToggleButton`
+- **Solution:** Use `<ThemeToggleButton>` component
+
+#### Location Badge
+- **Files:** `DailyView.tsx:66-69`, `MonthView.tsx:61-65`, `WeekView.tsx:30-33`
+- **Issue:** Same MapPin + location display pattern repeated
+- **Solution:** Create `<LocationBadge location={string} />` component
+
+#### Date Header Display
+- **Files:** `DailyView.tsx:41-47`, `MonthView.tsx:41-46`, `WeekView.tsx:19-24`
+- **Issue:** Same date formatting with `toLocaleDateString` options
+- **Solution:** Create `useDateDisplay(date)` hook or utility
+
+#### Section Toggle
+- **Files:** `Header.tsx:60-81`, `MobileNav.tsx:157-186`
+- **Issue:** Nearly identical toggle button styling
+- **Solution:** Create `<SectionToggle>` component
+
+---
+
+### 3. Prop Drilling - Context Needed
+
+#### ThemeContext
+- **Props drilled:** `isDark`, `onThemeToggle`
+- **Through:** `App` → `Header` → `ThemeToggleButton`, `App` → `LandingPage`
+- **Solution:** Create `ThemeContext` with `useTheme()` hook access
+
+#### LocationContext
+- **Props drilled:** `districts`, `selectedDistrict`, `onDistrictChange`, `location`
+- **Through:** `App` → `Header` → `MobileNav`, `App` → various views
+- **Solution:** Create `LocationContext` with `useLocation()` hook access
+
+---
+
+### 4. Missing Memoization
+
+| File | Line(s) | Issue | Solution |
+|------|---------|-------|----------|
+| `LandingPage.tsx` | 67-104 | `getRecommendedPills()` recalculated every render | Wrap in `useMemo` |
+| `LandingPage.tsx` | 109-125 | `getPrayerIcon()` not memoized | Extract to utility or `useCallback` |
+| `HijriCalendarView.tsx` | 94-161 | `handleDayClick` creates new content each render | Wrap in `useCallback` |
+| `HijriCalendarView.tsx` | 178-189 | Gregorian range formatting recalculated | Wrap in `useMemo` |
+| `MonthView.tsx` | 48-49 | `prevMonth`/`nextMonth` handlers | Wrap in `useCallback` |
+| `MonthView.tsx` | 51-54 | `handleDayClick` not memoized | Wrap in `useCallback` |
+| `WeekView.tsx` | 36-85 | Map creates new objects each render | Memoize row component |
+
+---
+
+### 5. Remaining Hardcoded Values
+
+| File | Line(s) | Value | Solution |
+|------|---------|-------|----------|
+| `LandingPage.tsx` | 147 | `", Sri Lanka"` suffix | Create `LOCATION_SUFFIX` constant |
+| `LandingPage.tsx` | 221-235 | Badge gradient colors | Create `BADGE_STYLES` constant object |
+| `LandingPage.tsx` | 289-315 | Navigation button gradients | Create `NAV_BUTTON_STYLES` constant |
+| `AdminPage.tsx` | 15 | `29 \| 30` days type | Create `HIJRI_MONTH_DAYS` enum |
+| `MonthView.tsx` | 112 | `.slice(0, 3)` month abbrev | Create `MONTH_ABBREV_LENGTH = 3` |
+
+---
+
+### 6. Repeated Tailwind Patterns
+
+| Pattern | Files | Solution |
+|---------|-------|----------|
+| `border-border/50 bg-card/40 backdrop-blur-sm` | 8+ components | Create `cardStyles` utility |
+| `bg-gradient-to-br from-primary via-primary to-accent` | LandingPage, buttons | Create gradient class in Tailwind config |
+| `text-xs text-muted-foreground uppercase tracking-wide` | Multiple headers | Create `subheadingStyles` utility |
+| `rounded-xl border border-border/50` | Multiple cards | Create `roundedCardStyles` utility |
+
+---
+
+### 7. Suggested New Utilities/Hooks
+
+```typescript
+// hooks/useFormattedDate.ts
+export function useFormattedDate(date: Date, options?: Intl.DateTimeFormatOptions): string
+
+// hooks/useRecommendedPills.ts
+export function useRecommendedPills(hijriDate: HijriDate, fastingInfo: FastingInfo): Pill[]
+
+// utils/prayerIcons.tsx
+export function getPrayerIcon(prayerName: string, className?: string): ReactNode
+
+// components/common/LocationBadge.tsx
+export function LocationBadge({ location }: { location: string }): JSX.Element
+
+// components/common/SectionToggle.tsx
+export function SectionToggle({ items, selected, onChange }): JSX.Element
+```
+
+---
+
+## Refactoring Priority Order
+
+### Phase 4: Component Extraction (HIGH)
+- [ ] Split `AdminPage.tsx` into smaller components
+- [ ] Split `LandingPage.tsx` into smaller components
+- [ ] Split `HijriCalendarView.tsx` into smaller components
+- [ ] Create `ThemeContext` and `LocationContext`
+
+### Phase 5: Deduplication (MEDIUM)
+- [ ] Create `<LocationBadge>` component
+- [ ] Create `useDateDisplay()` hook
+- [ ] Use existing `<ThemeToggleButton>` in LandingPage
+- [ ] Create `<SectionToggle>` component
+
+### Phase 6: Performance (MEDIUM)
+- [ ] Add `useMemo` to `getRecommendedPills` in LandingPage
+- [ ] Add `useCallback` to handlers in MonthView, HijriCalendarView
+- [ ] Memoize Gregorian range calculation
+- [ ] Memoize WeekView row rendering
+
+### Phase 7: Constants & Cleanup (LOW)
+- [ ] Extract remaining hardcoded values to constants
+- [ ] Create Tailwind utility classes for repeated patterns
+- [ ] Extract `getPrayerIcon` utility function
+
+---
+
 ## Notes
 
 - All refactoring maintains backward compatibility
