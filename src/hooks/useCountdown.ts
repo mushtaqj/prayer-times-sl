@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { parseTime, formatCountdown } from '@/lib/timeUtils'
+import { parseTime, formatCountdown } from '@/lib/utils/time'
 
 interface UseCountdownOptions {
   /** Target prayer time in HH:MM format */

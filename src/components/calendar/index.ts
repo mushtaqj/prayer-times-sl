@@ -11,4 +11,4 @@ export {
   type MonthThemeData
 } from './calendarConstants'
 // Re-export from central constants for convenience
-export { SACRED_MONTH_NUMBERS, HIJRI_MONTHS, WEEKDAYS } from '@/lib/hijriConstants'
+export { SACRED_MONTH_NUMBERS, HIJRI_MONTHS, WEEKDAYS } from '@/lib/utils/hijriConstants'

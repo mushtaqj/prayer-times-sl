@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { parseTime } from '@/lib/timeUtils'
-import { getStorageItem, setStorageItem } from '@/lib/storage'
+import { parseTime } from '@/lib/utils/time'
+import { getStorageItem, setStorageItem } from '@/lib/utils/storage'
 
 export type PrayerName = 'fajr' | 'sunrise' | 'dhuhr' | 'asr' | 'maghrib' | 'isha'
 

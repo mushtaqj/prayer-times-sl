@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import prayerData from '@/data/prayerTimes.json'
-import { parseTimeToMinutes } from '@/lib/timeUtils'
+import { parseTimeToMinutes } from '@/lib/utils/time'
 import type { District, DailyPrayerTimes, PrayerInfo } from '@/lib/data/types'
 
 export function usePrayerTimes(districtId: string) {

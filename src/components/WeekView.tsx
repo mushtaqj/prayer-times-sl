@@ -2,7 +2,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 
-import { cn } from '@/lib/utils'
+import { cn } from '@/lib/tailwind'
 import type { DailyPrayerTimes } from '@/lib/data/types'
 import { gregorianToHijri, getMoonPhase } from '@/lib/data/hijriCalendar'
 

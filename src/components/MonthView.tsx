@@ -19,7 +19,7 @@ import {
 import { Separator } from '@/components/ui/separator'
 import { PrayerRow } from '@/components/PrayerRow'
 import { ChevronLeft, ChevronRight, ChevronRight as ChevronIcon, MapPin } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { cn } from '@/lib/tailwind'
 import type { DailyPrayerTimes } from '@/lib/data/types'
 
 interface MonthViewProps {

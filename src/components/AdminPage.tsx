@@ -2,8 +2,8 @@ import { useState, useMemo } from 'react'
 import { Button } from '@/components/ui/button'
 import { Lock, Moon, AlertCircle, Loader2, Calendar, ArrowRight, Mail, Shield } from 'lucide-react'
 import { months, hijriMonths } from '@/lib/data/hijriCalendar'
-import { addDays, formatDate, parseDate } from '@/lib/dateUtils'
-import { LAST_HIJRI_MONTH, FIRST_HIJRI_MONTH } from '@/lib/hijriConstants'
+import { addDays, formatDate, parseDate } from '@/lib/utils/date'
+import { LAST_HIJRI_MONTH, FIRST_HIJRI_MONTH } from '@/lib/utils/hijriConstants'
 
 type SubmitStatus = 'idle' | 'loading' | 'success' | 'error'
 

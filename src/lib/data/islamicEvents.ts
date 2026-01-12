@@ -25,7 +25,7 @@ import {
   getAllEventsForDay as getAllEventsForDayUtil,
   hasEventOnDay as hasEventOnDayUtil,
   getEventTypeColor,
-} from '@/lib/eventMatching'
+} from '@/lib/utils/eventMatching'
 
 // ============================================================================
 // Enriched Static Data - Computed once at module load

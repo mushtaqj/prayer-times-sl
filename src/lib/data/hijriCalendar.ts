@@ -8,7 +8,7 @@ import { eventVirtues as monthVirtuesData } from './virtues'
 import type { HijriDate, HijriMonth, HijriMonthInfo, MoonPhase } from './types'
 
 // Import pure date utilities
-import { parseDate, addDays, daysBetween } from '@/lib/dateUtils'
+import { parseDate, addDays, daysBetween } from '@/lib/utils/date'
 
 // Constants
 const NEW_MOON_DAY = 1

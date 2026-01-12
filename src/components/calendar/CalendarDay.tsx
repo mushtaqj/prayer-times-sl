@@ -5,7 +5,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip'
 import { getMoonPhase } from '@/lib/data/hijriCalendar'
-import { getPrimaryEventType } from '@/lib/eventMatching'
+import { getPrimaryEventType } from '@/lib/utils/eventMatching'
 import { EVENT_STYLES } from './calendarConstants'
 import type { CalendarDay as CalendarDayType, DayEvent, FastingInfo } from '@/lib/data/types'
 

@@ -3,7 +3,7 @@
  */
 
 import type { IslamicEvent, AnnualFast, HijriDate, FastingInfo, DayEvent } from '@/lib/data/types'
-import { HIJRI_MONTHS, WEEKDAYS, AYYAM_AL_BEED_DAYS } from '@/lib/hijriConstants'
+import { HIJRI_MONTHS, WEEKDAYS, AYYAM_AL_BEED_DAYS } from '@/lib/utils/hijriConstants'
 
 /**
  * Check if a specific Hijri day falls within an annual recurring event range

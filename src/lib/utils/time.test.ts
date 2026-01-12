@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
-import { parseTime, parseTimeToMinutes, formatCountdown } from './timeUtils'
+import { parseTime, parseTimeToMinutes, formatCountdown } from './time'
 
 describe('timeUtils', () => {
   describe('parseTime', () => {

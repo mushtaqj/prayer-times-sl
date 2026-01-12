@@ -13,7 +13,7 @@ import {ActionBanner} from '@/components/ActionBanner'
 import {useTheme} from '@/hooks/useTheme'
 import {useAlarms} from '@/hooks/useAlarms'
 import {usePrayerTimes} from '@/hooks/usePrayerTimes'
-import {getStorageString, setStorageString} from '@/lib/storage'
+import {getStorageString, setStorageString} from '@/lib/utils/storage'
 import {Bell, Download} from 'lucide-react'
 
 function App() {

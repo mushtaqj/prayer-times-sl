@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { getStorageString, setStorageString } from '@/lib/storage'
+import { getStorageString, setStorageString } from '@/lib/utils/storage'
 
 export function useTheme() {
   const [isDark, setIsDark] = useState(() => {
