@@ -14,6 +14,7 @@ import {useTheme} from '@/hooks/useTheme'
 import {useAlarms} from '@/hooks/useAlarms'
 import {usePrayerTimes} from '@/hooks/usePrayerTimes'
 import {getStorageString, setStorageString} from '@/lib/utils/storage'
+import {COUNTRY_NAME} from '@/lib/utils/appConstants'
 import {Bell, Download} from 'lucide-react'
 
 function App() {
@@ -232,7 +233,7 @@ function App() {
           {!isHomePage && (
             <footer className="hidden sm:block text-center text-sm text-muted-foreground py-6 border-t border-border/50 bg-card/30">
               <p>Prayer times for {locationName} District</p>
-              <p className="mt-1 font-heading text-primary/80">Sri Lanka</p>
+              <p className="mt-1 font-heading text-primary/80">{COUNTRY_NAME}</p>
             </footer>
           )}
         </main>

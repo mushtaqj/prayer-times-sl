@@ -1,7 +1,7 @@
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
-
+import { LocationBadge } from '@/components/common'
 import { cn } from '@/lib/tailwind'
 import type { DailyPrayerTimes } from '@/lib/data/types'
 import { gregorianToHijri, getMoonPhase } from '@/lib/data/hijriCalendar'
@@ -28,9 +28,7 @@ export function WeekView({ prayers, location }: WeekViewProps) {
       <CardContent className="p-0">
         <div className="flex items-center justify-between p-4 border-b border-border/50 bg-muted/30">
           <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">{todayDateString}</p>
-          <div className="flex items-center gap-1.5 text-sm text-primary bg-primary/10 px-2 py-0.5 rounded-full">
-            <span className="font-medium">{location}</span>
-          </div>
+          <LocationBadge location={location} />
         </div>
         <div className="p-4 space-y-6">
           {prayers.map((prayer, index) => {

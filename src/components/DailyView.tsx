@@ -1,5 +1,5 @@
 import { Card, CardContent } from '@/components/ui/card'
-
+import { LocationBadge } from '@/components/common'
 import { NextPrayerBanner } from '@/components/NextPrayerBanner'
 import { PrayerRow } from '@/components/PrayerRow'
 import { HijriDateDisplay } from '@/components/HijriDateDisplay'
@@ -64,9 +64,7 @@ export function DailyView({ prayers, nextPrayer, currentPrayer, alarms, onToggle
           <div className="p-4 border-b border-border/50 bg-muted/30 space-y-2">
             <div className="flex items-center justify-between">
               <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">{dateString}</p>
-              <div className="flex items-center gap-1.5 text-sm text-primary bg-primary/10 px-2 py-0.5 rounded-full">
-                <span className="font-medium">{location}</span>
-              </div>
+              <LocationBadge location={location} />
             </div>
             {/* Hijri Date */}
             <HijriDateDisplay hijriDate={hijriToday} showMoonPhase={true} showEvents={true} />

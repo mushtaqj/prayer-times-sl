@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useCallback } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { ChevronDown, ChevronUp, HelpCircle } from 'lucide-react'
@@ -89,38 +89,75 @@ export function HijriCalendarView({ location }: HijriCalendarViewProps) {
 
   const monthTheme = getMonthTheme(currentHijriMonth)
 
-  const handleDayClick = (
-    day: typeof calendarDays[0],
-    isFriday: boolean
-  ) => {
-    const dayEvents = getAllEventsForDay(
+  const handleDayClick = useCallback(
+    (day: typeof calendarDays[0], isFriday: boolean) => {
+      const dayEvents = getAllEventsForDay(
+        currentHijriMonth,
+        day.hijriDay,
+        day.gregorianDate
+      )
+      const fastingInfo = isFastingDay({
+        day: day.hijriDay,
+        month: currentHijriMonth,
+        monthName: currentMonthData!.monthName,
+        year: currentHijriYear,
+        gregorianDate: day.gregorianDate,
+      })
+
+      const content = generateDayContent({
+        monthName: currentMonthData!.monthName,
+        hijriDay: day.hijriDay,
+        gregorianDate: day.gregorianDate,
+        dayEvents,
+        fastingInfo,
+        isFriday,
+        recurringFasts,
+      })
+
+      setVirtueSheet({
+        title: `${currentMonthData!.monthName} ${day.hijriDay}`,
+        content,
+      })
+    },
+    [
       currentHijriMonth,
-      day.hijriDay,
-      day.gregorianDate
-    )
-    const fastingInfo = isFastingDay({
-      day: day.hijriDay,
-      month: currentHijriMonth,
-      monthName: currentMonthData!.monthName,
-      year: currentHijriYear,
-      gregorianDate: day.gregorianDate,
-    })
-
-    const content = generateDayContent({
-      monthName: currentMonthData!.monthName,
-      hijriDay: day.hijriDay,
-      gregorianDate: day.gregorianDate,
-      dayEvents,
-      fastingInfo,
-      isFriday,
+      currentHijriYear,
+      currentMonthData,
+      getAllEventsForDay,
+      isFastingDay,
       recurringFasts,
-    })
+    ]
+  )
 
-    setVirtueSheet({
-      title: `${currentMonthData!.monthName} ${day.hijriDay}`,
-      content,
+  const gregorianRange = useMemo(() => {
+    if (!currentMonthData) return ''
+    const gregorianStart = new Date(currentMonthData.gregorianStart)
+    const gregorianEnd = new Date(gregorianStart)
+    gregorianEnd.setDate(gregorianEnd.getDate() + currentMonthData.days - 1)
+
+    const startMonth = gregorianStart.toLocaleDateString('en-US', {
+      month: 'short',
     })
-  }
+    const endMonth = gregorianEnd.toLocaleDateString('en-US', { month: 'short' })
+    const startYear = gregorianStart.getFullYear()
+    const endYear = gregorianEnd.getFullYear()
+
+    if (startMonth === endMonth && startYear === endYear) {
+      return `${startMonth} ${gregorianStart.getDate()}-${gregorianEnd.getDate()}, ${endYear}`
+    } else if (startYear === endYear) {
+      return `${startMonth} ${gregorianStart.getDate()} → ${endMonth} ${gregorianEnd.getDate()}, ${endYear}`
+    } else {
+      return `${startMonth} ${gregorianStart.getDate()}, ${startYear} → ${endMonth} ${gregorianEnd.getDate()}, ${endYear}`
+    }
+  }, [currentMonthData])
+
+  const showTodayButton = useMemo(() => {
+    return Boolean(
+      todayHijri &&
+        (currentHijriYear !== todayHijri.year ||
+          currentHijriMonth !== todayHijri.month)
+    )
+  }, [todayHijri, currentHijriYear, currentHijriMonth])
 
   if (!currentMonthData) {
     return (
@@ -131,32 +168,6 @@ export function HijriCalendarView({ location }: HijriCalendarViewProps) {
       </Card>
     )
   }
-
-  const gregorianStart = new Date(currentMonthData.gregorianStart)
-  const gregorianEnd = new Date(gregorianStart)
-  gregorianEnd.setDate(gregorianEnd.getDate() + currentMonthData.days - 1)
-
-  const startMonth = gregorianStart.toLocaleDateString('en-US', {
-    month: 'short',
-  })
-  const endMonth = gregorianEnd.toLocaleDateString('en-US', { month: 'short' })
-  const startYear = gregorianStart.getFullYear()
-  const endYear = gregorianEnd.getFullYear()
-
-  let gregorianRange: string
-  if (startMonth === endMonth && startYear === endYear) {
-    gregorianRange = `${startMonth} ${gregorianStart.getDate()}-${gregorianEnd.getDate()}, ${endYear}`
-  } else if (startYear === endYear) {
-    gregorianRange = `${startMonth} ${gregorianStart.getDate()} → ${endMonth} ${gregorianEnd.getDate()}, ${endYear}`
-  } else {
-    gregorianRange = `${startMonth} ${gregorianStart.getDate()}, ${startYear} → ${endMonth} ${gregorianEnd.getDate()}, ${endYear}`
-  }
-
-  const showTodayButton = Boolean(
-    todayHijri &&
-      (currentHijriYear !== todayHijri.year ||
-        currentHijriMonth !== todayHijri.month)
-  )
 
   return (
     <TooltipProvider delayDuration={300}>

@@ -2,6 +2,12 @@
  * Gregorian date constants
  */
 
+/** First month of the Gregorian year (January) */
+export const FIRST_GREGORIAN_MONTH = 1
+
+/** Last month of the Gregorian year (December) */
+export const LAST_GREGORIAN_MONTH = 12
+
 /** Gregorian month names */
 export const GREGORIAN_MONTHS = [
   'January', 'February', 'March', 'April', 'May', 'June',

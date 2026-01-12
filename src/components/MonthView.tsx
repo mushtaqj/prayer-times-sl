@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -17,11 +17,16 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet'
 import { Separator } from '@/components/ui/separator'
+import { LocationBadge } from '@/components/common'
 import { PrayerRow } from '@/components/PrayerRow'
-import { ChevronLeft, ChevronRight, ChevronRight as ChevronIcon, MapPin } from 'lucide-react'
+import { ChevronLeft, ChevronRight, ChevronRight as ChevronIcon } from 'lucide-react'
 import { cn } from '@/lib/tailwind'
 import type { DailyPrayerTimes } from '@/lib/data/types'
-import { GREGORIAN_MONTHS } from '@/lib/utils/dateConstants'
+import {
+  GREGORIAN_MONTHS,
+  FIRST_GREGORIAN_MONTH,
+  LAST_GREGORIAN_MONTH,
+} from '@/lib/utils/dateConstants'
 import { prayerNames } from '@/lib/data/prayerTimes'
 
 interface MonthViewProps {
@@ -45,13 +50,22 @@ export function MonthView({ getMonthPrayers, location }: MonthViewProps) {
     day: 'numeric',
   })
 
-  const prevMonth = () => setSelectedMonth(m => m === 1 ? 12 : m - 1)
-  const nextMonth = () => setSelectedMonth(m => m === 12 ? 1 : m + 1)
+  const prevMonth = useCallback(() => {
+    setSelectedMonth((m) =>
+      m === FIRST_GREGORIAN_MONTH ? LAST_GREGORIAN_MONTH : m - 1
+    )
+  }, [])
 
-  const handleDayClick = (prayer: DailyPrayerTimes) => {
+  const nextMonth = useCallback(() => {
+    setSelectedMonth((m) =>
+      m === LAST_GREGORIAN_MONTH ? FIRST_GREGORIAN_MONTH : m + 1
+    )
+  }, [])
+
+  const handleDayClick = useCallback((prayer: DailyPrayerTimes) => {
     setSelectedDay(prayer)
     setSheetOpen(true)
-  }
+  }, [])
 
   return (
     <>
@@ -59,10 +73,7 @@ export function MonthView({ getMonthPrayers, location }: MonthViewProps) {
         <CardHeader className="pb-6 px-0">
           <div className="flex items-center justify-between mb-2">
             <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">{todayDateString}</p>
-            <div className="flex items-center gap-1.5 text-sm text-primary bg-primary/10 px-2 py-0.5 rounded-full">
-              <MapPin className="w-3 h-3" />
-              <span className="font-medium">{location}</span>
-            </div>
+            <LocationBadge location={location} showIcon />
           </div>
           <div className="flex items-center justify-between gap-4">
             <CardTitle className="text-2xl font-heading text-primary">Monthly Schedule</CardTitle>

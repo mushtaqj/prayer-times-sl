@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { AppInfoModal } from './AppInfoModal'
 import { ThemeToggleButton, DistrictSelector } from '@/components/common'
 import { useLocation as useGeoLocation } from '@/hooks/useLocation'
+import { COUNTRY_NAME } from '@/lib/utils/appConstants'
 import type { District } from '@/lib/data/types'
 
 interface HeaderProps {
@@ -51,7 +52,7 @@ export function Header({
           />
           <div className="hidden sm:flex flex-col text-left">
             <h1 className="text-base font-bold leading-none tracking-tight">Prayer Times</h1>
-            <span className="text-[10px] text-muted-foreground font-medium">Sri Lanka</span>
+            <span className="text-[10px] text-muted-foreground font-medium">{COUNTRY_NAME}</span>
           </div>
         </Link>
 

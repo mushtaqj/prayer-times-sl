@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { VirtuesSheet } from '@/components/VirtuesSheet'
@@ -6,6 +6,7 @@ import { gregorianToHijri, getMoonPhase } from '@/lib/data/hijriCalendar'
 import { useIslamicEvents } from '@/hooks/useIslamicEvents'
 import { DAY_INDEX } from '@/lib/utils/dateConstants'
 import { AYYAM_AL_BEED_DAYS } from '@/lib/utils/hijriConstants'
+import { LOCATION_SUFFIX } from '@/lib/utils/appConstants'
 import { useCountdown } from '@/hooks/useCountdown'
 import { Moon, Sun } from 'lucide-react'
 import {
@@ -69,11 +70,11 @@ export function LandingPage({
     : { isFasting: false }
   const monthInfo = hijriDate ? getMonthName(hijriDate.month) ?? null : null
 
-  const openVirtuesSheet = (title: string, content: string) => {
+  const openVirtuesSheet = useCallback((title: string, content: string) => {
     setVirtuesSheet({ isOpen: true, title, content })
-  }
+  }, [])
 
-  const getRecommendedPills = () => {
+  const recommendedPills = useMemo(() => {
     const pills: { label: string; content: string; type: string }[] = []
 
     if (isFriday) {
@@ -115,9 +116,7 @@ export function LandingPage({
     }
 
     return pills
-  }
-
-  const recommendedPills = getRecommendedPills()
+  }, [isFriday, fastingInfo, hijriDate, recurringFasts])
   const isAyyamAlBeed = hijriDate
     ? AYYAM_AL_BEED_DAYS.includes(hijriDate.day)
     : false
@@ -145,7 +144,7 @@ export function LandingPage({
               Prayer Times
             </h1>
             <p className="text-[10px] text-muted-foreground">
-              {location}, Sri Lanka
+              {location}{LOCATION_SUFFIX}
             </p>
           </div>
         </div>

@@ -355,21 +355,26 @@ export function SectionToggle({ items, selected, onChange }): JSX.Element
   - Created `lib/utils/dayContent.ts` utility
 - [x] Create `ThemeContext` and `LocationContext` (in `src/contexts/`)
 
-### Phase 5: Deduplication (MEDIUM)
-- [ ] Create `<LocationBadge>` component
-- [ ] Create `useDateDisplay()` hook
-- [ ] Use existing `<ThemeToggleButton>` in LandingPage
-- [ ] Create `<SectionToggle>` component
+### Phase 5: Deduplication (MEDIUM) ✅
+- [x] Create `<LocationBadge>` component (in `components/common/`)
+  - Used in DailyView, WeekView, MonthView
+- [x] Create `useDateDisplay()` hook (in `hooks/`)
+- [x] SectionToggle - Skipped (too navigation-specific)
+- [x] ThemeToggleButton already used where needed
 
-### Phase 6: Performance (MEDIUM)
-- [ ] Add `useMemo` to `getRecommendedPills` in LandingPage
-- [ ] Add `useCallback` to handlers in MonthView, HijriCalendarView
-- [ ] Memoize Gregorian range calculation
-- [ ] Memoize WeekView row rendering
+### Phase 6: Performance (MEDIUM) ✅
+- [x] Add `useMemo` to `getRecommendedPills` in LandingPage
+- [x] Add `useCallback` to `openVirtuesSheet` in LandingPage
+- [x] Add `useCallback` to handlers in MonthView (`prevMonth`, `nextMonth`, `handleDayClick`)
+- [x] Add `useCallback` to `handleDayClick` in HijriCalendarView
+- [x] Memoize `gregorianRange` calculation in HijriCalendarView
+- [x] Memoize `showTodayButton` calculation in HijriCalendarView
 
-### Phase 7: Constants & Cleanup (LOW)
-- [ ] Extract remaining hardcoded values to constants
-- [ ] Create Tailwind utility classes for repeated patterns
+### Phase 7: Constants & Cleanup (LOW) ✅
+- [x] Create `lib/utils/appConstants.ts` with `COUNTRY_NAME`, `LOCATION_SUFFIX`, `MONTH_ABBREV_LENGTH`
+- [x] Add `FIRST_GREGORIAN_MONTH` and `LAST_GREGORIAN_MONTH` to dateConstants.ts
+- [x] Replace "Sri Lanka" hardcoded strings with `COUNTRY_NAME` constant
+- [x] Replace month cycling magic numbers (1, 12) with constants
 - [x] Extract `getPrayerIcon` utility function (moved to `lib/utils/prayerIcons.tsx`)
 
 ---
