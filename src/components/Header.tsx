@@ -1,36 +1,27 @@
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { MapPin, Loader2, Clock, Calendar, HelpCircle } from 'lucide-react'
+import { MapPin, Loader2, Clock, Calendar, HelpCircle, Bell, BellOff } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { AppInfoModal } from './AppInfoModal'
 import { ThemeToggleButton, DistrictSelector } from '@/components/common'
 import { useLocation as useGeoLocation } from '@/hooks/useLocation'
+import { useLocationContext, useThemeContext, usePushNotificationContext } from '@/contexts'
 import { COUNTRY_NAME } from '@/lib/constants/appConstants'
-import type { District } from '@/lib/data/types'
 
-interface HeaderProps {
-  districts: District[]
-  selectedDistrict: string
-  onDistrictChange: (value: string) => void
-  isDark: boolean
-  onThemeToggle: () => void
-}
-
-export function Header({
-  districts,
-  selectedDistrict,
-  onDistrictChange,
-  isDark,
-  onThemeToggle,
-}: HeaderProps) {
+export function Header() {
   const { detectLocation, isDetecting } = useGeoLocation()
   const [showInfo, setShowInfo] = useState(false)
   const location = useLocation()
 
+  // Use contexts
+  const { districts, selectedDistrict, setSelectedDistrict } = useLocationContext()
+  const { isDark, toggleTheme } = useThemeContext()
+  const { isEnabled: pushEnabled, openEnableModal, disable: disablePush } = usePushNotificationContext()
+
   const handleDetectLocation = async () => {
     const district = await detectLocation()
     if (district) {
-      onDistrictChange(district)
+      setSelectedDistrict(district)
     }
   }
 
@@ -102,11 +93,29 @@ export function Header({
           <DistrictSelector
             districts={districts}
             value={selectedDistrict}
-            onChange={onDistrictChange}
+            onChange={setSelectedDistrict}
             size="default"
           />
 
-          <ThemeToggleButton isDark={isDark} onToggle={onThemeToggle} />
+          <ThemeToggleButton isDark={isDark} onToggle={toggleTheme} />
+
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={pushEnabled ? disablePush : openEnableModal}
+            className={`h-7 w-7 sm:h-8 sm:w-8 transition-colors ${
+              pushEnabled
+                ? 'text-primary hover:text-primary/80'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+            title={pushEnabled ? 'Disable notifications' : 'Enable notifications'}
+          >
+            {pushEnabled ? (
+              <Bell className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            ) : (
+              <BellOff className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            )}
+          </Button>
 
           <Button
             variant="ghost"

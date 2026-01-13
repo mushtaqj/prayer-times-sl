@@ -1,37 +1,30 @@
-import {useEffect, useState} from 'react'
-import {Navigate, Route, Routes, useLocation} from 'react-router-dom'
-import {Header} from '@/components/Header'
-import {MobileNav} from '@/components/MobileNav'
-import {LandingPage} from '@/components/LandingPage'
-import {DailyView} from '@/components/DailyView'
-import {WeekView} from '@/components/WeekView'
-import {MonthView} from '@/components/MonthView'
-import {HijriCalendarView} from '@/components/HijriCalendarView'
-import {AdminPage} from '@/components/AdminPage'
-import {ViewSwitcher} from '@/components/ViewSwitcher'
-import {ActionBanner} from '@/components/ActionBanner'
-import {useTheme} from '@/hooks/useTheme'
-import {useAlarms} from '@/hooks/useAlarms'
-import {usePrayerTimes} from '@/hooks/usePrayerTimes'
-import {getStorageString, setStorageString} from '@/lib/utils/storage'
-import {COUNTRY_NAME} from '@/lib/constants/appConstants'
-import {Bell, Download} from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
+import { Header } from '@/components/Header'
+import { MobileNav } from '@/components/MobileNav'
+import { LandingPage } from '@/components/LandingPage'
+import { DailyView } from '@/components/DailyView'
+import { WeekView } from '@/components/WeekView'
+import { MonthView } from '@/components/MonthView'
+import { HijriCalendarView } from '@/components/HijriCalendarView'
+import { AdminPage } from '@/components/AdminPage'
+import { ViewSwitcher } from '@/components/ViewSwitcher'
+import { ActionBanner } from '@/components/ActionBanner'
+import { useLocationContext, useThemeContext } from '@/contexts'
+import { useAlarms } from '@/hooks/useAlarms'
+import { usePrayerTimes } from '@/hooks/usePrayerTimes'
+import { COUNTRY_NAME } from '@/lib/constants/appConstants'
+import { Bell, Download } from 'lucide-react'
 
 function App() {
-  const [selectedDistrict, setSelectedDistrict] = useState(() => {
-    return getStorageString('selectedDistrict', 'colombo')
-  })
   const [deferredPrompt, setDeferredPrompt] = useState<Event | null>(null)
   const [showInstallBanner, setShowInstallBanner] = useState(false)
 
   const location = useLocation()
-  const { isDark, toggleTheme } = useTheme()
+  const { selectedDistrict, locationName } = useLocationContext()
+  const { isDark, toggleTheme } = useThemeContext()
   const { alarms, toggleAlarm, requestNotificationPermission, hasPermission, scheduleNotifications } = useAlarms()
-  const { districts, todayPrayers, weekPrayers, getMonthPrayers, currentPrayer, nextPrayer } = usePrayerTimes(selectedDistrict)
-
-  useEffect(() => {
-    setStorageString('selectedDistrict', selectedDistrict)
-  }, [selectedDistrict])
+  const { todayPrayers, weekPrayers, getMonthPrayers, currentPrayer, nextPrayer } = usePrayerTimes(selectedDistrict)
 
   // PWA install prompt
   useEffect(() => {
@@ -66,9 +59,6 @@ function App() {
   const handleEnableNotifications = async () => {
     await requestNotificationPermission()
   }
-
-  // Get location name from selected district
-  const locationName = districts.find(d => d.id === selectedDistrict)?.name || 'Colombo'
 
   // Determine if we're on the home page or admin page
   const isHomePage = location.pathname === '/'
@@ -105,24 +95,10 @@ function App() {
     <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
       <div className="max-w-md md:max-w-4xl mx-auto min-h-screen flex flex-col shadow-2xl shadow-black/5 bg-card/30 border-x border-border/50">
         {/* Hide header on home page */}
-        {!isHomePage && (
-          <Header
-            districts={districts}
-            selectedDistrict={selectedDistrict}
-            onDistrictChange={setSelectedDistrict}
-            isDark={isDark}
-            onThemeToggle={toggleTheme}
-          />
-        )}
+        {!isHomePage && <Header />}
 
         {/* Mobile Navigation - bottom tabs + hamburger menu */}
-        <MobileNav
-          districts={districts}
-          selectedDistrict={selectedDistrict}
-          onDistrictChange={setSelectedDistrict}
-          isDark={isDark}
-          onThemeToggle={toggleTheme}
-        />
+        <MobileNav />
 
         <main className="flex-1 flex flex-col relative">
           <Routes>

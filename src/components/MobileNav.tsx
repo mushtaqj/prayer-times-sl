@@ -1,36 +1,32 @@
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Menu, X, Clock, Calendar, MapPin, Loader2, HelpCircle } from 'lucide-react'
+import { Menu, X, Clock, Calendar, MapPin, Loader2, HelpCircle, Bell, BellOff } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { AppInfoModal } from './AppInfoModal'
 import { ThemeToggleButton, DistrictSelector } from '@/components/common'
 import { useLocation as useGeoLocation } from '@/hooks/useLocation'
-import type { District } from '@/lib/data/types'
+import { useLocationContext, useThemeContext, usePushNotificationContext } from '@/contexts'
 
-interface MobileNavProps {
-  districts: District[]
-  selectedDistrict: string
-  onDistrictChange: (value: string) => void
-  isDark: boolean
-  onThemeToggle: () => void
-}
-
-export function MobileNav({
-  districts,
-  selectedDistrict,
-  onDistrictChange,
-  isDark,
-  onThemeToggle,
-}: MobileNavProps) {
+export function MobileNav() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [showInfo, setShowInfo] = useState(false)
   const { detectLocation, isDetecting } = useGeoLocation()
   const location = useLocation()
 
+  // Use contexts
+  const { districts, selectedDistrict, setSelectedDistrict } = useLocationContext()
+  const { isDark, toggleTheme } = useThemeContext()
+  const {
+    isEnabled: pushEnabled,
+    isSupported: pushSupported,
+    openEnableModal,
+    disable: disablePush,
+  } = usePushNotificationContext()
+
   const handleDetectLocation = async () => {
     const district = await detectLocation()
     if (district) {
-      onDistrictChange(district)
+      setSelectedDistrict(district)
       setMenuOpen(false)
     }
   }
@@ -117,7 +113,7 @@ export function MobileNav({
                   districts={districts}
                   value={selectedDistrict}
                   onChange={(value) => {
-                    onDistrictChange(value)
+                    setSelectedDistrict(value)
                     setMenuOpen(false)
                   }}
                   size="full"
@@ -127,8 +123,39 @@ export function MobileNav({
               {/* Appearance Section */}
               <div className="space-y-3">
                 <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Appearance</h3>
-                <ThemeToggleButton isDark={isDark} onToggle={onThemeToggle} showLabel />
+                <ThemeToggleButton isDark={isDark} onToggle={toggleTheme} showLabel />
               </div>
+
+              {/* Notifications Section */}
+              {pushSupported && (
+                <div className="space-y-3">
+                  <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Notifications</h3>
+                  <Button
+                    variant={pushEnabled ? 'default' : 'outline'}
+                    onClick={() => {
+                      if (pushEnabled) {
+                        disablePush()
+                      } else {
+                        openEnableModal()
+                        setMenuOpen(false)
+                      }
+                    }}
+                    className="w-full justify-start gap-2"
+                  >
+                    {pushEnabled ? (
+                      <>
+                        <Bell className="w-4 h-4" />
+                        Notifications Enabled
+                      </>
+                    ) : (
+                      <>
+                        <BellOff className="w-4 h-4" />
+                        Enable Notifications
+                      </>
+                    )}
+                  </Button>
+                </div>
+              )}
 
               {/* Help Section */}
               <div className="space-y-3">

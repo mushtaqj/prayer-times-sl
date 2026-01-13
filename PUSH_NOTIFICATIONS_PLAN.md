@@ -21,8 +21,8 @@ Deliver prayer time notifications even when the app is fully closed, on both And
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
-│                                                                      │
-│  USER DEVICE (PWA)                    FIREBASE                       │
+│                                                                     │
+│  USER DEVICE (PWA)                    FIREBASE                      │
 │  ┌─────────────────────┐              ┌─────────────────────┐       │
 │  │                     │   Subscribe  │                     │       │
 │  │  1. User selects    │ ──────────►  │  FCM stores the     │       │
@@ -45,7 +45,38 @@ Deliver prayer time notifications even when the app is fully closed, on both And
 │  │  (even if closed)   │              │  topic "zone-XX"    │       │
 │  │                     │              │                     │       │
 │  └─────────────────────┘              └─────────────────────┘       │
-│                                                                      │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Security Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│  WHY FIREBASE CLOUD FUNCTIONS (not Vercel API)?                     │
+│                                                                     │
+│  PROBLEM with HTTP endpoint:                                        │
+│  ┌─────────────────────────────────────────────────────────────┐    │
+│  │  Cloud Scheduler ──HTTP──► Vercel API ──► FCM               │    │
+│  │                    ↑                                        │    │
+│  │         (exposed endpoint = can be abused)                  │    │
+│  └─────────────────────────────────────────────────────────────┘    │
+│                                                                     │
+│  SOLUTION with Pub/Sub trigger:                                     │
+│  ┌─────────────────────────────────────────────────────────────┐    │
+│  │  Cloud Scheduler ──Pub/Sub──► Cloud Function ──► FCM        │    │
+│  │                    ↑                                        │    │
+│  │         (internal trigger, NO HTTP endpoint)                │    │
+│  └─────────────────────────────────────────────────────────────┘    │
+│                                                                     │
+│  Benefits:                                                          │
+│  - No HTTP endpoint exposed to the internet                         │
+│  - Cannot be discovered or abused                                   │
+│  - Cannot be DDoS'd to spam notifications                           │
+│  - Direct FCM integration (same Firebase project)                   │
+│                                                                     │
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -57,8 +88,8 @@ Users subscribe to their zone's topic. All prayers are sent to everyone in the z
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
-│  TOPICS (13 total - one per zone)                                    │
-│                                                                      │
+│  TOPICS (13 total - one per zone)                                   │
+│                                                                     │
 │  zone-01: Colombo, Gampaha, Kalutara                                │
 │  zone-02: Jaffna, Nallur                                            │
 │  zone-03: Kilinochchi, Mullaitivu, Vavuniya                         │
@@ -72,7 +103,7 @@ Users subscribe to their zone's topic. All prayers are sent to everyone in the z
 │  zone-11: Kegalle, Ratnapura                                        │
 │  zone-12: Galle, Matara                                             │
 │  zone-13: Hambantota                                                │
-│                                                                      │
+│                                                                     │
 │  Total: 26 districts → 13 zones → 13 topics                         │
 └─────────────────────────────────────────────────────────────────────┘
 ```
@@ -117,24 +148,90 @@ The function checks if current time matches any prayer for any zone. If not with
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
-│  FIREBASE FREE TIER USAGE                                            │
-│                                                                      │
-│  Cloud Functions Invocations:                                        │
+│  FIREBASE FREE TIER USAGE                                           │
+│                                                                     │
+│  Cloud Functions Invocations:                                       │
 │    - Daily runs: 1,020                                              │
 │    - Monthly runs: ~31,000                                          │
 │    - Free tier limit: 2,000,000/month                               │
-│    - Usage: 1.5% of free tier ✅                                     │
-│                                                                      │
-│  FCM Messages:                                                       │
-│    - Unlimited (no cost) ✅                                          │
-│                                                                      │
-│  Cloud Scheduler:                                                    │
+│    - Usage: 1.5% of free tier ✅                                    │
+│                                                                     │
+│  FCM Messages:                                                      │
+│    - Unlimited (no cost) ✅                                         │
+│                                                                     │
+│  Cloud Scheduler:                                                   │
 │    - Free tier: 3 jobs                                              │
 │    - We need: 1 job                                                 │
-│    - Usage: Within free tier ✅                                      │
-│                                                                      │
-│  TOTAL COST: $0/month                                                │
+│    - Usage: Within free tier ✅                                     │
+│                                                                     │
+│  TOTAL COST: $0/month                                               │
 └─────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Implementation Status
+
+### Phase 1: Firebase Setup ✅
+- [x] Firebase project created (acju-prayer-time-sl)
+- [x] Cloud Messaging (FCM) enabled
+- [x] VAPID keys generated
+- [x] Firebase config added to app
+
+### Phase 2: Backend - Cloud Functions ✅
+- [x] Created `functions/` folder with scheduled function
+- [x] Pub/Sub triggered function (no HTTP endpoint)
+- [x] Prayer times data copied via predeploy script
+- [x] Subscribe/unsubscribe API routes (Vercel)
+
+### Phase 3: Frontend Integration ✅
+- [x] Firebase SDK added to PWA
+- [x] Service worker configured for push (`firebase-messaging-sw.js`)
+- [x] Notification enable modal with district selector
+- [x] Location change prompt banner
+- [x] Subscribe/unsubscribe logic
+- [x] iOS installation detection & guide
+
+### Phase 4: Deployment (Pending)
+- [ ] Deploy Cloud Functions (`firebase deploy --only functions`)
+- [ ] Test notifications end-to-end
+- [ ] Test on Android Chrome (installed PWA)
+- [ ] Test on iOS Safari (installed PWA)
+
+---
+
+## Project Structure
+
+```
+prayer-times-app/
+├── src/
+│   ├── data/
+│   │   └── prayerTimes.json          # Source of truth for prayer times
+│   ├── lib/
+│   │   └── firebase/
+│   │       ├── config.ts             # Firebase app initialization
+│   │       ├── messaging.ts          # Push notification utilities
+│   │       └── index.ts              # Module exports
+│   ├── hooks/
+│   │   └── usePushNotifications.ts   # React hook for notifications
+│   └── components/
+│       └── notifications/
+│           ├── NotificationEnableModal.tsx
+│           ├── LocationChangePrompt.tsx
+│           └── index.ts
+├── api/                               # Vercel API routes
+│   └── notifications/
+│       ├── subscribe.js              # Subscribe to FCM topic
+│       └── unsubscribe.js            # Unsubscribe from FCM topic
+├── functions/                         # Firebase Cloud Functions
+│   ├── index.js                      # Scheduled notification function
+│   ├── package.json
+│   └── data/                         # Copied from src/data/ on deploy
+│       └── prayerTimes.json
+├── public/
+│   └── firebase-messaging-sw.js      # Service worker for background push
+├── firebase.json                      # Firebase configuration
+└── .firebaserc                        # Firebase project reference
 ```
 
 ---
@@ -145,33 +242,20 @@ The function checks if current time matches any prayer for any zone. If not with
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
-│  TWO DIFFERENT CONCEPTS                                              │
-│                                                                      │
+│  TWO DIFFERENT CONCEPTS                                             │
+│                                                                     │
 │  1. VIEWING DISTRICT (can change freely)                            │
 │     - User browses prayer times for any district                    │
 │     - Stored in localStorage                                        │
 │     - NO subscription changes                                       │
-│                                                                      │
+│                                                                     │
 │  2. NOTIFICATION DISTRICT (rarely changes)                          │
 │     - User's "home" district for push notifications                 │
 │     - Only changes when user explicitly confirms                    │
 │     - Triggers subscribe/unsubscribe                                │
-│                                                                      │
+│                                                                     │
 └─────────────────────────────────────────────────────────────────────┘
 ```
-
-### localStorage Structure
-
-```typescript
-{
-  "viewingDistrict": "kandy",        // Can change anytime (no API call)
-  "notificationDistrict": "colombo", // Only changes on user confirmation
-  "notificationZone": "01",          // The subscribed FCM topic
-  "pushEnabled": true
-}
-```
-
----
 
 ### Flow 1: First-Time Notification Enable
 
@@ -179,36 +263,25 @@ When user taps the notification bell icon for the first time:
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
-│                                                                      │
 │   ┌─────────────────────────────────────────────────────────────┐   │
 │   │                                                             │   │
-│   │   🔔 Enable Prayer Notifications                           │   │
+│   │   🔔 Enable Prayer Notifications                            │   │
 │   │                                                             │   │
-│   │   You'll receive reminders 10 minutes before each prayer.  │   │
+│   │   You'll receive notifications for all 5 daily prayers      │   │
+│   │   based on the selected location's prayer times.            │   │
 │   │                                                             │   │
 │   │   Notification Location:                                    │   │
-│   │   ┌─────────────────────────────────────┐                  │   │
-│   │   │  Colombo (Zone 01)              ▼   │                  │   │
-│   │   └─────────────────────────────────────┘                  │   │
+│   │   ┌─────────────────────────────────────┐                   │   │
+│   │   │  Colombo (Zone 01)              ▼   │                   │   │
+│   │   └─────────────────────────────────────┘                   │   │
 │   │                                                             │   │
-│   │   You can change this anytime.                             │   │
-│   │                                                             │   │
-│   │   ┌──────────────┐    ┌──────────────┐                     │   │
-│   │   │    Cancel    │    │    Enable    │                     │   │
-│   │   └──────────────┘    └──────────────┘                     │   │
+│   │   ┌──────────────┐    ┌────────────────────┐                │   │
+│   │   │    Cancel    │    │ Enable Notifications│               │   │
+│   │   └──────────────┘    └────────────────────┘                │   │
 │   │                                                             │   │
 │   └─────────────────────────────────────────────────────────────┘   │
-│                                                                      │
 └─────────────────────────────────────────────────────────────────────┘
 ```
-
-**Logic:**
-1. Show modal with district selector (defaults to currently viewing district)
-2. User confirms → Request browser notification permission
-3. If granted → Subscribe to zone topic, save to localStorage
-4. Show success toast
-
----
 
 ### Flow 2: Browsing Different District (Subtle Prompt)
 
@@ -216,28 +289,18 @@ When user changes to a district in a **different zone** while notifications are 
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
-│                                                                      │
 │  ┌─────────────────────────────────────────────────────────────┐    │
-│  │                    Prayer Times - Kandy                     │    │
-│  │  ─────────────────────────────────────────────────────────  │    │
 │  │                                                             │    │
-│  │  Fajr      4:52 AM                                         │    │
-│  │  Sunrise   6:10 AM                                         │    │
-│  │  Dhuhr     12:15 PM                                        │    │
-│  │  ...                                                        │    │
+│  │  📍 Update notification location?                           │    │
 │  │                                                             │    │
-│  │  ┌─────────────────────────────────────────────────────┐   │    │
-│  │  │                                                     │   │    │
-│  │  │  📍 Update notification location to Kandy?         │   │    │
-│  │  │                                                     │   │    │
-│  │  │  ┌─────────┐  ┌─────────────┐           ┌─────┐    │   │    │
-│  │  │  │   Yes   │  │  Not now    │           │  ✕  │    │   │    │
-│  │  │  └─────────┘  └─────────────┘           └─────┘    │   │    │
-│  │  │                                                     │   │    │
-│  │  └─────────────────────────────────────────────────────┘   │    │
+│  │  You're viewing Kandy but receiving notifications           │    │
+│  │  for Colombo                                                │    │
+│  │                                                             │    │
+│  │  ┌─────────────┐  ┌─────────────┐              ┌─────┐      │    │
+│  │  │ Keep current│  │  Use Kandy  │              │  ✕  │      │    │
+│  │  └─────────────┘  └─────────────┘              └─────┘      │    │
 │  │                                                             │    │
 │  └─────────────────────────────────────────────────────────────┘    │
-│                                                                      │
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -250,362 +313,115 @@ When user changes to a district in a **different zone** while notifications are 
 - Same zone (e.g., Colombo → Gampaha, both zone-01)
 - User already dismissed for this session
 
-**User actions:**
-- **Yes** → Unsubscribe old zone, subscribe new zone, update localStorage, show toast
-- **Not now** → Dismiss banner, continue browsing (no subscription change)
-- **✕** → Dismiss and don't show again this session
-
----
-
-### Flow 3: Complete User Scenarios
-
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│  SCENARIO 1: First-time user                                         │
-│                                                                      │
-│  1. Opens app → Sees Colombo times (default)                        │
-│  2. Taps bell icon → Modal: "Enable notifications for Colombo?"     │
-│  3. Confirms → Browser permission prompt → Subscribed to zone-01    │
-│  4. Gets notifications for Colombo prayers                          │
-│                                                                      │
-└─────────────────────────────────────────────────────────────────────┘
-
-┌─────────────────────────────────────────────────────────────────────┐
-│  SCENARIO 2: User browses another district (SAME zone)              │
-│                                                                      │
-│  1. User (Colombo/zone-01 notifications) taps "Gampaha"             │
-│  2. Sees Gampaha prayer times                                       │
-│  3. NO prompt shown (Gampaha is also zone-01)                       │
-│  4. Notifications unchanged - same zone, same times                 │
-│                                                                      │
-└─────────────────────────────────────────────────────────────────────┘
-
-┌─────────────────────────────────────────────────────────────────────┐
-│  SCENARIO 3: User browses another district (DIFFERENT zone)         │
-│                                                                      │
-│  1. User (Colombo/zone-01 notifications) taps "Kandy"               │
-│  2. Sees Kandy prayer times                                         │
-│  3. Subtle banner: "Update notification location to Kandy?"         │
-│                                                                      │
-│  4a. User taps "Yes":                                               │
-│      → Unsubscribe from zone-01                                     │
-│      → Subscribe to zone-07                                         │
-│      → Toast: "Notifications updated to Kandy"                      │
-│                                                                      │
-│  4b. User taps "Not now":                                           │
-│      → Banner dismissed                                             │
-│      → Still viewing Kandy times                                    │
-│      → Still getting Colombo notifications                          │
-│                                                                      │
-│  4c. User taps "✕":                                                 │
-│      → Banner dismissed                                             │
-│      → Don't show again this session                                │
-│                                                                      │
-└─────────────────────────────────────────────────────────────────────┘
-
-┌─────────────────────────────────────────────────────────────────────┐
-│  SCENARIO 4: User disables notifications                             │
-│                                                                      │
-│  1. User taps bell icon (currently enabled)                         │
-│  2. Confirmation: "Disable notifications?"                          │
-│  3. Confirms → Unsubscribe from topic                               │
-│  4. No more prompts when browsing different districts               │
-│                                                                      │
-└─────────────────────────────────────────────────────────────────────┘
-```
-
----
-
-### Flow Logic Implementation
-
-```typescript
-// Check if location change prompt should be shown
-function shouldShowLocationChangePrompt(
-  newDistrict: string,
-  notificationZone: string | null,
-  pushEnabled: boolean,
-  dismissedThisSession: boolean
-): boolean {
-  if (!pushEnabled) return false
-  if (!notificationZone) return false
-  if (dismissedThisSession) return false
-
-  const newZone = getZoneForDistrict(newDistrict)
-  return newZone !== notificationZone
-}
-
-// Handle district change (viewing)
-function handleDistrictChange(newDistrict: string) {
-  // Always update viewing district
-  localStorage.setItem('viewingDistrict', newDistrict)
-
-  // Check if we should prompt for notification location change
-  const notificationZone = localStorage.getItem('notificationZone')
-  const pushEnabled = localStorage.getItem('pushEnabled') === 'true'
-
-  if (shouldShowLocationChangePrompt(newDistrict, notificationZone, pushEnabled, dismissedThisSession)) {
-    showLocationChangePrompt(newDistrict)
-  }
-}
-
-// User confirms location change
-async function confirmLocationChange(newDistrict: string) {
-  const oldZone = localStorage.getItem('notificationZone')
-  const newZone = getZoneForDistrict(newDistrict)
-
-  try {
-    // Update FCM subscription
-    if (oldZone) {
-      await unsubscribeFromTopic(`zone-${oldZone}`)
-    }
-    await subscribeToTopic(`zone-${newZone}`)
-
-    // Update localStorage
-    localStorage.setItem('notificationDistrict', newDistrict)
-    localStorage.setItem('notificationZone', newZone)
-
-    showToast(`Notifications updated to ${newDistrict}`)
-  } catch (error) {
-    showToast('Failed to update notifications', 'error')
-  }
-}
-```
-
----
-
-## Implementation Details
-
-### 1. Client-Side (PWA)
-
-**Subscribe to notifications:**
-```typescript
-import { getMessaging, getToken } from 'firebase/messaging'
-
-async function subscribeToNotifications(zoneId: string) {
-  const messaging = getMessaging()
-
-  // Get permission
-  const permission = await Notification.requestPermission()
-  if (permission !== 'granted') {
-    throw new Error('Notification permission denied')
-  }
-
-  // Get FCM token
-  const token = await getToken(messaging, {
-    vapidKey: 'YOUR_VAPID_PUBLIC_KEY'
-  })
-
-  // Subscribe to zone topic via Cloud Function
-  await fetch('/api/subscribe', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ token, topic: `zone-${zoneId}` })
-  })
-}
-
-async function unsubscribeFromNotifications(zoneId: string) {
-  const messaging = getMessaging()
-  const token = await getToken(messaging)
-
-  await fetch('/api/unsubscribe', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ token, topic: `zone-${zoneId}` })
-  })
-}
-```
-
-**Service Worker (push handler):**
-```typescript
-// sw.js or via vite-plugin-pwa
-self.addEventListener('push', (event) => {
-  const data = event.data?.json() ?? {}
-
-  const options = {
-    body: data.body,
-    icon: '/icon-192x192.png',
-    badge: '/badge-72x72.png',
-    tag: `prayer-${data.prayer}`,      // Prevents duplicate notifications
-    renotify: true,
-    requireInteraction: true,
-    vibrate: [200, 100, 200],
-    data: { url: '/' }
-  }
-
-  event.waitUntil(
-    self.registration.showNotification(data.title, options)
-  )
-})
-
-self.addEventListener('notificationclick', (event) => {
-  event.notification.close()
-  event.waitUntil(
-    clients.openWindow(event.notification.data.url || '/')
-  )
-})
-```
-
-### 2. Cloud Functions (Backend)
-
-**Subscribe/Unsubscribe endpoints:**
-```typescript
-import * as admin from 'firebase-admin'
-
-// POST /api/subscribe
-export async function subscribe(req, res) {
-  const { token, topic } = req.body
-  await admin.messaging().subscribeToTopic(token, topic)
-  res.json({ success: true })
-}
-
-// POST /api/unsubscribe
-export async function unsubscribe(req, res) {
-  const { token, topic } = req.body
-  await admin.messaging().unsubscribeFromTopic(token, topic)
-  res.json({ success: true })
-}
-```
-
-**Scheduled notification sender:**
-```typescript
-import * as functions from 'firebase-functions'
-import * as admin from 'firebase-admin'
-
-// Prayer times data (imported from your existing data)
-import prayerTimesData from './prayerTimes.json'
-
-const ZONES = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13']
-const REMINDER_MINUTES = 10
-
-// Single cron: runs every minute from 4 AM to 8 PM
-export const checkPrayerTimes = functions.pubsub
-  .schedule('* 4-20 * * *')
-  .timeZone('Asia/Colombo')
-  .onRun(async (context) => {
-    const now = new Date()
-    const currentHHMM = formatTime(now) // e.g., "05:23"
-    const month = now.getMonth() + 1
-    const day = now.getDate()
-
-    for (const zone of ZONES) {
-      const todayTimes = getPrayerTimesForZone(zone, month, day)
-
-      for (const [prayer, time] of Object.entries(todayTimes)) {
-        if (prayer === 'day') continue // Skip the 'day' field
-
-        const reminderTime = subtractMinutes(time, REMINDER_MINUTES)
-
-        if (reminderTime === currentHHMM) {
-          await sendNotification(zone, prayer, REMINDER_MINUTES)
-        }
-      }
-    }
-  })
-
-async function sendNotification(zone: string, prayer: string, minutesBefore: number) {
-  const prayerName = capitalize(prayer)
-
-  await admin.messaging().sendToTopic(`zone-${zone}`, {
-    notification: {
-      title: `${prayerName} Prayer`,
-      body: `${prayerName} is in ${minutesBefore} minutes`
-    },
-    data: {
-      prayer: prayer,
-      zone: zone
-    }
-  })
-
-  console.log(`Sent ${prayer} notification to zone-${zone}`)
-}
-```
-
 ---
 
 ## iOS-Specific Requirements
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
-│  iOS PUSH NOTIFICATION REQUIREMENTS                                  │
-│                                                                      │
+│  iOS PUSH NOTIFICATION REQUIREMENTS                                 │
+│                                                                     │
 │  1. iOS 16.4+ required (Safari 16.4+)                               │
-│                                                                      │
+│                                                                     │
 │  2. PWA MUST be installed to home screen                            │
 │     - Push does NOT work in Safari browser tab                      │
 │     - Only works when opened from home screen icon                  │
-│                                                                      │
-│  3. User must manually enable notifications                         │
-│     - Settings > [App Name] > Notifications > Allow                 │
-│                                                                      │
+│                                                                     │
+│  3. User must grant notification permission                         │
+│                                                                     │
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
-**iOS Detection & User Guidance:**
-```typescript
-const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
-const isStandalone = window.matchMedia('(display-mode: standalone)').matches
-                     || (navigator as any).standalone === true
+The app detects iOS and shows installation instructions:
+1. Tap the **Share** button in Safari
+2. Scroll down and tap **Add to Home Screen**
+3. Tap **Add** in the top right
+4. Open the app from your home screen
 
-function getIOSInstallStatus() {
-  if (!isIOS) return 'not-ios'
-  if (isStandalone) return 'installed'
-  return 'not-installed'
-}
+---
 
-// Show appropriate guidance based on status
-const status = getIOSInstallStatus()
-if (status === 'not-installed') {
-  showIOSInstallInstructions()
-  // "To receive notifications:
-  //  1. Tap the Share button (square with arrow)
-  //  2. Scroll down and tap 'Add to Home Screen'
-  //  3. Open the app from your home screen
-  //  4. Enable notifications when prompted
-  //  5. If needed, go to Settings > Prayer Times > Notifications"
-}
+## Deployment Instructions
+
+### 1. Set Environment Variables
+
+**Vercel (for subscribe/unsubscribe APIs):**
+```
+FIREBASE_SERVICE_ACCOUNT_KEY={"type":"service_account",...}
+```
+
+**Firebase (set via CLI or Console):**
+No additional env vars needed - uses default credentials.
+
+### 2. Deploy Cloud Functions
+
+```bash
+# Install Firebase CLI if needed
+npm install -g firebase-tools
+
+# Login to Firebase
+firebase login
+
+# Navigate to project root
+cd prayer-times-app
+
+# Install function dependencies
+cd functions && npm install && cd ..
+
+# Deploy functions
+firebase deploy --only functions
+```
+
+The predeploy script automatically copies `prayerTimes.json` to `functions/data/`.
+
+### 3. Verify Deployment
+
+```bash
+# View function logs
+firebase functions:log
+
+# Check Cloud Scheduler in Firebase Console
+# Console > Functions > sendPrayerNotifications
 ```
 
 ---
 
-## Implementation Phases
+## API Reference
 
-### Phase 1: Firebase Setup
-```
-□ 1.1 Create Firebase project
-□ 1.2 Enable Cloud Messaging (FCM)
-□ 1.3 Generate VAPID keys
-□ 1.4 Set up Cloud Functions
-□ 1.5 Configure Cloud Scheduler (single job: "* 4-20 * * *")
-```
+### Vercel API Routes
 
-### Phase 2: Backend (Cloud Functions)
-```
-□ 2.1 Create subscribe/unsubscribe endpoints
-□ 2.2 Import prayer times data
-□ 2.3 Implement scheduled notification function
-□ 2.4 Deploy and test with single zone
-□ 2.5 Test all 13 zones
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/api/notifications/subscribe` | POST | Subscribe device to zone topic |
+| `/api/notifications/unsubscribe` | POST | Unsubscribe device from zone topic |
+
+**Subscribe Request:**
+```json
+{
+  "token": "fcm-device-token",
+  "topic": "zone-01"
+}
 ```
 
-### Phase 3: Frontend Integration
-```
-□ 3.1 Add Firebase SDK to PWA
-□ 3.2 Configure service worker for push
-□ 3.3 Create notification enable modal (with district selector)
-□ 3.4 Create location change prompt banner
-□ 3.5 Implement subscribe/unsubscribe logic
-□ 3.6 Handle zone changes on user confirmation
-□ 3.7 Add iOS installation detection & guide
-```
+### Firebase Cloud Function
 
-### Phase 4: Testing
-```
-□ 4.1 Test on Android Chrome (installed PWA)
-□ 4.2 Test on Android Chrome (browser tab)
-□ 4.3 Test on iOS Safari (installed PWA)
-□ 4.4 Test notification timing accuracy
-□ 4.5 Test zone switching flow
-□ 4.6 Test "Not now" and dismiss behaviors
+| Function | Trigger | Schedule |
+|----------|---------|----------|
+| `sendPrayerNotifications` | Pub/Sub | `* 4-20 * * *` (Asia/Colombo) |
+
+This function is NOT callable via HTTP - it's triggered internally by Cloud Scheduler.
+
+---
+
+## localStorage Structure
+
+```typescript
+{
+  "selectedDistrict": "kandy",        // Viewing district (can change freely)
+  "pushEnabled": "true",              // Push notifications enabled
+  "notificationDistrict": "colombo",  // District for notifications
+  "notificationZone": "01",           // FCM topic subscribed to
+  "fcmToken": "..."                   // Device FCM token
+}
 ```
 
 ---
@@ -616,19 +432,10 @@ if (status === 'not-installed') {
 |--------|----------|
 | Platform | Firebase (FCM + Cloud Functions) |
 | Topics | 13 (one per zone, all prayers included) |
-| Cron Strategy | Single job "* 4-20 * * *" (1,020 runs/day) |
+| Notification Trigger | Pub/Sub scheduled function (secure, no HTTP) |
+| Cron Strategy | Single job `* 4-20 * * *` (1,020 runs/day) |
 | Cost | $0 (within free tier) |
 | User Login | Not required |
 | iOS Support | Yes (requires PWA install + iOS 16.4+) |
 | Android Support | Yes (PWA or browser) |
 | Location UX | Subtle prompt when browsing different zone |
-
----
-
-## Next Steps
-
-1. **Create Firebase project** - Set up FCM and Cloud Functions
-2. **Start Phase 1** - Firebase setup and configuration
-3. **Design UI components** - Enable modal, location change banner
-
-Ready to begin implementation?
