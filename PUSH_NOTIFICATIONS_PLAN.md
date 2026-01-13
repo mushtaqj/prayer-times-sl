@@ -12,7 +12,7 @@ Deliver prayer time notifications even when the app is fully closed, on both And
 - No Google login required for users (just notification permission)
 - Topics feature = no database needed for subscriptions
 - FCM handles fan-out (1 API call delivers to all subscribers)
-- Free tier covers our usage (0.5% of limit)
+- Free tier covers our usage
 - Works on Android PWA and iOS PWA (16.4+)
 
 ---
@@ -77,11 +77,6 @@ Users subscribe to their zone's topic. All prayers are sent to everyone in the z
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
-**User Flow:**
-1. Select district → App maps to zone → Subscribe to `zone-XX` topic
-2. Change district → Unsubscribe old zone, subscribe new zone
-3. Disable notifications → Unsubscribe from topic
-
 ---
 
 ## Prayer Time Ranges (Verified from Data)
@@ -99,20 +94,22 @@ Users subscribe to their zone's topic. All prayers are sent to everyone in the z
 
 ---
 
-## Cron Windows (With 10min Reminder + 1min Buffer)
+## Cron Strategy
 
-Crons only run during these windows, not 24/7.
+**Single Cloud Scheduler job** running every minute from 4 AM to 8 PM:
 
-| Prayer   | Cron Start | Cron End  | Duration | Cron Expression |
-|----------|------------|-----------|----------|-----------------|
-| Fajr     | 4:10 AM    | 5:14 AM   | 64 min   | `10-59 4 * * *` + `0-14 5 * * *` |
-| Sunrise  | 5:34 AM    | 6:34 AM   | 60 min   | `34-59 5 * * *` + `0-34 6 * * *` |
-| Dhuhr    | 11:37 AM   | 12:28 PM  | 51 min   | `37-59 11 * * *` + `0-28 12 * * *` |
-| Asr      | 2:55 PM    | 3:49 PM   | 54 min   | `55-59 14 * * *` + `0-49 15 * * *` |
-| Maghrib  | 5:32 PM    | 6:38 PM   | 66 min   | `32-59 17 * * *` + `0-38 18 * * *` |
-| Isha     | 6:43 PM    | 7:54 PM   | 71 min   | `43-59 18 * * *` + `0-54 19 * * *` |
+```
+Schedule: "* 4-20 * * *" (every minute, 4:00 AM - 8:59 PM)
+Timezone: Asia/Colombo
+Runs: 1,020 times/day
+```
 
-**Total: 366 cron runs/day** (vs 1440 if running every minute 24/7)
+The function checks if current time matches any prayer for any zone. If not within a prayer window, it exits immediately (minimal cost).
+
+**Why this approach:**
+- Uses only 1 Cloud Scheduler job (free tier allows 3)
+- Simple cron expression
+- Function handles the prayer window logic internally
 
 ---
 
@@ -123,21 +120,255 @@ Crons only run during these windows, not 24/7.
 │  FIREBASE FREE TIER USAGE                                            │
 │                                                                      │
 │  Cloud Functions Invocations:                                        │
-│    - Daily runs: 366                                                 │
-│    - Monthly runs: ~11,000                                           │
-│    - Free tier limit: 2,000,000/month                                │
-│    - Usage: 0.55% of free tier ✅                                    │
+│    - Daily runs: 1,020                                              │
+│    - Monthly runs: ~31,000                                          │
+│    - Free tier limit: 2,000,000/month                               │
+│    - Usage: 1.5% of free tier ✅                                     │
 │                                                                      │
 │  FCM Messages:                                                       │
 │    - Unlimited (no cost) ✅                                          │
 │                                                                      │
 │  Cloud Scheduler:                                                    │
-│    - Free tier: 3 jobs                                               │
-│    - We need: 1 job (or 6 for separate prayers)                      │
+│    - Free tier: 3 jobs                                              │
+│    - We need: 1 job                                                 │
 │    - Usage: Within free tier ✅                                      │
 │                                                                      │
 │  TOTAL COST: $0/month                                                │
 └─────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## User Experience Flow
+
+### Key Concepts
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│  TWO DIFFERENT CONCEPTS                                              │
+│                                                                      │
+│  1. VIEWING DISTRICT (can change freely)                            │
+│     - User browses prayer times for any district                    │
+│     - Stored in localStorage                                        │
+│     - NO subscription changes                                       │
+│                                                                      │
+│  2. NOTIFICATION DISTRICT (rarely changes)                          │
+│     - User's "home" district for push notifications                 │
+│     - Only changes when user explicitly confirms                    │
+│     - Triggers subscribe/unsubscribe                                │
+│                                                                      │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### localStorage Structure
+
+```typescript
+{
+  "viewingDistrict": "kandy",        // Can change anytime (no API call)
+  "notificationDistrict": "colombo", // Only changes on user confirmation
+  "notificationZone": "01",          // The subscribed FCM topic
+  "pushEnabled": true
+}
+```
+
+---
+
+### Flow 1: First-Time Notification Enable
+
+When user taps the notification bell icon for the first time:
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                                                                      │
+│   ┌─────────────────────────────────────────────────────────────┐   │
+│   │                                                             │   │
+│   │   🔔 Enable Prayer Notifications                           │   │
+│   │                                                             │   │
+│   │   You'll receive reminders 10 minutes before each prayer.  │   │
+│   │                                                             │   │
+│   │   Notification Location:                                    │   │
+│   │   ┌─────────────────────────────────────┐                  │   │
+│   │   │  Colombo (Zone 01)              ▼   │                  │   │
+│   │   └─────────────────────────────────────┘                  │   │
+│   │                                                             │   │
+│   │   You can change this anytime.                             │   │
+│   │                                                             │   │
+│   │   ┌──────────────┐    ┌──────────────┐                     │   │
+│   │   │    Cancel    │    │    Enable    │                     │   │
+│   │   └──────────────┘    └──────────────┘                     │   │
+│   │                                                             │   │
+│   └─────────────────────────────────────────────────────────────┘   │
+│                                                                      │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+**Logic:**
+1. Show modal with district selector (defaults to currently viewing district)
+2. User confirms → Request browser notification permission
+3. If granted → Subscribe to zone topic, save to localStorage
+4. Show success toast
+
+---
+
+### Flow 2: Browsing Different District (Subtle Prompt)
+
+When user changes to a district in a **different zone** while notifications are enabled:
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                                                                      │
+│  ┌─────────────────────────────────────────────────────────────┐    │
+│  │                    Prayer Times - Kandy                     │    │
+│  │  ─────────────────────────────────────────────────────────  │    │
+│  │                                                             │    │
+│  │  Fajr      4:52 AM                                         │    │
+│  │  Sunrise   6:10 AM                                         │    │
+│  │  Dhuhr     12:15 PM                                        │    │
+│  │  ...                                                        │    │
+│  │                                                             │    │
+│  │  ┌─────────────────────────────────────────────────────┐   │    │
+│  │  │                                                     │   │    │
+│  │  │  📍 Update notification location to Kandy?         │   │    │
+│  │  │                                                     │   │    │
+│  │  │  ┌─────────┐  ┌─────────────┐           ┌─────┐    │   │    │
+│  │  │  │   Yes   │  │  Not now    │           │  ✕  │    │   │    │
+│  │  │  └─────────┘  └─────────────┘           └─────┘    │   │    │
+│  │  │                                                     │   │    │
+│  │  └─────────────────────────────────────────────────────┘   │    │
+│  │                                                             │    │
+│  └─────────────────────────────────────────────────────────────┘    │
+│                                                                      │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+**When to show this prompt:**
+- Notifications are enabled AND
+- User navigates to a district in a DIFFERENT zone than their notification zone
+
+**When NOT to show:**
+- Notifications disabled
+- Same zone (e.g., Colombo → Gampaha, both zone-01)
+- User already dismissed for this session
+
+**User actions:**
+- **Yes** → Unsubscribe old zone, subscribe new zone, update localStorage, show toast
+- **Not now** → Dismiss banner, continue browsing (no subscription change)
+- **✕** → Dismiss and don't show again this session
+
+---
+
+### Flow 3: Complete User Scenarios
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│  SCENARIO 1: First-time user                                         │
+│                                                                      │
+│  1. Opens app → Sees Colombo times (default)                        │
+│  2. Taps bell icon → Modal: "Enable notifications for Colombo?"     │
+│  3. Confirms → Browser permission prompt → Subscribed to zone-01    │
+│  4. Gets notifications for Colombo prayers                          │
+│                                                                      │
+└─────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────┐
+│  SCENARIO 2: User browses another district (SAME zone)              │
+│                                                                      │
+│  1. User (Colombo/zone-01 notifications) taps "Gampaha"             │
+│  2. Sees Gampaha prayer times                                       │
+│  3. NO prompt shown (Gampaha is also zone-01)                       │
+│  4. Notifications unchanged - same zone, same times                 │
+│                                                                      │
+└─────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────┐
+│  SCENARIO 3: User browses another district (DIFFERENT zone)         │
+│                                                                      │
+│  1. User (Colombo/zone-01 notifications) taps "Kandy"               │
+│  2. Sees Kandy prayer times                                         │
+│  3. Subtle banner: "Update notification location to Kandy?"         │
+│                                                                      │
+│  4a. User taps "Yes":                                               │
+│      → Unsubscribe from zone-01                                     │
+│      → Subscribe to zone-07                                         │
+│      → Toast: "Notifications updated to Kandy"                      │
+│                                                                      │
+│  4b. User taps "Not now":                                           │
+│      → Banner dismissed                                             │
+│      → Still viewing Kandy times                                    │
+│      → Still getting Colombo notifications                          │
+│                                                                      │
+│  4c. User taps "✕":                                                 │
+│      → Banner dismissed                                             │
+│      → Don't show again this session                                │
+│                                                                      │
+└─────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────┐
+│  SCENARIO 4: User disables notifications                             │
+│                                                                      │
+│  1. User taps bell icon (currently enabled)                         │
+│  2. Confirmation: "Disable notifications?"                          │
+│  3. Confirms → Unsubscribe from topic                               │
+│  4. No more prompts when browsing different districts               │
+│                                                                      │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+### Flow Logic Implementation
+
+```typescript
+// Check if location change prompt should be shown
+function shouldShowLocationChangePrompt(
+  newDistrict: string,
+  notificationZone: string | null,
+  pushEnabled: boolean,
+  dismissedThisSession: boolean
+): boolean {
+  if (!pushEnabled) return false
+  if (!notificationZone) return false
+  if (dismissedThisSession) return false
+
+  const newZone = getZoneForDistrict(newDistrict)
+  return newZone !== notificationZone
+}
+
+// Handle district change (viewing)
+function handleDistrictChange(newDistrict: string) {
+  // Always update viewing district
+  localStorage.setItem('viewingDistrict', newDistrict)
+
+  // Check if we should prompt for notification location change
+  const notificationZone = localStorage.getItem('notificationZone')
+  const pushEnabled = localStorage.getItem('pushEnabled') === 'true'
+
+  if (shouldShowLocationChangePrompt(newDistrict, notificationZone, pushEnabled, dismissedThisSession)) {
+    showLocationChangePrompt(newDistrict)
+  }
+}
+
+// User confirms location change
+async function confirmLocationChange(newDistrict: string) {
+  const oldZone = localStorage.getItem('notificationZone')
+  const newZone = getZoneForDistrict(newDistrict)
+
+  try {
+    // Update FCM subscription
+    if (oldZone) {
+      await unsubscribeFromTopic(`zone-${oldZone}`)
+    }
+    await subscribeToTopic(`zone-${newZone}`)
+
+    // Update localStorage
+    localStorage.setItem('notificationDistrict', newDistrict)
+    localStorage.setItem('notificationZone', newZone)
+
+    showToast(`Notifications updated to ${newDistrict}`)
+  } catch (error) {
+    showToast('Failed to update notifications', 'error')
+  }
+}
 ```
 
 ---
@@ -148,7 +379,7 @@ Crons only run during these windows, not 24/7.
 
 **Subscribe to notifications:**
 ```typescript
-import { getMessaging, getToken, onMessage } from 'firebase/messaging'
+import { getMessaging, getToken } from 'firebase/messaging'
 
 async function subscribeToNotifications(zoneId: string) {
   const messaging = getMessaging()
@@ -167,6 +398,7 @@ async function subscribeToNotifications(zoneId: string) {
   // Subscribe to zone topic via Cloud Function
   await fetch('/api/subscribe', {
     method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ token, topic: `zone-${zoneId}` })
   })
 }
@@ -177,6 +409,7 @@ async function unsubscribeFromNotifications(zoneId: string) {
 
   await fetch('/api/unsubscribe', {
     method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ token, topic: `zone-${zoneId}` })
   })
 }
@@ -244,9 +477,9 @@ import prayerTimesData from './prayerTimes.json'
 const ZONES = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13']
 const REMINDER_MINUTES = 10
 
-// Runs every minute during prayer windows
+// Single cron: runs every minute from 4 AM to 8 PM
 export const checkPrayerTimes = functions.pubsub
-  .schedule('every 1 minutes')
+  .schedule('* 4-20 * * *')
   .timeZone('Asia/Colombo')
   .onRun(async (context) => {
     const now = new Date()
@@ -319,7 +552,7 @@ function getIOSInstallStatus() {
   return 'not-installed'
 }
 
-// Show appropriate UI based on status
+// Show appropriate guidance based on status
 const status = getIOSInstallStatus()
 if (status === 'not-installed') {
   showIOSInstallInstructions()
@@ -342,7 +575,7 @@ if (status === 'not-installed') {
 □ 1.2 Enable Cloud Messaging (FCM)
 □ 1.3 Generate VAPID keys
 □ 1.4 Set up Cloud Functions
-□ 1.5 Configure Cloud Scheduler for cron jobs
+□ 1.5 Configure Cloud Scheduler (single job: "* 4-20 * * *")
 ```
 
 ### Phase 2: Backend (Cloud Functions)
@@ -358,10 +591,11 @@ if (status === 'not-installed') {
 ```
 □ 3.1 Add Firebase SDK to PWA
 □ 3.2 Configure service worker for push
-□ 3.3 Create notification permission UI
-□ 3.4 Implement subscribe on zone selection
-□ 3.5 Handle zone changes (unsubscribe/subscribe)
-□ 3.6 Add iOS installation detection & guide
+□ 3.3 Create notification enable modal (with district selector)
+□ 3.4 Create location change prompt banner
+□ 3.5 Implement subscribe/unsubscribe logic
+□ 3.6 Handle zone changes on user confirmation
+□ 3.7 Add iOS installation detection & guide
 ```
 
 ### Phase 4: Testing
@@ -370,21 +604,9 @@ if (status === 'not-installed') {
 □ 4.2 Test on Android Chrome (browser tab)
 □ 4.3 Test on iOS Safari (installed PWA)
 □ 4.4 Test notification timing accuracy
-□ 4.5 Test zone switching
+□ 4.5 Test zone switching flow
+□ 4.6 Test "Not now" and dismiss behaviors
 ```
-
----
-
-## Data Bug Found
-
-During analysis, found 2 incorrect entries in `prayerTimes.json`:
-
-```
-Zone 07, Month 9, Day 28: dhuhr = "11:59 PM" (should be "11:59 AM")
-Zone 07, Month 9, Day 29: dhuhr = "11:59 PM" (should be "11:59 AM")
-```
-
-**Action:** Fix these entries in the data file.
 
 ---
 
@@ -394,18 +616,19 @@ Zone 07, Month 9, Day 29: dhuhr = "11:59 PM" (should be "11:59 AM")
 |--------|----------|
 | Platform | Firebase (FCM + Cloud Functions) |
 | Topics | 13 (one per zone, all prayers included) |
-| Cron Strategy | Window-based (366 runs/day, not 1440) |
+| Cron Strategy | Single job "* 4-20 * * *" (1,020 runs/day) |
 | Cost | $0 (within free tier) |
 | User Login | Not required |
 | iOS Support | Yes (requires PWA install + iOS 16.4+) |
 | Android Support | Yes (PWA or browser) |
+| Location UX | Subtle prompt when browsing different zone |
 
 ---
 
 ## Next Steps
 
-1. **Fix data bug** - Correct the 2 Dhuhr entries
-2. **Create Firebase project** - Set up FCM and Cloud Functions
-3. **Start Phase 1** - Firebase setup and configuration
+1. **Create Firebase project** - Set up FCM and Cloud Functions
+2. **Start Phase 1** - Firebase setup and configuration
+3. **Design UI components** - Enable modal, location change banner
 
 Ready to begin implementation?
