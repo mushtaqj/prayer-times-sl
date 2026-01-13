@@ -33,13 +33,13 @@ describe('LocationChangePrompt', () => {
 
       // The banner shows both current and new district
       expect(screen.getByText('Colombo')).toBeInTheDocument()
-      expect(screen.getByText('Kandy')).toBeInTheDocument()
+      expect(screen.getByText('Kandy?')).toBeInTheDocument()
     })
 
     it('shows the new district name', () => {
       render(<LocationChangePrompt {...defaultProps} />)
 
-      expect(screen.getByText('Kandy')).toBeInTheDocument()
+      expect(screen.getByText('Kandy?')).toBeInTheDocument()
     })
 
     it('shows the current notification district', () => {
@@ -116,7 +116,7 @@ describe('LocationChangePrompt', () => {
       )
 
       expect(screen.getByText('Not set')).toBeInTheDocument()
-      expect(screen.getByText('Kandy')).toBeInTheDocument()
+      expect(screen.getByText('Kandy?')).toBeInTheDocument()
     })
   })
 })
