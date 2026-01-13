@@ -11,7 +11,7 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'icon-192x192.png'],
+      includeAssets: ['favicon.svg', 'icon-192x192.png', 'firebase-messaging-sw.js'],
       manifest: {
         name: 'Prayer Times',
         short_name: 'Prayer',
@@ -39,7 +39,9 @@ export default defineConfig({
         ]
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,json}']
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,json}'],
+        // Don't precache the Firebase messaging service worker
+        navigateFallbackDenylist: [/^\/firebase-messaging-sw\.js$/]
       }
     })
   ],

@@ -52,7 +52,15 @@ export async function getFCMToken(): Promise<string | null> {
   if (!messaging) return null
 
   try {
-    const token = await getToken(messaging, { vapidKey: VAPID_KEY })
+    // Register the Firebase messaging service worker explicitly
+    const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js', {
+      scope: '/',
+    })
+
+    const token = await getToken(messaging, {
+      vapidKey: VAPID_KEY,
+      serviceWorkerRegistration: registration,
+    })
     return token
   } catch (error) {
     console.error('Error getting FCM token:', error)
