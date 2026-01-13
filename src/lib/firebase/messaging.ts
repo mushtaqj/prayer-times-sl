@@ -52,18 +52,57 @@ export async function getFCMToken(): Promise<string | null> {
   if (!messaging) return null
 
   try {
-    // Register the Firebase messaging service worker explicitly
-    const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js', {
-      scope: '/',
-    })
+    console.log('Getting FCM token with VAPID key:', VAPID_KEY?.substring(0, 20) + '...')
 
+    // First, ensure Firebase messaging service worker is registered
+    const registrations = await navigator.serviceWorker.getRegistrations()
+    console.log('Existing service worker registrations:', registrations.length)
+
+    let firebaseReg = registrations.find(r => r.active?.scriptURL.includes('firebase-messaging-sw.js'))
+
+    if (!firebaseReg) {
+      console.log('Registering Firebase messaging service worker...')
+      firebaseReg = await navigator.serviceWorker.register('/firebase-messaging-sw.js')
+
+      // Wait for it to be active
+      if (!firebaseReg.active) {
+        console.log('Waiting for Firebase SW to activate...')
+        await new Promise<void>((resolve, reject) => {
+          const timeout = setTimeout(() => reject(new Error('SW activation timeout')), 10000)
+
+          const checkState = () => {
+            if (firebaseReg!.active) {
+              clearTimeout(timeout)
+              resolve()
+            }
+          }
+
+          firebaseReg!.addEventListener('updatefound', () => {
+            const newWorker = firebaseReg!.installing
+            newWorker?.addEventListener('statechange', checkState)
+          })
+
+          // Check immediately in case it's already active
+          checkState()
+        })
+      }
+      console.log('Firebase SW registered and active')
+    } else {
+      console.log('Firebase SW already registered:', firebaseReg.active?.scriptURL)
+    }
+
+    console.log('Requesting FCM token...')
     const token = await getToken(messaging, {
       vapidKey: VAPID_KEY,
-      serviceWorkerRegistration: registration,
+      serviceWorkerRegistration: firebaseReg,
     })
+
+    console.log('FCM Token obtained successfully:', token?.substring(0, 20) + '...')
     return token
   } catch (error) {
     console.error('Error getting FCM token:', error)
+    console.error('VAPID_KEY present:', !!VAPID_KEY)
+    console.error('VAPID_KEY length:', VAPID_KEY?.length)
     return null
   }
 }
