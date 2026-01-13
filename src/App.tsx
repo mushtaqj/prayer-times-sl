@@ -207,9 +207,8 @@ function App() {
 
           {/* Footer - hidden on mobile */}
           {!isHomePage && (
-            <footer className="hidden sm:block text-center text-sm text-muted-foreground py-6 border-t border-border/50 bg-card/30">
-              <p>Prayer times for {locationName} District</p>
-              <p className="mt-1 font-heading text-primary/80">{COUNTRY_NAME}</p>
+            <footer className="hidden sm:block text-center text-xs text-muted-foreground py-4 border-t border-border/50 bg-card/30">
+              <p>Data provided by ACJU • {locationName} District, {COUNTRY_NAME}</p>
             </footer>
           )}
         </main>
