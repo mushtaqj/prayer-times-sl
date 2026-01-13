@@ -87,6 +87,97 @@ export function getFastingInfo(
 }
 
 /**
+ * Process fixed events for a given day
+ * Returns events and whether fasting is forbidden
+ */
+function processFixedEvents(
+  hijriMonth: number,
+  hijriDay: number,
+  fixedEvents: IslamicEvent[]
+): { events: DayEvent[]; isFastingForbidden: boolean } {
+  const dayFixedEvents = fixedEvents.filter(
+    e => e.hijriMonth === hijriMonth && e.hijriDay === hijriDay
+  )
+
+  const events: DayEvent[] = dayFixedEvents.map(event => ({
+    name: event.name,
+    type: event.type,
+    isRecurring: false,
+    details: event.details
+  }))
+
+  const isFastingForbidden = dayFixedEvents.some(e => e.fastingForbidden)
+
+  return { events, isFastingForbidden }
+}
+
+/**
+ * Get Ayyam al-Beed event if applicable
+ */
+function getAyyamAlBeedEvent(hijriDay: number, details?: string): DayEvent | null {
+  if (!AYYAM_AL_BEED_DAYS.includes(hijriDay)) return null
+
+  return {
+    name: FAST_NAMES.AYYAM_AL_BEED,
+    type: EVENT_TYPE.SUNNAH,
+    isRecurring: true,
+    details
+  }
+}
+
+/**
+ * Get annual recurring events for a given day
+ */
+function getAnnualRecurringEvents(
+  hijriMonth: number,
+  hijriDay: number,
+  annualFasts: AnnualFast[]
+): DayEvent[] {
+  return annualFasts
+    .filter(e => e.hijriMonth === hijriMonth && e.timing === EVENT_TIMING.FIXED)
+    .filter(e => isInAnnualEventRange(hijriDay, e))
+    .map(event => ({
+      name: event.name,
+      type: event.type,
+      isRecurring: true,
+      details: event.details
+    }))
+}
+
+/**
+ * Get weekly fast events (Monday/Thursday)
+ */
+function getWeeklyFastEvents(
+  gregorianDate: Date | undefined,
+  weeklyFastDetails?: { monday?: string; thursday?: string }
+): DayEvent[] {
+  if (!gregorianDate) return []
+
+  const dayOfWeek = gregorianDate.getDay()
+  const events: DayEvent[] = []
+
+  if (dayOfWeek === DAY_INDEX.MONDAY) {
+    events.push({
+      name: FAST_NAMES.MONDAY_FAST,
+      type: EVENT_TYPE.SUNNAH,
+      isRecurring: true,
+      details: weeklyFastDetails?.monday
+    })
+  }
+
+  if (dayOfWeek === DAY_INDEX.THURSDAY) {
+    events.push({
+      name: FAST_NAMES.THURSDAY_FAST,
+      type: EVENT_TYPE.SUNNAH,
+      isRecurring: true,
+      details: weeklyFastDetails?.thursday
+    })
+  }
+
+  return events
+}
+
+/**
  * Get all events for a specific day including recurring
  */
 export function getAllEventsForDay(
@@ -98,77 +189,26 @@ export function getAllEventsForDay(
   ayyamAlBeedDetails?: string,
   weeklyFastDetails?: { monday?: string; thursday?: string }
 ): DayEvent[] {
-  const result: DayEvent[] = []
-
-  // Add fixed events
-  const dayFixedEvents = fixedEvents.filter(
-    e => e.hijriMonth === hijriMonth && e.hijriDay === hijriDay
+  const { events: fixedDayEvents, isFastingForbidden } = processFixedEvents(
+    hijriMonth,
+    hijriDay,
+    fixedEvents
   )
-  let isFastingForbiddenToday = false
 
-  for (const event of dayFixedEvents) {
-    result.push({
-      name: event.name,
-      type: event.type,
-      isRecurring: false,
-      details: event.details
-    })
-    if (event.fastingForbidden) {
-      isFastingForbiddenToday = true
-    }
+  // Only include recurring fasts if fasting is not forbidden
+  if (isFastingForbidden) {
+    return fixedDayEvents
   }
 
-  // ONLY add recurring fasts if fasting is NOT forbidden
-  if (!isFastingForbiddenToday) {
-    // Add Ayyam al-Beed (13, 14, 15 of each month)
-    if (AYYAM_AL_BEED_DAYS.includes(hijriDay)) {
-      result.push({
-        name: FAST_NAMES.AYYAM_AL_BEED,
-        type: EVENT_TYPE.SUNNAH,
-        isRecurring: true,
-        details: ayyamAlBeedDetails
-      })
-    }
+  const recurringEvents: DayEvent[] = []
 
-    // Add fixed annual recurring events
-    const annualFixedEvents = annualFasts.filter(
-      e => e.hijriMonth === hijriMonth && e.timing === EVENT_TIMING.FIXED
-    )
+  const ayyamAlBeed = getAyyamAlBeedEvent(hijriDay, ayyamAlBeedDetails)
+  if (ayyamAlBeed) recurringEvents.push(ayyamAlBeed)
 
-    for (const event of annualFixedEvents) {
-      if (isInAnnualEventRange(hijriDay, event)) {
-        result.push({
-          name: event.name,
-          type: event.type,
-          isRecurring: true,
-          details: event.details
-        })
-      }
-    }
+  recurringEvents.push(...getAnnualRecurringEvents(hijriMonth, hijriDay, annualFasts))
+  recurringEvents.push(...getWeeklyFastEvents(gregorianDate, weeklyFastDetails))
 
-    // Add Monday/Thursday fasting if gregorianDate provided
-    if (gregorianDate) {
-      const dayOfWeek = gregorianDate.getDay()
-      if (dayOfWeek === DAY_INDEX.MONDAY) {
-        result.push({
-          name: FAST_NAMES.MONDAY_FAST,
-          type: EVENT_TYPE.SUNNAH,
-          isRecurring: true,
-          details: weeklyFastDetails?.monday
-        })
-      }
-      if (dayOfWeek === DAY_INDEX.THURSDAY) {
-        result.push({
-          name: FAST_NAMES.THURSDAY_FAST,
-          type: EVENT_TYPE.SUNNAH,
-          isRecurring: true,
-          details: weeklyFastDetails?.thursday
-        })
-      }
-    }
-  }
-
-  return result
+  return [...fixedDayEvents, ...recurringEvents]
 }
 
 /**

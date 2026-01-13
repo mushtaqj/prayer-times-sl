@@ -96,15 +96,6 @@ export function formatShortDateYear(date: Date): string {
 }
 
 /**
- * Get the start of day for a given date
- */
-export function startOfDay(date: Date): Date {
-  const result = new Date(date)
-  result.setHours(0, 0, 0, 0)
-  return result
-}
-
-/**
  * Check if a date is today
  */
 export function isToday(date: Date): boolean {

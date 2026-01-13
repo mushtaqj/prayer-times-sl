@@ -5,7 +5,6 @@ import {
   addDays,
   daysBetween,
   formatDate,
-  startOfDay,
   isToday,
   formatDateISO,
 } from './date'
@@ -203,36 +202,6 @@ describe('date utilities', () => {
       const result = formatDate(date, { weekday: 'long' })
 
       expect(result).toBe('Sunday')
-    })
-  })
-
-  describe('startOfDay', () => {
-    it('sets time to midnight', () => {
-      const date = new Date(2025, 5, 15, 14, 30, 45, 123)
-      const result = startOfDay(date)
-
-      expect(result.getHours()).toBe(0)
-      expect(result.getMinutes()).toBe(0)
-      expect(result.getSeconds()).toBe(0)
-      expect(result.getMilliseconds()).toBe(0)
-    })
-
-    it('preserves the date', () => {
-      const date = new Date(2025, 5, 15, 14, 30)
-      const result = startOfDay(date)
-
-      expect(result.getFullYear()).toBe(2025)
-      expect(result.getMonth()).toBe(5)
-      expect(result.getDate()).toBe(15)
-    })
-
-    it('does not mutate original date', () => {
-      const date = new Date(2025, 5, 15, 14, 30)
-      const originalTime = date.getTime()
-
-      startOfDay(date)
-
-      expect(date.getTime()).toBe(originalTime)
     })
   })
 

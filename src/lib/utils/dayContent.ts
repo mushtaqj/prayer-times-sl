@@ -30,6 +30,68 @@ interface GenerateDayContentParams {
   recurringFasts: RecurringFasts
 }
 
+const DEFAULT_FRIDAY_BLESSINGS = `## Friday Blessings
+- **Surah Kahf**: Recite for light until next Friday
+- **Salawat**: Send abundant blessings upon the Prophet ﷺ
+- **Best Dua Time**: Between Asr and Maghrib
+- **Jumu'ah Prayer**: Obligatory for men`
+
+/**
+ * Generate content for day events
+ */
+function generateEventsContent(dayEvents: DayEvent[]): string {
+  return dayEvents
+    .map(e => e.details ? e.details : `## ${e.name}\n*${e.type}*`)
+    .join('\n\n')
+}
+
+/**
+ * Generate Friday blessings content
+ */
+function generateFridayContent(recurringFasts: RecurringFasts): string {
+  return recurringFasts.friday?.details ?? DEFAULT_FRIDAY_BLESSINGS
+}
+
+/**
+ * Get fasting details based on fast type
+ */
+function getFastingDetails(
+  fastingInfo: FastingInfo,
+  recurringFasts: RecurringFasts
+): string | null {
+  if (!fastingInfo.isFasting || fastingInfo.reason === RAMADAN_NAME) {
+    return null
+  }
+
+  switch (fastingInfo.reason) {
+    case FAST_NAMES.MONDAY_FAST:
+      return recurringFasts.weekly.find(f => f.id === RECURRING_FAST_IDS.MONDAY)?.details ?? null
+
+    case FAST_NAMES.THURSDAY_FAST:
+      return recurringFasts.weekly.find(f => f.id === RECURRING_FAST_IDS.THURSDAY)?.details ?? null
+
+    case FAST_NAMES.AYYAM_AL_BEED_FULL:
+      return recurringFasts.monthly.ayyamAlBeed.details ?? null
+
+    default:
+      return `## Fasting\n- **${fastingInfo.reason}** (${fastingInfo.type})`
+  }
+}
+
+/**
+ * Generate fasting content section
+ */
+function generateFastingContent(
+  fastingInfo: FastingInfo,
+  recurringFasts: RecurringFasts
+): string | null {
+  if (fastingInfo.type === FASTING_TYPE.FORBIDDEN) {
+    return `## Fasting Forbidden\n- **${fastingInfo.reason}**: Fasting is prohibited on this day`
+  }
+
+  return getFastingDetails(fastingInfo, recurringFasts)
+}
+
 export function generateDayContent({
   monthName,
   hijriDay,
@@ -40,63 +102,20 @@ export function generateDayContent({
   recurringFasts,
 }: GenerateDayContentParams): string {
   const dayName = formatWeekday(gregorianDate)
-  let content = `# ${dayName}, ${monthName} ${hijriDay}\n\n`
+  const sections: string[] = [`# ${dayName}, ${monthName} ${hijriDay}`]
 
-  // Add events with their full details
   if (dayEvents.length > 0) {
-    dayEvents.forEach((e) => {
-      if (e.details) {
-        content += e.details + `\n\n`
-      } else {
-        content += `## ${e.name}\n`
-        content += `*${e.type}*\n\n`
-      }
-    })
+    sections.push(generateEventsContent(dayEvents))
   }
 
-  // Add Friday info
   if (isFriday) {
-    const fridayVirtues = recurringFasts.friday?.details
-    if (fridayVirtues) {
-      content += fridayVirtues + `\n\n`
-    } else {
-      content += `## Friday Blessings\n`
-      content += `- **Surah Kahf**: Recite for light until next Friday\n`
-      content += `- **Salawat**: Send abundant blessings upon the Prophet ﷺ\n`
-      content += `- **Best Dua Time**: Between Asr and Maghrib\n`
-      content += `- **Jumu'ah Prayer**: Obligatory for men\n\n`
-    }
+    sections.push(generateFridayContent(recurringFasts))
   }
 
-  // Add fasting info with details
-  if (fastingInfo.isFasting && fastingInfo.reason !== RAMADAN_NAME) {
-    if (fastingInfo.reason === FAST_NAMES.MONDAY_FAST) {
-      const mondayDetails = recurringFasts.weekly.find(
-        (f) => f.id === RECURRING_FAST_IDS.MONDAY
-      )?.details
-      if (mondayDetails) {
-        content += mondayDetails + `\n\n`
-      }
-    } else if (fastingInfo.reason === FAST_NAMES.THURSDAY_FAST) {
-      const thursdayDetails = recurringFasts.weekly.find(
-        (f) => f.id === RECURRING_FAST_IDS.THURSDAY
-      )?.details
-      if (thursdayDetails) {
-        content += thursdayDetails + `\n\n`
-      }
-    } else if (fastingInfo.reason === FAST_NAMES.AYYAM_AL_BEED_FULL) {
-      const ayyamDetails = recurringFasts.monthly.ayyamAlBeed.details
-      if (ayyamDetails) {
-        content += ayyamDetails + `\n\n`
-      }
-    } else {
-      content += `## Fasting\n`
-      content += `- **${fastingInfo.reason}** (${fastingInfo.type})\n\n`
-    }
-  } else if (fastingInfo.type === FASTING_TYPE.FORBIDDEN) {
-    content += `## Fasting Forbidden\n`
-    content += `- **${fastingInfo.reason}**: Fasting is prohibited on this day\n\n`
+  const fastingContent = generateFastingContent(fastingInfo, recurringFasts)
+  if (fastingContent) {
+    sections.push(fastingContent)
   }
 
-  return content
+  return sections.join('\n\n') + '\n\n'
 }

@@ -2,9 +2,7 @@
  * Hijri calendar constants - single source of truth for magic numbers
  */
 
-import { DAY_INDEX } from './dateConstants'
-
-// Hijri year structure
+// Hijri year structure (MONTHS_IN_HIJRI_YEAR, VALID_MONTH_DAYS, DEFAULT_MONTH_DAYS are used by scripts/update-hijri.js)
 export const MONTHS_IN_HIJRI_YEAR = 12
 export const FIRST_HIJRI_MONTH = 1
 export const LAST_HIJRI_MONTH = 12
@@ -36,9 +34,6 @@ export const SACRED_MONTH_NUMBERS: readonly number[] = [
   HIJRI_MONTHS.DHUL_QADAH,
   HIJRI_MONTHS.DHUL_HIJJAH,
 ]
-
-// Sunnah fasting days (uses DAY_INDEX from dateConstants)
-export const SUNNAH_FASTING_DAYS = [DAY_INDEX.MONDAY, DAY_INDEX.THURSDAY] as const
 
 // Ayyam al-Beed (White Days) - 13th, 14th, 15th of each Hijri month
 export const AYYAM_AL_BEED_DAYS: readonly number[] = [13, 14, 15]
