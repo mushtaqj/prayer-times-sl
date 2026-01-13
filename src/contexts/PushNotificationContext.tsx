@@ -84,9 +84,9 @@ export function PushNotificationProvider({ children }: PushNotificationProviderP
         isIOSInstalled={pushNotifications.isIOSInstalled}
       />
 
-      {/* Location Change Prompt - rendered at top level */}
+      {/* Location Change Prompt - sleek top banner */}
       {pushNotifications.showLocationPrompt && pushNotifications.promptDistrictId && (
-        <div className="fixed top-[calc(48px+env(safe-area-inset-top)+8px)] sm:top-[68px] left-4 right-4 z-50 max-w-md mx-auto">
+        <div className="fixed top-[calc(48px+env(safe-area-inset-top))] sm:top-[60px] left-0 right-0 z-50">
           <LocationChangePrompt
             promptDistrictId={pushNotifications.promptDistrictId}
             currentNotificationDistrict={pushNotifications.state.notificationDistrict}

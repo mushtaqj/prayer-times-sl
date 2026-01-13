@@ -28,10 +28,12 @@ describe('LocationChangePrompt', () => {
   })
 
   describe('rendering', () => {
-    it('renders the prompt with correct text', () => {
+    it('renders the banner with district names', () => {
       render(<LocationChangePrompt {...defaultProps} />)
 
-      expect(screen.getByText('Update notification location?')).toBeInTheDocument()
+      // The banner shows both current and new district
+      expect(screen.getByText('Colombo')).toBeInTheDocument()
+      expect(screen.getByText('Kandy')).toBeInTheDocument()
     })
 
     it('shows the new district name', () => {
@@ -46,16 +48,10 @@ describe('LocationChangePrompt', () => {
       expect(screen.getByText('Colombo')).toBeInTheDocument()
     })
 
-    it('renders Keep current button', () => {
+    it('renders Update button', () => {
       render(<LocationChangePrompt {...defaultProps} />)
 
-      expect(screen.getByRole('button', { name: /keep current/i })).toBeInTheDocument()
-    })
-
-    it('renders Use [district] button', () => {
-      render(<LocationChangePrompt {...defaultProps} />)
-
-      expect(screen.getByRole('button', { name: /use kandy/i })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /update/i })).toBeInTheDocument()
     })
 
     it('renders dismiss button', () => {
@@ -74,14 +70,6 @@ describe('LocationChangePrompt', () => {
   })
 
   describe('interactions', () => {
-    it('calls onDismiss when Keep current is clicked', () => {
-      render(<LocationChangePrompt {...defaultProps} />)
-
-      fireEvent.click(screen.getByRole('button', { name: /keep current/i }))
-
-      expect(defaultProps.onDismiss).toHaveBeenCalled()
-    })
-
     it('calls onDismiss when X button is clicked', () => {
       render(<LocationChangePrompt {...defaultProps} />)
 
@@ -90,10 +78,10 @@ describe('LocationChangePrompt', () => {
       expect(defaultProps.onDismiss).toHaveBeenCalled()
     })
 
-    it('calls onAccept when Use [district] is clicked', async () => {
+    it('calls onAccept when Update is clicked', async () => {
       render(<LocationChangePrompt {...defaultProps} />)
 
-      fireEvent.click(screen.getByRole('button', { name: /use kandy/i }))
+      fireEvent.click(screen.getByRole('button', { name: /update/i }))
 
       await waitFor(() => {
         expect(defaultProps.onAccept).toHaveBeenCalled()
@@ -102,22 +90,24 @@ describe('LocationChangePrompt', () => {
   })
 
   describe('loading state', () => {
-    it('shows Updating... text when loading', () => {
+    it('shows ... text when loading', () => {
       render(<LocationChangePrompt {...defaultProps} isLoading={true} />)
 
-      expect(screen.getByText('Updating...')).toBeInTheDocument()
+      expect(screen.getByText('...')).toBeInTheDocument()
     })
 
     it('disables buttons when loading', () => {
       render(<LocationChangePrompt {...defaultProps} isLoading={true} />)
 
-      expect(screen.getByRole('button', { name: /keep current/i })).toBeDisabled()
-      expect(screen.getByRole('button', { name: /updating/i })).toBeDisabled()
+      const buttons = screen.getAllByRole('button')
+      buttons.forEach((button) => {
+        expect(button).toBeDisabled()
+      })
     })
   })
 
   describe('without current notification district', () => {
-    it('renders without current district info', () => {
+    it('renders with "Not set" when no current district', () => {
       render(
         <LocationChangePrompt
           {...defaultProps}
@@ -125,9 +115,8 @@ describe('LocationChangePrompt', () => {
         />
       )
 
-      expect(screen.getByText("You're viewing")).toBeInTheDocument()
+      expect(screen.getByText('Not set')).toBeInTheDocument()
       expect(screen.getByText('Kandy')).toBeInTheDocument()
-      expect(screen.queryByText('but receiving notifications for')).not.toBeInTheDocument()
     })
   })
 })
