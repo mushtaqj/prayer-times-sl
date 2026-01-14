@@ -19,66 +19,61 @@ Deliver prayer time notifications even when the app is fully closed, on both And
 
 ## Architecture Overview
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                                                                     │
-│  USER DEVICE (PWA)                    FIREBASE                      │
-│  ┌─────────────────────┐              ┌─────────────────────┐       │
-│  │                     │   Subscribe  │                     │       │
-│  │  1. User selects    │ ──────────►  │  FCM stores the     │       │
-│  │     district        │   to topic   │  subscription       │       │
-│  │                     │  "zone-01"   │                     │       │
-│  │  2. User enables    │              │                     │       │
-│  │     notifications   │              │                     │       │
-│  │                     │              └──────────┬──────────┘       │
-│  │  3. No login needed │                         │                  │
-│  │                     │              ┌──────────▼──────────┐       │
-│  └─────────────────────┘              │                     │       │
-│                                       │  Cloud Function     │       │
-│                                       │  (Scheduled Cron)   │       │
-│  ┌─────────────────────┐              │                     │       │
-│  │                     │              │  Checks: "Is it     │       │
-│  │  Service Worker     │   Push       │  prayer time for    │       │
-│  │  receives push      │ ◄─────────── │  any zone?"         │       │
-│  │                     │              │                     │       │
-│  │  Shows notification │              │  If yes, sends to   │       │
-│  │  (even if closed)   │              │  topic "zone-XX"    │       │
-│  │                     │              │                     │       │
-│  └─────────────────────┘              └─────────────────────┘       │
-│                                                                     │
-└─────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+    subgraph Device["User Device (PWA)"]
+        User["1. User selects district"]
+        Enable["2. User enables notifications"]
+        NoLogin["3. No login needed"]
+        SW["Service Worker"]
+    end
+    
+    subgraph Firebase["Firebase"]
+        FCM["FCM stores subscription"]
+        CF["Cloud Function<br/>(Scheduled Cron)"]
+    end
+    
+    User -->|Subscribe to topic<br/>'zone-01'| FCM
+    Enable --> FCM
+    CF -->|Check: Is it prayer time<br/>for any zone?| CF
+    CF -->|Push notification| SW
+    SW -->|Shows notification<br/>(even if closed)| User
 ```
 
 ---
 
 ## Security Architecture
 
+```mermaid
+flowchart TB
+    subgraph Problem["Problem: HTTP Endpoint"]
+        Scheduler1["Cloud Scheduler"]
+        Vercel["Vercel API"]
+        FCM1["FCM"]
+        Exposed["Exposed endpoint<br/>= can be abused"]
+        
+        Scheduler1 -->|HTTP| Vercel
+        Vercel --> FCM1
+        Exposed -.-> Vercel
+    end
+    
+    subgraph Solution["Solution: Pub/Sub Trigger"]
+        Scheduler2["Cloud Scheduler"]
+        CloudFn["Cloud Function"]
+        FCM2["FCM"]
+        Internal["Internal trigger<br/>NO HTTP endpoint"]
+        
+        Scheduler2 -->|Pub/Sub| CloudFn
+        CloudFn --> FCM2
+        Internal -.-> CloudFn
+    end
 ```
-┌─────────────────────────────────────────────────────────────────────┐
-│  WHY FIREBASE CLOUD FUNCTIONS (not Vercel API)?                     │
-│                                                                     │
-│  PROBLEM with HTTP endpoint:                                        │
-│  ┌─────────────────────────────────────────────────────────────┐    │
-│  │  Cloud Scheduler ──HTTP──► Vercel API ──► FCM               │    │
-│  │                    ↑                                        │    │
-│  │         (exposed endpoint = can be abused)                  │    │
-│  └─────────────────────────────────────────────────────────────┘    │
-│                                                                     │
-│  SOLUTION with Pub/Sub trigger:                                     │
-│  ┌─────────────────────────────────────────────────────────────┐    │
-│  │  Cloud Scheduler ──Pub/Sub──► Cloud Function ──► FCM        │    │
-│  │                    ↑                                        │    │
-│  │         (internal trigger, NO HTTP endpoint)                │    │
-│  └─────────────────────────────────────────────────────────────┘    │
-│                                                                     │
-│  Benefits:                                                          │
-│  - No HTTP endpoint exposed to the internet                         │
-│  - Cannot be discovered or abused                                   │
-│  - Cannot be DDoS'd to spam notifications                           │
-│  - Direct FCM integration (same Firebase project)                   │
-│                                                                     │
-└─────────────────────────────────────────────────────────────────────┘
-```
+
+**Benefits of Pub/Sub approach:**
+- No HTTP endpoint exposed to the internet
+- Cannot be discovered or abused
+- Cannot be DDoS'd to spam notifications
+- Direct FCM integration (same Firebase project)
 
 ---
 
@@ -86,26 +81,25 @@ Deliver prayer time notifications even when the app is fully closed, on both And
 
 Users subscribe to their zone's topic. All prayers are sent to everyone in the zone.
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│  TOPICS (13 total - one per zone)                                   │
-│                                                                     │
-│  zone-01: Colombo, Gampaha, Kalutara                                │
-│  zone-02: Jaffna, Nallur                                            │
-│  zone-03: Kilinochchi, Mullaitivu, Vavuniya                         │
-│  zone-04: Mannar, Puttalam                                          │
-│  zone-05: Anuradhapura, Polonnaruwa                                 │
-│  zone-06: Kurunegala                                                │
-│  zone-07: Kandy, Matale, Nuwara Eliya                               │
-│  zone-08: Ampara, Batticaloa                                        │
-│  zone-09: Trincomalee                                               │
-│  zone-10: Badulla, Monaragala                                       │
-│  zone-11: Kegalle, Ratnapura                                        │
-│  zone-12: Galle, Matara                                             │
-│  zone-13: Hambantota                                                │
-│                                                                     │
-│  Total: 26 districts → 13 zones → 13 topics                         │
-└─────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    subgraph Topics["FCM Topics (13 total)"]
+        Z01["zone-01: Colombo, Gampaha, Kalutara"]
+        Z02["zone-02: Jaffna, Nallur"]
+        Z03["zone-03: Kilinochchi, Mullaitivu, Vavuniya"]
+        Z04["zone-04: Mannar, Puttalam"]
+        Z05["zone-05: Anuradhapura, Polonnaruwa"]
+        Z06["zone-06: Kurunegala"]
+        Z07["zone-07: Kandy, Matale, Nuwara Eliya"]
+        Z08["zone-08: Ampara, Batticaloa"]
+        Z09["zone-09: Trincomalee"]
+        Z10["zone-10: Badulla, Monaragala"]
+        Z11["zone-11: Kegalle, Ratnapura"]
+        Z12["zone-12: Galle, Matara"]
+        Z13["zone-13: Hambantota"]
+    end
+    
+    Districts["26 Districts"] --> Zones["13 Zones"] --> Topics
 ```
 
 ---
@@ -146,45 +140,37 @@ The function checks if current time matches any prayer for any zone. If not with
 
 ## Cost Analysis
 
+```mermaid
+pie title Firebase Free Tier Usage
+    "Cloud Functions (1.5%)" : 1.5
+    "Remaining Free Tier" : 98.5
 ```
-┌─────────────────────────────────────────────────────────────────────┐
-│  FIREBASE FREE TIER USAGE                                           │
-│                                                                     │
-│  Cloud Functions Invocations:                                       │
-│    - Daily runs: 1,020                                              │
-│    - Monthly runs: ~31,000                                          │
-│    - Free tier limit: 2,000,000/month                               │
-│    - Usage: 1.5% of free tier ✅                                    │
-│                                                                     │
-│  FCM Messages:                                                      │
-│    - Unlimited (no cost) ✅                                         │
-│                                                                     │
-│  Cloud Scheduler:                                                   │
-│    - Free tier: 3 jobs                                              │
-│    - We need: 1 job                                                 │
-│    - Usage: Within free tier ✅                                     │
-│                                                                     │
-│  TOTAL COST: $0/month                                               │
-└─────────────────────────────────────────────────────────────────────┘
-```
+
+| Resource | Usage | Free Tier Limit | Percentage |
+|----------|-------|-----------------|------------|
+| Cloud Functions Invocations | ~31,000/month | 2,000,000/month | 1.5% |
+| FCM Messages | Unlimited | Unlimited | N/A |
+| Cloud Scheduler Jobs | 1 | 3 | 33% |
+
+**TOTAL COST: $0/month**
 
 ---
 
 ## Implementation Status
 
-### Phase 1: Firebase Setup ✅
+### Phase 1: Firebase Setup
 - [x] Firebase project created (acju-prayer-time-sl)
 - [x] Cloud Messaging (FCM) enabled
 - [x] VAPID keys generated
 - [x] Firebase config added to app
 
-### Phase 2: Backend - Cloud Functions ✅
+### Phase 2: Backend - Cloud Functions
 - [x] Created `functions/` folder with scheduled function
 - [x] Pub/Sub triggered function (no HTTP endpoint)
 - [x] Prayer times data copied via predeploy script
 - [x] Subscribe/unsubscribe API routes (Vercel)
 
-### Phase 3: Frontend Integration ✅
+### Phase 3: Frontend Integration
 - [x] Firebase SDK added to PWA
 - [x] Service worker configured for push (`firebase-messaging-sw.js`)
 - [x] Notification enable modal with district selector
@@ -240,68 +226,58 @@ prayer-times-app/
 
 ### Key Concepts
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│  TWO DIFFERENT CONCEPTS                                             │
-│                                                                     │
-│  1. VIEWING DISTRICT (can change freely)                            │
-│     - User browses prayer times for any district                    │
-│     - Stored in localStorage                                        │
-│     - NO subscription changes                                       │
-│                                                                     │
-│  2. NOTIFICATION DISTRICT (rarely changes)                          │
-│     - User's "home" district for push notifications                 │
-│     - Only changes when user explicitly confirms                    │
-│     - Triggers subscribe/unsubscribe                                │
-│                                                                     │
-└─────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TB
+    subgraph Viewing["1. VIEWING DISTRICT (can change freely)"]
+        Browse["User browses prayer times for any district"]
+        LocalStore["Stored in localStorage"]
+        NoSub["NO subscription changes"]
+    end
+    
+    subgraph Notification["2. NOTIFICATION DISTRICT (rarely changes)"]
+        Home["User's 'home' district for push notifications"]
+        Explicit["Only changes when user explicitly confirms"]
+        SubUnsub["Triggers subscribe/unsubscribe"]
+    end
+    
+    Browse --> LocalStore --> NoSub
+    Home --> Explicit --> SubUnsub
 ```
 
 ### Flow 1: First-Time Notification Enable
 
-When user taps the notification bell icon for the first time:
-
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│   ┌─────────────────────────────────────────────────────────────┐   │
-│   │                                                             │   │
-│   │   🔔 Enable Prayer Notifications                            │   │
-│   │                                                             │   │
-│   │   You'll receive notifications for all 5 daily prayers      │   │
-│   │   based on the selected location's prayer times.            │   │
-│   │                                                             │   │
-│   │   Notification Location:                                    │   │
-│   │   ┌─────────────────────────────────────┐                   │   │
-│   │   │  Colombo (Zone 01)              ▼   │                   │   │
-│   │   └─────────────────────────────────────┘                   │   │
-│   │                                                             │   │
-│   │   ┌──────────────┐    ┌────────────────────┐                │   │
-│   │   │    Cancel    │    │ Enable Notifications│               │   │
-│   │   └──────────────┘    └────────────────────┘                │   │
-│   │                                                             │   │
-│   └─────────────────────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────────────────┘
+```mermaid
+sequenceDiagram
+    participant User
+    participant Modal as Enable Modal
+    participant PWA
+    participant FCM
+    
+    User->>Modal: Tap notification bell
+    Modal->>User: Show district selector
+    User->>Modal: Select district & confirm
+    Modal->>PWA: Request notification permission
+    PWA->>FCM: Get device token
+    FCM-->>PWA: Token
+    PWA->>FCM: Subscribe to zone topic
+    FCM-->>PWA: Success
+    PWA->>User: Notifications enabled!
 ```
 
 ### Flow 2: Browsing Different District (Subtle Prompt)
 
 When user changes to a district in a **different zone** while notifications are enabled:
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│  ┌─────────────────────────────────────────────────────────────┐    │
-│  │                                                             │    │
-│  │  📍 Update notification location?                           │    │
-│  │                                                             │    │
-│  │  You're viewing Kandy but receiving notifications           │    │
-│  │  for Colombo                                                │    │
-│  │                                                             │    │
-│  │  ┌─────────────┐  ┌─────────────┐              ┌─────┐      │    │
-│  │  │ Keep current│  │  Use Kandy  │              │  ✕  │      │    │
-│  │  └─────────────┘  └─────────────┘              └─────┘      │    │
-│  │                                                             │    │
-│  └─────────────────────────────────────────────────────────────┘    │
-└─────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A[User viewing Colombo<br/>Notifications: Colombo zone-01] --> B[User switches to Kandy]
+    B --> C{Same zone?}
+    C -->|Yes| D[No prompt shown]
+    C -->|No| E[Show location prompt banner]
+    E --> F{User choice}
+    F -->|Keep current| G[Dismiss, keep Colombo notifications]
+    F -->|Use Kandy| H[Unsubscribe zone-01<br/>Subscribe zone-07]
+    F -->|Dismiss| I[Hide for this session]
 ```
 
 **When to show this prompt:**
@@ -310,33 +286,35 @@ When user changes to a district in a **different zone** while notifications are 
 
 **When NOT to show:**
 - Notifications disabled
-- Same zone (e.g., Colombo → Gampaha, both zone-01)
+- Same zone (e.g., Colombo -> Gampaha, both zone-01)
 - User already dismissed for this session
 
 ---
 
 ## iOS-Specific Requirements
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│  iOS PUSH NOTIFICATION REQUIREMENTS                                 │
-│                                                                     │
-│  1. iOS 16.4+ required (Safari 16.4+)                               │
-│                                                                     │
-│  2. PWA MUST be installed to home screen                            │
-│     - Push does NOT work in Safari browser tab                      │
-│     - Only works when opened from home screen icon                  │
-│                                                                     │
-│  3. User must grant notification permission                         │
-│                                                                     │
-└─────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    A[iOS User] --> B{iOS 16.4+?}
+    B -->|No| C[Push not supported]
+    B -->|Yes| D{PWA installed to home screen?}
+    D -->|No| E[Show installation guide]
+    D -->|Yes| F{Permission granted?}
+    F -->|No| G[Request permission]
+    F -->|Yes| H[Push notifications work!]
+    
+    E --> E1["1. Tap Share button"]
+    E1 --> E2["2. Add to Home Screen"]
+    E2 --> E3["3. Open from home screen"]
+    E3 --> D
 ```
 
-The app detects iOS and shows installation instructions:
-1. Tap the **Share** button in Safari
-2. Scroll down and tap **Add to Home Screen**
-3. Tap **Add** in the top right
-4. Open the app from your home screen
+**iOS Push Notification Requirements:**
+1. iOS 16.4+ required (Safari 16.4+)
+2. PWA MUST be installed to home screen
+   - Push does NOT work in Safari browser tab
+   - Only works when opened from home screen icon
+3. User must grant notification permission
 
 ---
 

@@ -18,12 +18,53 @@ A modern, mobile-first Progressive Web App (PWA) for Islamic prayer times and Hi
 - **Special Day Indicators**: Fasting days, holy nights, and recommended practices
 - **Event Details**: Tap any event for detailed information and virtues
 
+### Push Notifications
+- **Background Notifications**: Receive prayer reminders even when the app is closed
+- **Zone-Based**: Notifications are sent based on your district's prayer times
+- **No Login Required**: Just enable notifications and select your district
+- **iOS & Android Support**: Works on both platforms (iOS requires PWA installation)
+
 ### App Features
 - **Dark/Light Mode**: Theme toggle for comfortable viewing
 - **Offline Support**: Works without internet after first load (PWA)
 - **Installable**: Add to home screen for native app experience
 - **URL Routing**: Deep links to specific sections (`/prayer`, `/prayer/week`, `/hijri`)
 - **Mobile-First Design**: Optimized for mobile with bottom navigation
+- **Code Splitting**: Fast initial load with route-based lazy loading
+
+## Architecture
+
+```mermaid
+flowchart TB
+    subgraph Frontend["Frontend (React PWA)"]
+        App["App.tsx"]
+        Routes["Routes"]
+        Hooks["Custom Hooks"]
+        Data["Data Layer"]
+    end
+    
+    subgraph Backend["Backend Services"]
+        Vercel["Vercel API Routes"]
+        Firebase["Firebase Cloud Functions"]
+        FCM["Firebase Cloud Messaging"]
+    end
+    
+    subgraph Storage["Data Storage"]
+        JSON["Static JSON Data"]
+        LocalStorage["localStorage"]
+    end
+    
+    App --> Routes
+    Routes --> Hooks
+    Hooks --> Data
+    Data --> JSON
+    Hooks --> LocalStorage
+    
+    App -->|Subscribe/Unsubscribe| Vercel
+    Vercel --> FCM
+    Firebase -->|Scheduled Push| FCM
+    FCM -->|Push Notification| App
+```
 
 ## Routes
 
@@ -56,11 +97,12 @@ A modern, mobile-first Progressive Web App (PWA) for Islamic prayer times and Hi
 ## Tech Stack
 
 - **React 19** with TypeScript
-- **React Router** for client-side routing
-- **Vite** for fast development and builds
+- **React Router 7** for client-side routing
+- **Vite 7** for fast development and builds
 - **Tailwind CSS v4** with shadcn/ui components
 - **PWA** with Workbox service worker for offline support
-- **Local Storage** for persisting user preferences
+- **Firebase Cloud Messaging** for push notifications
+- **Vercel** for hosting and serverless API routes
 
 ## Getting Started
 
@@ -74,36 +116,88 @@ npm run dev
 # Build for production
 npm run build
 
+# Run tests
+npm run test
+
 # Preview production build
 npm run preview
 ```
 
-## PWA Features & Limitations
+## Push Notifications
 
-### What Works
-- Installable on home screen (Android, iOS, Desktop)
-- Offline access to all prayer times and calendar data
-- Standalone mode (no browser UI)
-- Theme and district preferences persist
+### How It Works
 
-### Current Limitations
+```mermaid
+sequenceDiagram
+    participant User
+    participant PWA
+    participant Vercel as Vercel API
+    participant FCM as Firebase Cloud Messaging
+    participant CloudFn as Cloud Function
+    
+    User->>PWA: Enable notifications
+    PWA->>FCM: Get device token
+    PWA->>Vercel: Subscribe to zone topic
+    Vercel->>FCM: Register subscription
+    
+    Note over CloudFn: Runs every minute 4AM-8PM
+    CloudFn->>CloudFn: Check if prayer time - 10min
+    CloudFn->>FCM: Send to zone topic
+    FCM->>PWA: Push notification
+    PWA->>User: Show prayer reminder
+```
 
-**Notifications require the app to be open.**
+### Enabling Notifications
 
-The current notification system uses browser `setTimeout` which only works while the app is running. When you close the app:
-- Scheduled notifications are lost
-- No alerts will fire
+1. Open the app and tap the notification bell icon
+2. Select your district from the dropdown
+3. Grant notification permission when prompted
+4. You'll receive notifications 10 minutes before each prayer
 
-**Why?** True background notifications require:
-- A backend server with Web Push (FCM/VAPID)
-- Or wrapping in a native app container (Capacitor)
+### iOS Requirements
 
-**Workaround**: Keep the app open in a background tab for notifications to work.
+Push notifications on iOS require:
+- iOS 16.4 or later
+- The app must be installed to your home screen (not just opened in Safari)
 
-### Future Improvements
-- Web Push notifications with backend service
-- Better iOS PWA support detection
-- Periodic sync for background updates
+To install on iOS:
+1. Open the app in Safari
+2. Tap the Share button
+3. Tap "Add to Home Screen"
+4. Open the app from your home screen
+
+## Project Structure
+
+```
+src/
+├── components/          # React components
+│   ├── ui/             # shadcn/ui components
+│   ├── common/         # Shared components (LoadingSpinner, etc.)
+│   ├── layouts/        # Layout components (PrayerLayout)
+│   ├── landing/        # Landing page components
+│   ├── calendar/       # Hijri calendar components
+│   └── notifications/  # Push notification UI
+├── hooks/              # Custom React hooks
+│   ├── useAlarms.ts    # Local notification scheduling
+│   ├── usePrayerTimes.ts
+│   ├── useHijriCalendar.ts
+│   ├── useIslamicEvents.ts
+│   └── usePushNotifications.ts
+├── contexts/           # React Context providers
+│   ├── LocationContext.tsx
+│   ├── ThemeContext.tsx
+│   └── PushNotificationContext.tsx
+├── data/               # Static JSON data
+│   ├── prayerTimes.json
+│   ├── hijriCalendar.json
+│   └── islamicEvents.json
+├── lib/                # Utilities and data access
+│   ├── data/          # Data access layer
+│   ├── firebase/      # Firebase SDK setup
+│   ├── utils/         # Utility functions
+│   └── constants/     # App constants
+└── App.tsx            # Main app with routing
+```
 
 ## Islamic Months
 
@@ -143,28 +237,10 @@ The current notification system uses browser `setTimeout` which only works while
 - [ACJU Calendars](https://www.acju.lk/calenders-en/) - Official moon sighting announcements
 - [SLHub Hilaal Calendar](https://www.slhub.com/downloads/hilaal-calendar) - Monthly Hijri calendars
 
-## Project Structure
+## Documentation
 
-```
-src/
-├── components/          # React components
-│   ├── ui/             # shadcn/ui components
-│   ├── LandingPage.tsx # Home page with countdown
-│   ├── DailyView.tsx   # Today's prayer times
-│   ├── WeekView.tsx    # Weekly schedule
-│   ├── MonthView.tsx   # Monthly schedule
-│   └── HijriCalendarView.tsx
-├── hooks/              # Custom React hooks
-│   ├── useAlarms.ts    # Notification scheduling
-│   ├── usePrayerTimes.ts
-│   ├── useHijriCalendar.ts
-│   └── useIslamicEvents.ts
-├── data/               # Static JSON data
-│   ├── prayerTimes.json
-│   ├── hijriCalendar.json
-│   └── islamicEvents.json
-└── lib/                # Utilities
-```
+- [Architecture Documentation](./plan-docs/ARCHITECTURE.md) - Detailed system architecture
+- [Push Notifications Plan](./plan-docs/PUSH_NOTIFICATIONS_PLAN.md) - Push notification implementation details
 
 ## License
 
@@ -175,3 +251,4 @@ MIT
 - [ACJU](https://www.acju.lk/) for prayer times and Islamic calendar data
 - [shadcn/ui](https://ui.shadcn.com/) for UI components
 - [Lucide](https://lucide.dev/) for icons
+- [Firebase](https://firebase.google.com/) for push notifications

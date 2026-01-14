@@ -30,6 +30,7 @@ prayer-times-app/
 │   │   ├── admin/                    # Admin panel components
 │   │   ├── calendar/                 # Hijri calendar components
 │   │   ├── common/                   # Shared components
+│   │   ├── layouts/                  # Layout components (PrayerLayout)
 │   │   ├── landing/                  # Landing page sub-components
 │   │   └── notifications/            # Push notification UI
 │   ├── contexts/                     # React Context providers
@@ -87,75 +88,55 @@ prayer-times-app/
 
 ## Application Architecture
 
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                              REACT APPLICATION                               │
-├─────────────────────────────────────────────────────────────────────────────┤
-│                                                                             │
-│  ┌─────────────────────────────────────────────────────────────────────┐    │
-│  │                         PROVIDER LAYER                              │    │
-│  │  ┌─────────────┐  ┌─────────────┐  ┌──────────────────────────┐    │    │
-│  │  │   Theme     │  │  Location   │  │   Push Notification      │    │    │
-│  │  │  Provider   │  │  Provider   │  │      Provider            │    │    │
-│  │  └─────────────┘  └─────────────┘  └──────────────────────────┘    │    │
-│  └─────────────────────────────────────────────────────────────────────┘    │
-│                                    │                                        │
-│                                    ▼                                        │
-│  ┌─────────────────────────────────────────────────────────────────────┐    │
-│  │                          ROUTING LAYER                              │    │
-│  │                                                                     │    │
-│  │   /           → LandingPage (countdown, today's blessings)          │    │
-│  │   /prayer     → DailyView (today's prayer times + alarms)           │    │
-│  │   /prayer/week → WeekView (7-day schedule)                          │    │
-│  │   /prayer/month → MonthView (monthly table)                         │    │
-│  │   /hijri      → HijriCalendarView (full calendar)                   │    │
-│  │   /admin      → AdminPage (hidden, Hijri updates)                   │    │
-│  │                                                                     │    │
-│  └─────────────────────────────────────────────────────────────────────┘    │
-│                                    │                                        │
-│                                    ▼                                        │
-│  ┌─────────────────────────────────────────────────────────────────────┐    │
-│  │                           HOOKS LAYER                               │    │
-│  │                                                                     │    │
-│  │   usePrayerTimes ──────► Prayer data for selected district          │    │
-│  │   useHijriCalendar ────► Calendar navigation and date conversion    │    │
-│  │   useIslamicEvents ────► Events, fasting days, recurring fasts      │    │
-│  │   useAlarms ───────────► Local notification scheduling              │    │
-│  │   useCountdown ────────► Next prayer countdown timer                │    │
-│  │   usePushNotifications → FCM token and subscription management      │    │
-│  │                                                                     │    │
-│  └─────────────────────────────────────────────────────────────────────┘    │
-│                                    │                                        │
-│                                    ▼                                        │
-│  ┌─────────────────────────────────────────────────────────────────────┐    │
-│  │                         DATA ACCESS LAYER                           │    │
-│  │                                                                     │    │
-│  │   lib/data/prayerTimes.ts ────► getPrayerTimesForDay()              │    │
-│  │                               ► getCurrentAndNextPrayer()           │    │
-│  │                               ► findNearestDistrict()               │    │
-│  │                                                                     │    │
-│  │   lib/data/hijriCalendar.ts ──► gregorianToHijri()                  │    │
-│  │                               ► hijriToGregorian()                  │    │
-│  │                               ► getMoonPhase()                      │    │
-│  │                                                                     │    │
-│  │   lib/data/islamicEvents.ts ──► getEventsForDate()                  │    │
-│  │                               ► getFastingInfo()                    │    │
-│  │                               ► getUpcomingEvents()                 │    │
-│  │                                                                     │    │
-│  └─────────────────────────────────────────────────────────────────────┘    │
-│                                    │                                        │
-│                                    ▼                                        │
-│  ┌─────────────────────────────────────────────────────────────────────┐    │
-│  │                         STATIC DATA (JSON)                          │    │
-│  │                                                                     │    │
-│  │   prayerTimes.json ─────► 13 zones × 12 months × ~30 days           │    │
-│  │   hijriCalendar.json ───► Hijri months from 1424 AH onwards         │    │
-│  │   islamicEvents.json ───► Events, fasting rules, recurring fasts    │    │
-│  │   virtues.json ─────────► Markdown content for details              │    │
-│  │                                                                     │    │
-│  └─────────────────────────────────────────────────────────────────────┘    │
-│                                                                             │
-└─────────────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TB
+    subgraph React["React Application"]
+        subgraph Providers["Provider Layer"]
+            Theme["ThemeProvider"]
+            Location["LocationProvider"]
+            Push["PushNotificationProvider"]
+        end
+        
+        subgraph Routes["Routing Layer"]
+            Landing["/ - LandingPage"]
+            Prayer["PrayerLayout"]
+            Daily["/prayer - DailyView"]
+            Week["/prayer/week - WeekView"]
+            Month["/prayer/month - MonthView"]
+            Hijri["/hijri - HijriCalendarView"]
+            Admin["/admin - AdminPage"]
+        end
+        
+        subgraph Hooks["Hooks Layer"]
+            usePrayerTimes["usePrayerTimes"]
+            useHijriCalendar["useHijriCalendar"]
+            useIslamicEvents["useIslamicEvents"]
+            useAlarms["useAlarms"]
+            useCountdown["useCountdown"]
+            usePushNotifications["usePushNotifications"]
+        end
+        
+        subgraph Data["Data Access Layer"]
+            prayerTimesLib["lib/data/prayerTimes.ts"]
+            hijriLib["lib/data/hijriCalendar.ts"]
+            eventsLib["lib/data/islamicEvents.ts"]
+        end
+        
+        subgraph JSON["Static Data (JSON)"]
+            prayerJSON["prayerTimes.json"]
+            hijriJSON["hijriCalendar.json"]
+            eventsJSON["islamicEvents.json"]
+            virtuesJSON["virtues.json"]
+        end
+    end
+    
+    Providers --> Routes
+    Prayer --> Daily
+    Prayer --> Week
+    Prayer --> Month
+    Routes --> Hooks
+    Hooks --> Data
+    Data --> JSON
 ```
 
 ---
@@ -164,152 +145,146 @@ prayer-times-app/
 
 ### Prayer Times Flow
 
-```
-User selects district (LocationContext)
-         │
-         ▼
-usePrayerTimes(districtId)
-         │
-         ├──► getDistrictById() → Get zone from district
-         │
-         ├──► getTodayPrayerTimes() → Query JSON data
-         │
-         ├──► getCurrentAndNextPrayer() → Calculate based on current time
-         │
-         └──► Returns: { todayPrayers, weekPrayers, currentPrayer, nextPrayer }
-                    │
-                    ▼
-         Components render prayer times
-                    │
-                    ▼
-         useAlarms schedules local notifications
+```mermaid
+sequenceDiagram
+    participant User
+    participant LocationContext
+    participant usePrayerTimes
+    participant DataLayer as lib/data/prayerTimes.ts
+    participant JSON as prayerTimes.json
+    participant Component
+    participant useAlarms
+    
+    User->>LocationContext: Select district
+    LocationContext->>usePrayerTimes: districtId
+    usePrayerTimes->>DataLayer: getDistrictById()
+    DataLayer->>JSON: Query zone data
+    JSON-->>DataLayer: Zone prayer times
+    DataLayer-->>usePrayerTimes: todayPrayers, weekPrayers
+    usePrayerTimes->>DataLayer: getCurrentAndNextPrayer()
+    DataLayer-->>usePrayerTimes: currentPrayer, nextPrayer
+    usePrayerTimes-->>Component: Prayer data
+    Component->>useAlarms: Schedule notifications
+    useAlarms-->>User: Browser notifications
 ```
 
 ### Push Notification Flow
 
-```
-User enables notifications
-         │
-         ▼
-usePushNotifications.enable(districtId)
-         │
-         ├──► Request browser notification permission
-         │
-         ├──► Get FCM token from Firebase
-         │
-         ├──► POST /api/notifications/subscribe
-         │         │
-         │         ▼
-         │    Firebase Admin SDK subscribes token to topic
-         │
-         └──► Store in localStorage: { notificationDistrict, notificationZone, fcmToken }
-
-                    ┌──────────────────────────────────┐
-                    │                                  │
-                    ▼                                  │
-         Firebase Cloud Function (scheduled)           │
-                    │                                  │
-                    ├──► Runs every minute 4AM-8PM    │
-                    │                                  │
-                    ├──► Check if current time matches │
-                    │    any prayer - 10 minutes       │
-                    │                                  │
-                    └──► Send FCM message to topic ────┘
-                              │
-                              ▼
-                    Service Worker receives push
-                              │
-                              ▼
-                    Shows native notification
+```mermaid
+sequenceDiagram
+    participant User
+    participant PWA
+    participant ServiceWorker as Service Worker
+    participant VercelAPI as Vercel API
+    participant FCM as Firebase Cloud Messaging
+    participant CloudFunction as Cloud Function
+    participant Scheduler as Cloud Scheduler
+    
+    User->>PWA: Enable notifications
+    PWA->>PWA: Request permission
+    PWA->>FCM: Get FCM token
+    FCM-->>PWA: Device token
+    PWA->>VercelAPI: POST /api/notifications/subscribe
+    VercelAPI->>FCM: Subscribe token to topic
+    FCM-->>VercelAPI: Success
+    VercelAPI-->>PWA: Subscribed to zone-XX
+    
+    Note over Scheduler,CloudFunction: Every minute 4AM-8PM
+    Scheduler->>CloudFunction: Pub/Sub trigger
+    CloudFunction->>CloudFunction: Check prayer times
+    CloudFunction->>FCM: Send to topic zone-XX
+    FCM->>ServiceWorker: Push message
+    ServiceWorker->>User: Show notification
 ```
 
 ### Hijri Calendar Flow
 
-```
-User navigates calendar (useHijriCalendar)
-         │
-         ├──► previousMonth() / nextMonth()
-         │
-         ├──► goToMonth(year, month)
-         │
-         └──► Returns: { currentMonthData, calendarDays, ... }
-                    │
-                    ▼
-HijriCalendarView renders grid
-                    │
-                    ├──► For each day:
-                    │         │
-                    │         ├──► getAllEventsForDay()
-                    │         │
-                    │         └──► isFastingDay()
-                    │
-                    └──► Render CalendarDay with indicators
+```mermaid
+flowchart TD
+    A[User navigates calendar] --> B[useHijriCalendar hook]
+    B --> C{Navigation action}
+    C -->|previousMonth| D[Update year/month state]
+    C -->|nextMonth| D
+    C -->|goToMonth| D
+    D --> E[Get currentMonthData]
+    E --> F[Generate calendarDays array]
+    F --> G[HijriCalendarView renders grid]
+    G --> H[For each CalendarDay]
+    H --> I[getAllEventsForDay]
+    H --> J[isFastingDay]
+    I --> K[Render event indicators]
+    J --> K
 ```
 
 ---
 
 ## Component Hierarchy
 
-```
-App
-├── Header (hidden on landing page)
-├── MobileNav (bottom tabs + hamburger menu)
-└── Routes
-    ├── / → LandingPage
-    │       ├── NextPrayerCard
-    │       ├── TodayBlessingsCard
-    │       ├── NavigationButtons
-    │       ├── MonthPickerModal
-    │       └── VirtuesSheet
-    │
-    ├── /prayer → DailyView
-    │       ├── NextPrayerBanner
-    │       ├── HijriDateDisplay
-    │       └── PrayerRow (×6)
-    │
-    ├── /prayer/week → WeekView
-    │       └── (7 day sections with PrayerRow)
-    │
-    ├── /prayer/month → MonthView
-    │       ├── Table (desktop)
-    │       ├── List (mobile)
-    │       └── Sheet (day details)
-    │
-    ├── /hijri → HijriCalendarView
-    │       ├── CalendarHeader
-    │       ├── CalendarDay (×29-30)
-    │       ├── MonthEventsCard
-    │       ├── CalendarLegend
-    │       └── VirtuesSheet
-    │
-    └── /admin → AdminPage (standalone, no header/nav)
+```mermaid
+graph TD
+    App --> Header
+    App --> MobileNav
+    App --> Routes
+    
+    Routes --> Landing["/  LandingPage"]
+    Routes --> PrayerLayout["/prayer  PrayerLayout"]
+    Routes --> HijriView["/hijri  HijriCalendarView"]
+    Routes --> AdminView["/admin  AdminPage"]
+    
+    Landing --> NextPrayerCard
+    Landing --> TodayBlessingsCard
+    Landing --> NavigationButtons
+    Landing --> MonthPickerModal
+    Landing --> VirtuesSheet
+    
+    PrayerLayout --> ViewSwitcher
+    PrayerLayout --> DailyRoute["DailyViewRoute"]
+    PrayerLayout --> WeekRoute["WeekViewRoute"]
+    PrayerLayout --> MonthRoute["MonthViewRoute"]
+    
+    DailyRoute --> DailyView
+    DailyView --> NextPrayerBanner
+    DailyView --> HijriDateDisplay
+    DailyView --> PrayerRow
+    
+    WeekRoute --> WeekView
+    MonthRoute --> MonthView
+    
+    HijriView --> CalendarHeader
+    HijriView --> CalendarDay
+    HijriView --> MonthEventsCard
+    HijriView --> CalendarLegend
+    HijriView --> VirtuesSheet2[VirtuesSheet]
 ```
 
 ---
 
 ## State Management
 
-### Context Providers
+```mermaid
+flowchart LR
+    subgraph Contexts["Context Providers"]
+        Theme["ThemeContext<br/>Dark/Light mode"]
+        Location["LocationContext<br/>Selected district"]
+        PushNotif["PushNotificationContext<br/>FCM state"]
+    end
+    
+    subgraph Storage["localStorage"]
+        ThemeStore["theme"]
+        DistrictStore["selectedDistrict"]
+        PushStore["pushEnabled<br/>notificationDistrict<br/>fcmToken"]
+    end
+    
+    Theme <--> ThemeStore
+    Location <--> DistrictStore
+    PushNotif <--> PushStore
+```
 
 | Context | Purpose | Persisted |
 |---------|---------|-----------|
 | `ThemeContext` | Dark/light mode toggle | localStorage |
 | `LocationContext` | Selected district | localStorage |
 | `PushNotificationContext` | FCM state and actions | localStorage |
-
-### Local State (useState)
-
-Most component state is local:
-- Calendar month navigation
-- Modal open/close states
-- Form inputs
-
-### Derived State (useMemo)
-
-Expensive computations are memoized:
-- Prayer time calculations
-- Calendar day arrays
-- Event lookups
 
 ---
 
@@ -336,19 +311,30 @@ Expensive computations are memoized:
 
 ## Build Output
 
-```
-dist/
-├── index.html                     # Entry HTML
-├── manifest.webmanifest           # PWA manifest
-├── registerSW.js                  # Service worker registration
-├── sw.js                          # Generated service worker
-├── workbox-*.js                   # Workbox runtime
-└── assets/
-    ├── index-*.css                # Tailwind CSS (~82 KB)
-    └── index-*.js                 # App bundle (~1,275 KB)
+The app uses route-based code splitting for optimal loading:
+
+```mermaid
+pie title Bundle Size Distribution
+    "Main bundle" : 1021
+    "LandingPage" : 13
+    "DailyViewRoute" : 8
+    "WeekViewRoute" : 3
+    "MonthViewRoute" : 7
+    "HijriCalendarView" : 31
+    "VirtuesSheet" : 119
+    "AdminPage" : 12
 ```
 
-**Note:** Bundle size exceeds recommended limit. See REFACTORING_PLAN.md for code splitting plan.
+| Chunk | Size | Gzipped |
+|-------|------|---------|
+| Main bundle | 1,021 KB | 183 KB |
+| LandingPage | 13 KB | 4 KB |
+| DailyViewRoute | 8 KB | 3 KB |
+| WeekViewRoute | 2.5 KB | 1 KB |
+| MonthViewRoute | 6.5 KB | 2 KB |
+| HijriCalendarView | 31 KB | 10 KB |
+| VirtuesSheet | 119 KB | 37 KB |
+| AdminPage | 12 KB | 4 KB |
 
 ---
 
@@ -366,7 +352,7 @@ dist/
 
 | File | Contents |
 |------|----------|
-| `src/data/prayerTimes.json` | 13 zones × 12 months of prayer times |
+| `src/data/prayerTimes.json` | 13 zones x 12 months of prayer times |
 | `src/data/hijriCalendar.json` | Hijri month mappings (1424 AH+) |
 | `src/data/islamicEvents.json` | Events, fasting rules |
 | `src/data/virtues.json` | Markdown content for virtues |
@@ -384,6 +370,30 @@ dist/
 ---
 
 ## Deployment
+
+```mermaid
+flowchart LR
+    subgraph GitHub["GitHub Repository"]
+        Main["main branch"]
+    end
+    
+    subgraph Vercel["Vercel"]
+        Frontend["Frontend App"]
+        API["API Routes"]
+    end
+    
+    subgraph Firebase["Firebase"]
+        Functions["Cloud Functions"]
+        FCM["Cloud Messaging"]
+        Scheduler["Cloud Scheduler"]
+    end
+    
+    Main -->|Auto deploy| Frontend
+    Main -->|Auto deploy| API
+    Main -->|Manual deploy| Functions
+    Scheduler -->|Pub/Sub| Functions
+    Functions -->|Send| FCM
+```
 
 ### Frontend (Vercel)
 
@@ -413,6 +423,4 @@ firebase deploy --only functions
 
 ## Related Documents
 
-- [REFACTORING_PLAN.md](./REFACTORING_PLAN.md) - Planned code improvements
-- [CODE_ANALYSIS.md](./CODE_ANALYSIS.md) - Detailed issue analysis
-- [PUSH_NOTIFICATIONS_PLAN.md](./PUSH_NOTIFICATIONS_PLAN.md) - Push notification implementation
+- [PUSH_NOTIFICATIONS_PLAN.md](./PUSH_NOTIFICATIONS_PLAN.md) - Push notification implementation details
