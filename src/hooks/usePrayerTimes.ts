@@ -46,7 +46,10 @@ export function usePrayerTimes(districtId: string) {
     return getPrayerTimesForMonth(district.zone, month)
   }, [district.zone])
 
-  // Include currentMinute in dependencies to trigger re-calculation when time changes
+  // Re-calculate current/next prayer when time changes
+  // Note: currentMinute is intentionally used as a trigger to force recalculation
+  // every minute, even though it's not directly used in the calculation.
+  // This ensures the UI updates as prayer times pass throughout the day.
   const prayerInfo = useMemo(() => {
     return getCurrentAndNextPrayer(todayPrayers)
     // eslint-disable-next-line react-hooks/exhaustive-deps

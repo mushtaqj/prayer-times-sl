@@ -12,9 +12,8 @@ import {
 import { prayerNames, prayerMetadata } from '@/lib/data/prayerTimes'
 import type { PrayerName } from '@/lib/data/types'
 
-interface AlarmSettings {
-  [key: string]: boolean
-}
+/** Alarm settings for each prayer - typed for safety */
+type AlarmSettings = Record<PrayerName, boolean>
 
 interface UseAlarmsReturn {
   alarms: AlarmSettings

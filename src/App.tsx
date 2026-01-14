@@ -1,20 +1,23 @@
-import { useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { Header } from '@/components/Header'
 import { MobileNav } from '@/components/MobileNav'
-import { LandingPage } from '@/components/LandingPage'
-import { DailyView } from '@/components/DailyView'
-import { WeekView } from '@/components/WeekView'
-import { MonthView } from '@/components/MonthView'
-import { HijriCalendarView } from '@/components/HijriCalendarView'
-import { AdminPage } from '@/components/AdminPage'
-import { ViewSwitcher } from '@/components/ViewSwitcher'
 import { ActionBanner } from '@/components/ActionBanner'
+import { LoadingSpinner } from '@/components/common'
+import { PrayerLayout } from '@/components/layouts'
 import { useLocationContext, useThemeContext } from '@/contexts'
 import { useAlarms } from '@/hooks/useAlarms'
 import { usePrayerTimes } from '@/hooks/usePrayerTimes'
 import { COUNTRY_NAME } from '@/lib/constants/appConstants'
-import { Bell, Download } from 'lucide-react'
+import { Download } from 'lucide-react'
+
+// Lazy load route components for code splitting
+const LandingPage = lazy(() => import('@/components/LandingPage').then(m => ({ default: m.LandingPage })))
+const DailyViewRoute = lazy(() => import('@/components/DailyViewRoute').then(m => ({ default: m.DailyViewRoute })))
+const WeekViewRoute = lazy(() => import('@/components/WeekViewRoute').then(m => ({ default: m.WeekViewRoute })))
+const MonthViewRoute = lazy(() => import('@/components/MonthViewRoute').then(m => ({ default: m.MonthViewRoute })))
+const HijriCalendarView = lazy(() => import('@/components/HijriCalendarView').then(m => ({ default: m.HijriCalendarView })))
+const AdminPage = lazy(() => import('@/components/AdminPage').then(m => ({ default: m.AdminPage })))
 
 function App() {
   const [deferredPrompt, setDeferredPrompt] = useState<Event | null>(null)
@@ -64,16 +67,6 @@ function App() {
   const isHomePage = location.pathname === '/'
   const isAdminPage = location.pathname === '/admin'
 
-  // Notification banner component (for prayer pages)
-  const notificationBanner = !hasPermission && (
-    <ActionBanner
-      icon={Bell}
-      message="Enable notifications for prayer alerts"
-      actionLabel="Enable"
-      onAction={handleEnableNotifications}
-    />
-  )
-
   // Install banner component (for landing page)
   const installBanner = showInstallBanner && (
     <ActionBanner
@@ -86,9 +79,25 @@ function App() {
     />
   )
 
+  // Context data for prayer layout child routes
+  const prayerLayoutContext = {
+    todayPrayers,
+    weekPrayers,
+    getMonthPrayers,
+    currentPrayer,
+    nextPrayer,
+    alarms,
+    onToggleAlarm: toggleAlarm,
+    location: locationName,
+  }
+
   // Render admin page completely standalone (no header, no nav)
   if (isAdminPage) {
-    return <AdminPage />
+    return (
+      <Suspense fallback={<LoadingSpinner />}>
+        <AdminPage />
+      </Suspense>
+    )
   }
 
   return (
@@ -101,109 +110,55 @@ function App() {
         <MobileNav />
 
         <main className="flex-1 flex flex-col relative">
-          <Routes>
-            {/* Home / Landing Page */}
-            <Route
-              path="/"
-              element={
-                <div className="flex-1 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                  <LandingPage
-                    currentPrayer={currentPrayer}
-                    nextPrayer={nextPrayer}
-                    location={locationName}
-                    isDark={isDark}
-                    onThemeToggle={toggleTheme}
-                    installBanner={installBanner}
+          <Suspense fallback={<LoadingSpinner />}>
+            <Routes>
+              {/* Home / Landing Page */}
+              <Route
+                path="/"
+                element={
+                  <div className="flex-1 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    <LandingPage
+                      currentPrayer={currentPrayer}
+                      nextPrayer={nextPrayer}
+                      location={locationName}
+                      isDark={isDark}
+                      onThemeToggle={toggleTheme}
+                      installBanner={installBanner}
+                    />
+                  </div>
+                }
+              />
+
+              {/* Prayer Times Section - Nested Routes */}
+              <Route
+                path="/prayer"
+                element={
+                  <PrayerLayout
+                    hasPermission={hasPermission}
+                    onEnableNotifications={handleEnableNotifications}
+                    context={prayerLayoutContext}
                   />
-                </div>
-              }
-            />
+                }
+              >
+                <Route index element={<DailyViewRoute />} />
+                <Route path="week" element={<WeekViewRoute />} />
+                <Route path="month" element={<MonthViewRoute />} />
+              </Route>
 
-            {/* Prayer Times Section */}
-            <Route
-              path="/prayer"
-              element={
-                <>
-                  {/* Sticky View Switcher */}
-                  <div className="sticky top-[calc(48px+env(safe-area-inset-top))] sm:top-[60px] z-30 mt-[calc(48px+env(safe-area-inset-top))] sm:mt-0 bg-background/95 backdrop-blur-md px-4 py-3 border-b border-border/50 supports-[backdrop-filter]:bg-background/60 shadow-sm">
-                    <ViewSwitcher />
+              {/* Hijri Calendar Section */}
+              <Route
+                path="/hijri"
+                element={
+                  <div className="p-4 mt-[calc(48px+env(safe-area-inset-top))] sm:mt-0 pb-20 sm:pb-4 flex-1 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    <HijriCalendarView location={locationName} />
                   </div>
+                }
+              />
 
-                  <div className="p-4 pb-20 sm:pb-4 space-y-6 flex-1">
-                    {notificationBanner}
-
-                    {/* Daily Prayer View */}
-                    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                      <DailyView
-                        prayers={todayPrayers}
-                        nextPrayer={nextPrayer}
-                        currentPrayer={currentPrayer}
-                        alarms={alarms}
-                        onToggleAlarm={toggleAlarm}
-                        location={locationName}
-                      />
-                    </div>
-                  </div>
-                </>
-              }
-            />
-
-            {/* Prayer Week View */}
-            <Route
-              path="/prayer/week"
-              element={
-                <>
-                  <div className="sticky top-[calc(48px+env(safe-area-inset-top))] sm:top-[60px] z-30 mt-[calc(48px+env(safe-area-inset-top))] sm:mt-0 bg-background/95 backdrop-blur-md px-4 py-3 border-b border-border/50 supports-[backdrop-filter]:bg-background/60 shadow-sm">
-                    <ViewSwitcher />
-                  </div>
-
-                  <div className="p-4 pb-20 sm:pb-4 space-y-6 flex-1">
-                    {notificationBanner}
-
-                    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                      <WeekView prayers={weekPrayers} location={locationName} />
-                    </div>
-                  </div>
-                </>
-              }
-            />
-
-            {/* Prayer Month View */}
-            <Route
-              path="/prayer/month"
-              element={
-                <>
-                  <div className="sticky top-[calc(48px+env(safe-area-inset-top))] sm:top-[60px] z-30 mt-[calc(48px+env(safe-area-inset-top))] sm:mt-0 bg-background/95 backdrop-blur-md px-4 py-3 border-b border-border/50 supports-[backdrop-filter]:bg-background/60 shadow-sm">
-                    <ViewSwitcher />
-                  </div>
-
-                  <div className="p-4 pb-20 sm:pb-4 space-y-6 flex-1">
-                    {notificationBanner}
-
-                    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                      <MonthView getMonthPrayers={getMonthPrayers} location={locationName} />
-                    </div>
-                  </div>
-                </>
-              }
-            />
-
-            {/* Hijri Calendar Section */}
-            <Route
-              path="/hijri"
-              element={
-                <div className="p-4 mt-[calc(48px+env(safe-area-inset-top))] sm:mt-0 pb-20 sm:pb-4 flex-1 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                  <HijriCalendarView location={locationName} />
-                </div>
-              }
-            />
-
-            {/* Admin Page - hidden route */}
-            <Route path="/admin" element={<AdminPage />} />
-
-            {/* Redirect any unknown routes to home */}
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
+              {/* Redirect any unknown routes to home */}
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </Suspense>
 
           {/* Footer - hidden on mobile */}
           {!isHomePage && (

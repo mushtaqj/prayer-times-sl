@@ -1,4 +1,5 @@
 export { CircleProgress } from './CircleProgress'
 export { DistrictSelector } from './DistrictSelector'
+export { LoadingSpinner } from './LoadingSpinner'
 export { LocationBadge } from './LocationBadge'
 export { ThemeToggleButton } from './ThemeToggleButton'
