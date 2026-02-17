@@ -2,7 +2,7 @@
   "metadata": {
     "source": "ACJU Sri Lanka (All Ceylon Jamiyyathul Ulama)",
     "description": "Historical Hijri calendar data based on official moon sighting in Sri Lanka",
-    "lastUpdated": "2026-01-10"
+    "lastUpdated": "2026-02-17"
   },
   "hijriMonths": [
     {
@@ -2341,7 +2341,23 @@
       "monthName": "Rajab",
       "gregorianStart": "2025-12-23",
       "days": 29,
+      "status": "completed"
+    },
+    {
+      "hijriYear": 1447,
+      "hijriMonth": 8,
+      "monthName": "Shaban",
+      "gregorianStart": "2026-01-21",
+      "days": 30,
       "status": "ongoing"
+    },
+    {
+      "hijriYear": 1447,
+      "hijriMonth": 9,
+      "monthName": "Ramadan",
+      "gregorianStart": "2026-02-20",
+      "days": 30,
+      "status": "upcoming"
     }
   ]
 }
