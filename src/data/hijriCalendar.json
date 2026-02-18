@@ -2348,14 +2348,22 @@
       "hijriMonth": 8,
       "monthName": "Shaban",
       "gregorianStart": "2026-01-21",
-      "days": 30,
-      "status": "ongoing"
+      "days": 29,
+      "status": "completed"
     },
     {
       "hijriYear": 1447,
       "hijriMonth": 9,
       "monthName": "Ramadan",
-      "gregorianStart": "2026-02-20",
+      "gregorianStart": "2026-02-19",
+      "days": 30,
+      "status": "ongoing"
+    },
+    {
+      "hijriYear": 1447,
+      "hijriMonth": 10,
+      "monthName": "Shawwal",
+      "gregorianStart": "2026-03-20",
       "days": 30,
       "status": "upcoming"
     }
