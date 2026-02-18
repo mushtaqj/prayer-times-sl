@@ -13,6 +13,7 @@ import {
   MonthEventsCard,
   CalendarDay,
   EmptyCalendarCell,
+  PreviousMonthDay,
   UncertainDay30Cell,
   getMonthTheme,
   WEEKDAY_LABELS,
@@ -36,6 +37,7 @@ export function HijriCalendarView({ location }: HijriCalendarViewProps) {
     currentHijriYear,
     currentHijriMonth,
     calendarDays,
+    previousMonthDays,
     hijriMonths,
     previousMonth,
     nextMonth,
@@ -70,20 +72,23 @@ export function HijriCalendarView({ location }: HijriCalendarViewProps) {
 
   const calendarGrid = useMemo(() => {
     const grid: (typeof calendarDays[0] | null)[] = []
-    for (let i = 0; i < startDayOfWeek; i++) {
-      grid.push(null)
+    if (previousMonthDays.length > 0) {
+      grid.push(...previousMonthDays)
+    } else {
+      for (let i = 0; i < startDayOfWeek; i++) {
+        grid.push(null)
+      }
     }
     grid.push(...calendarDays)
     return grid
-  }, [calendarDays, startDayOfWeek])
+  }, [calendarDays, startDayOfWeek, previousMonthDays])
 
   const isCurrentMonth = useMemo(() => {
-    if (!todayHijri) return false
-    return (
-      currentHijriYear === todayHijri.year &&
-      currentHijriMonth === todayHijri.month
-    )
-  }, [currentHijriYear, currentHijriMonth, todayHijri])
+    // The "Current" ribbon follows the ongoing month status.
+    // During transition (moon sighted, new month declared ongoing, old month completed),
+    // the ribbon moves to the new month even though the Gregorian date is still in the old one.
+    return currentMonthData?.status === 'ongoing'
+  }, [currentMonthData])
 
   const showDay30Uncertain = useMemo(() => {
     return isCurrentMonth && currentMonthData?.days === 29
@@ -152,12 +157,13 @@ export function HijriCalendarView({ location }: HijriCalendarViewProps) {
   }, [currentMonthData])
 
   const showTodayButton = useMemo(() => {
-    return Boolean(
-      todayHijri &&
-        (currentHijriYear !== todayHijri.year ||
-          currentHijriMonth !== todayHijri.month)
-    )
-  }, [todayHijri, currentHijriYear, currentHijriMonth])
+    if (!todayHijri) return false
+    // Today is in the current month
+    if (currentHijriYear === todayHijri.year && currentHijriMonth === todayHijri.month) return false
+    // Today is visible in the trailing previous month days
+    if (previousMonthDays.some(d => d.isToday)) return false
+    return true
+  }, [todayHijri, currentHijriYear, currentHijriMonth, previousMonthDays])
 
   if (!currentMonthData) {
     return (
@@ -221,6 +227,17 @@ export function HijriCalendarView({ location }: HijriCalendarViewProps) {
                   return (
                     <EmptyCalendarCell
                       key={`empty-${index}`}
+                      isLastCol={isLastCol}
+                      isFriday={isFriday}
+                    />
+                  )
+                }
+
+                if (!day.isCurrentMonth) {
+                  return (
+                    <PreviousMonthDay
+                      key={`prev-${day.hijriDay}`}
+                      day={day}
                       isLastCol={isLastCol}
                       isFriday={isFriday}
                     />

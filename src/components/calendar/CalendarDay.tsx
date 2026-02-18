@@ -149,13 +149,49 @@ export function CalendarDay({
 }
 
 /**
- * Empty cell for calendar grid padding
+ * Empty cell for calendar grid padding (when no previous month data available)
  */
 export function EmptyCalendarCell({ isLastCol, isFriday }: { isLastCol: boolean; isFriday: boolean }) {
   return (
     <div
       className={`aspect-square border-b border-border ${!isLastCol ? 'border-r border-border' : ''} ${isFriday ? 'bg-primary/5' : 'bg-muted/10'}`}
     />
+  )
+}
+
+/**
+ * Dimmed day cell for trailing days from the previous month
+ */
+export function PreviousMonthDay({
+  day,
+  isLastCol,
+  isFriday,
+}: {
+  day: CalendarDayType
+  isLastCol: boolean
+  isFriday: boolean
+}) {
+  const isGregorianStart = day.gregorianDate.getDate() === 1
+  const gregorianDayLabel = isGregorianStart
+    ? `${formatMonthShort(day.gregorianDate)} 1`
+    : day.gregorianDate.getDate().toString()
+
+  return (
+    <div
+      className={`aspect-square p-1 flex flex-col relative transition-colors border-b border-border ${!isLastCol ? 'border-r border-border' : ''} ${isFriday ? 'bg-primary/5' : 'bg-muted/10'} ${day.isToday ? 'ring-2 ring-primary ring-inset z-10 bg-primary/10' : ''}`}
+    >
+      {/* Hijri Day Number - CENTER */}
+      <div className="flex-1 flex items-center justify-center">
+        <span className={`text-2xl font-bold leading-none tracking-tight ${day.isToday ? 'text-primary/60' : 'text-muted-foreground/30'}`}>
+          {day.hijriDay}
+        </span>
+      </div>
+
+      {/* Gregorian Day - Bottom Right */}
+      <span className={`absolute bottom-1 right-1.5 text-[10px] font-medium leading-none ${isGregorianStart ? 'text-primary/30 font-bold' : 'text-muted-foreground/30'}`}>
+        {gregorianDayLabel}
+      </span>
+    </div>
   )
 }
 

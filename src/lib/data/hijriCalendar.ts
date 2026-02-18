@@ -64,12 +64,15 @@ export function getMoonPhase(hijriDay: number): MoonPhase {
  * Returns null if date is outside available data range
  */
 export function gregorianToHijri(date: Date): HijriDate | null {
+  // Normalize to midnight so time-of-day doesn't affect date range comparison
+  const normalized = new Date(date.getFullYear(), date.getMonth(), date.getDate())
+
   for (const month of months) {
     const startDate = parseDate(month.gregorianStart)
     const endDate = addDays(startDate, month.days - 1)
 
-    if (date >= startDate && date <= endDate) {
-      const dayOfMonth = daysBetween(startDate, date) + 1
+    if (normalized >= startDate && normalized <= endDate) {
+      const dayOfMonth = daysBetween(startDate, normalized) + 1
       return {
         day: dayOfMonth,
         month: month.hijriMonth,

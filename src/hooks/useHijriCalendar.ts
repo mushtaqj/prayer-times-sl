@@ -30,6 +30,15 @@ export function useHijriCalendar() {
     )
   }, [currentHijriYear, currentHijriMonth])
 
+  // Get previous month data (for trailing days in grid)
+  const previousMonthData = useMemo(() => {
+    const prevMonth = currentHijriMonth === FIRST_HIJRI_MONTH ? LAST_HIJRI_MONTH : currentHijriMonth - 1
+    const prevYear = currentHijriMonth === FIRST_HIJRI_MONTH ? currentHijriYear - 1 : currentHijriYear
+    return months.find(
+      m => m.hijriYear === prevYear && m.hijriMonth === prevMonth
+    )
+  }, [currentHijriYear, currentHijriMonth])
+
   // Get calendar days for the current month view
   const calendarDays = useMemo((): CalendarDay[] => {
     if (!currentMonthData) return []
@@ -50,6 +59,33 @@ export function useHijriCalendar() {
 
     return days
   }, [currentMonthData])
+
+  // Trailing days from previous month that fill the grid's leading empty cells
+  const previousMonthDays = useMemo((): CalendarDay[] => {
+    if (!currentMonthData) return []
+
+    const startDate = parseDate(currentMonthData.gregorianStart)
+    const startDayOfWeek = startDate.getDay() // 0=Sun ... 6=Sat
+
+    if (startDayOfWeek === 0 || !previousMonthData) return []
+
+    const today = new Date()
+    const prevStartDate = parseDate(previousMonthData.gregorianStart)
+    const days: CalendarDay[] = []
+
+    for (let i = startDayOfWeek; i > 0; i--) {
+      const hijriDay = previousMonthData.days - i + 1
+      const gregorianDate = addDays(prevStartDate, hijriDay - 1)
+      days.push({
+        hijriDay,
+        gregorianDate,
+        isCurrentMonth: false,
+        isToday: isSameDay(gregorianDate, today),
+      })
+    }
+
+    return days
+  }, [currentMonthData, previousMonthData])
 
   // Navigate to previous month
   const previousMonth = useCallback(() => {
@@ -114,9 +150,11 @@ export function useHijriCalendar() {
   return {
     todayHijri,
     currentMonthData,
+    previousMonthData,
     currentHijriYear,
     currentHijriMonth,
     calendarDays,
+    previousMonthDays,
     hijriMonths,
     availableYears,
     previousMonth,
