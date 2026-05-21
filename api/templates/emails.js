@@ -43,6 +43,48 @@ export function confirmationEmail({ days, confirmUrl }) {
   }
 }
 
+export function syncAcjuCodeEmail({ code }) {
+  return {
+    subject: 'Hijri Calendar ACJU Sync Code',
+    html: `
+      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 500px; margin: 0 auto; padding: 20px;">
+        <div style="text-align: center; margin-bottom: 24px;">
+          <div style="display: inline-block; background: #dbeafe; border-radius: 50%; padding: 16px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="2">
+              <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/>
+              <path d="M21 3v5h-5"/>
+            </svg>
+          </div>
+        </div>
+
+        <h2 style="color: #1d4ed8; text-align: center; margin-bottom: 16px;">
+          Hijri Calendar ACJU Sync
+        </h2>
+
+        <p style="color: #374151; line-height: 1.6;">
+          Enter the code below in the admin page to sync the calendar with ACJU.
+        </p>
+
+        <div style="text-align: center; margin: 32px 0;">
+          <div style="display: inline-block; background: #f3f4f6; padding: 16px 32px; border-radius: 8px; font-family: monospace; font-size: 28px; letter-spacing: 6px; font-weight: 600; color: #111827;">
+            ${code}
+          </div>
+        </div>
+
+        <p style="color: #6b7280; font-size: 14px; text-align: center;">
+          This code expires in 15 minutes.
+        </p>
+
+        <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;" />
+
+        <p style="color: #9ca3af; font-size: 12px; text-align: center;">
+          If you didn't request this, please ignore this email.
+        </p>
+      </div>
+    `,
+  }
+}
+
 export function rollbackEmail({ confirmUrl }) {
   return {
     subject: 'Confirm Hijri Calendar Rollback',

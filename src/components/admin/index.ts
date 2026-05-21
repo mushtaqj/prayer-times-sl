@@ -1,3 +1,4 @@
+export { AcjuSyncCard } from './AcjuSyncCard'
 export { AdminForm } from './AdminForm'
 export { AdminSuccessState } from './AdminSuccessState'
 export { MonthTransitionCard } from './MonthTransitionCard'

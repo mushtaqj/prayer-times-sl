@@ -1,18 +1,10 @@
-name: Update Hijri Calendar
+name: Sync Hijri Calendar with ACJU
 
 on:
   workflow_dispatch:
-    inputs:
-      days:
-        description: 'Number of days in the current month (29 or 30)'
-        required: true
-        type: choice
-        options:
-          - '29'
-          - '30'
 
 jobs:
-  update-hijri:
+  sync-hijri:
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -29,15 +21,17 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Update Hijri Calendar JSON
-        run: node scripts/update-hijri.js
-        env:
-          DAYS: ${{ github.event.inputs.days }}
+      - name: Sync Hijri calendar with ACJU
+        run: node scripts/sync-hijri-acju.js
 
       - name: Commit and push changes
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git add src/data/hijriCalendar.json
-          git diff --staged --quiet || git commit -m "Complete Hijri month (${{ github.event.inputs.days }} days) and start next month"
-          git push
+          if git diff --staged --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "Sync Hijri calendar with ACJU"
+            git push
+          fi

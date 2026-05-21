@@ -4,6 +4,7 @@ import { months, hijriMonths } from '@/lib/data/hijriCalendar'
 import { addDays, formatDate, parseDate } from '@/lib/utils/date'
 import { LAST_HIJRI_MONTH, FIRST_HIJRI_MONTH } from '@/lib/constants/hijriConstants'
 import {
+  AcjuSyncCard,
   AdminForm,
   AdminSuccessState,
   MonthTransitionCard,
@@ -204,6 +205,7 @@ export function AdminPage() {
           />
         )}
 
+        <AcjuSyncCard />
         <SecurityNote />
         <RecentChangesHistory recentMonths={recentMonths} />
       </div>
