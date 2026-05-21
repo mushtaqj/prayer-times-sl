@@ -128,19 +128,16 @@ export function CalendarDay({
             day.isToday
               ? 'text-primary'
               : isSpeculative
-                ? 'text-amber-600/70 dark:text-amber-400/70 italic'
+                ? 'text-muted-foreground/60'
                 : textColor
           }`}
         >
           {day.hijriDay}
-          {isSpeculative && (
-            <span className="text-base align-top ml-0.5 text-amber-600/80 dark:text-amber-400/80">?</span>
-          )}
         </span>
       </div>
 
       {/* Gregorian Day - Bottom Right */}
-      <span className={`absolute bottom-1 right-1.5 text-[10px] font-medium leading-none ${isGregorianStart ? 'text-primary font-bold' : 'text-muted-foreground/60'}`}>
+      <span className={`absolute bottom-1 right-1.5 text-xs font-medium leading-none ${isGregorianStart ? 'text-primary font-bold' : 'text-muted-foreground/70'}`}>
         {gregorianDayLabel}
       </span>
     </div>
@@ -209,7 +206,7 @@ export function PreviousMonthDay({
       </div>
 
       {/* Gregorian Day - Bottom Right */}
-      <span className={`absolute bottom-1 right-1.5 text-[10px] font-medium leading-none ${isGregorianStart ? 'text-primary/30 font-bold' : 'text-muted-foreground/30'}`}>
+      <span className={`absolute bottom-1 right-1.5 text-xs font-medium leading-none ${isGregorianStart ? 'text-primary/40 font-bold' : 'text-muted-foreground/40'}`}>
         {gregorianDayLabel}
       </span>
     </div>
