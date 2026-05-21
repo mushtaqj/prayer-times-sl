@@ -8,7 +8,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 const dbPath = join(__dirname, '../src/data/hijriCalendar.json')
 const db = await JSONFilePreset(dbPath, { months: [], metadata: {}, hijriMonths: [] })
 
-const { restored, demoted, removed } = revertTransition(db)
+const { restored, demoted, removed } = revertTransition(db.data)
 
 console.log(`Removed:  ${removed.monthName} ${removed.hijriYear} (upcoming)`)
 console.log(`Demoted:  ${demoted.monthName} ${demoted.hijriYear} -> upcoming (start ${demoted.gregorianStart})`)

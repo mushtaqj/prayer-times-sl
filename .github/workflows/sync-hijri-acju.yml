@@ -2,6 +2,12 @@ name: Sync Hijri Calendar with ACJU
 
 on:
   workflow_dispatch:
+    inputs:
+      count:
+        description: 'Max transitions to apply (leave blank to apply all ACJU has).'
+        required: false
+        type: string
+        default: ''
 
 jobs:
   sync-hijri:
@@ -23,6 +29,8 @@ jobs:
 
       - name: Sync Hijri calendar with ACJU
         run: node scripts/sync-hijri-acju.js
+        env:
+          COUNT: ${{ github.event.inputs.count }}
 
       - name: Commit and push changes
         run: |

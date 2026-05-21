@@ -19,7 +19,7 @@ if (!days || !VALID_MONTH_DAYS.includes(days)) {
 const dbPath = join(__dirname, '../src/data/hijriCalendar.json')
 const db = await JSONFilePreset(dbPath, { months: [], metadata: {}, hijriMonths: [] })
 
-const { completed, newOngoing, newUpcoming } = applyTransition(db, days)
+const { completed, newOngoing, newUpcoming } = applyTransition(db.data, days)
 
 console.log(`Completed: ${completed.monthName} ${completed.hijriYear} (${days} days)`)
 console.log(`Ongoing:   ${newOngoing.monthName} ${newOngoing.hijriYear} starts ${newOngoing.gregorianStart}`)

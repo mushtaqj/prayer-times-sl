@@ -1,72 +1,32 @@
 // Vercel Serverless Function - Confirm Hijri ACJU Sync (OTP step 2)
 // POST /api/confirm-sync-acju
 //
-// Body: { email, code, token }
-// Validates the signed token issued by /api/request-sync-acju, matches the
-// hashed code, and dispatches the sync-hijri-acju GitHub workflow.
+// Body: { email, code, token, count }
+// Validates the signed token issued by /api/request-sync-acju, then dispatches
+// the sync-hijri-acju GitHub workflow. `count` (optional, integer >= 1) caps
+// how many transitions the apply step will commit so the admin can approve a
+// prefix of the previewed plan; omit it to apply everything ACJU has.
 
-import crypto from 'crypto'
-
-function sha256(input) {
-  return crypto.createHash('sha256').update(input).digest('hex')
-}
-
-function timingSafeEqualHex(a, b) {
-  if (a.length !== b.length) return false
-  return crypto.timingSafeEqual(Buffer.from(a, 'hex'), Buffer.from(b, 'hex'))
-}
+import { validateSyncToken } from './lib/syncAcjuToken.js'
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' })
   }
 
-  const { email, code, token } = req.body || {}
-  if (!email || !code || !token) {
-    return res.status(400).json({ error: 'Missing required fields' })
+  const auth = validateSyncToken(req.body || {})
+  if (!auth.ok) {
+    return res.status(auth.status).json({ error: auth.error })
   }
 
-  if (!process.env.ADMIN_SECRET) {
-    return res.status(500).json({ error: 'Server configuration error' })
-  }
-
-  const [payloadB64, signature] = token.split('.')
-  if (!payloadB64 || !signature) {
-    return res.status(400).json({ error: 'Invalid token format' })
-  }
-
-  const payloadStr = Buffer.from(payloadB64, 'base64url').toString()
-  const expectedSignature = crypto
-    .createHmac('sha256', process.env.ADMIN_SECRET)
-    .update(payloadStr)
-    .digest('hex')
-
-  if (!timingSafeEqualHex(signature, expectedSignature)) {
-    return res.status(401).json({ error: 'Invalid token signature' })
-  }
-
-  let payload
-  try {
-    payload = JSON.parse(payloadStr)
-  } catch {
-    return res.status(400).json({ error: 'Invalid token payload' })
-  }
-
-  if (payload.purpose !== 'sync-acju') {
-    return res.status(400).json({ error: 'Token is not for sync' })
-  }
-
-  if (Date.now() > payload.expiresAt) {
-    return res.status(401).json({ error: 'Sync code has expired. Please request a new one.' })
-  }
-
-  if (payload.email !== String(email).toLowerCase()) {
-    return res.status(401).json({ error: 'Email does not match' })
-  }
-
-  const submittedHash = sha256(String(code))
-  if (!timingSafeEqualHex(submittedHash, payload.codeHash)) {
-    return res.status(401).json({ error: 'Invalid sync code' })
+  const { count } = req.body || {}
+  let countInput = ''
+  if (count !== undefined && count !== null && count !== '') {
+    const parsed = parseInt(count, 10)
+    if (!Number.isFinite(parsed) || parsed < 1) {
+      return res.status(400).json({ error: 'count must be a positive integer' })
+    }
+    countInput = String(parsed)
   }
 
   const { GITHUB_TOKEN, GITHUB_REPO } = process.env
@@ -84,7 +44,7 @@ export default async function handler(req, res) {
           Accept: 'application/vnd.github.v3+json',
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ ref: 'main' }),
+        body: JSON.stringify({ ref: 'main', inputs: { count: countInput } }),
       }
     )
 
