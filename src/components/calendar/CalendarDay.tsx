@@ -18,6 +18,7 @@ interface CalendarDayProps {
   currentHijriMonth: number
   isLastCol: boolean
   isFriday: boolean
+  isSpeculative?: boolean
   onDayClick?: () => void
 }
 
@@ -27,6 +28,7 @@ export function CalendarDay({
   fastingInfo,
   isLastCol,
   isFriday,
+  isSpeculative = false,
   onDayClick,
 }: CalendarDayProps) {
   const moonPhase = getMoonPhase(day.hijriDay)
@@ -70,6 +72,9 @@ export function CalendarDay({
   if (fastingInfo.isFasting && fastingInfo.reason && !tooltipLines.some(l => l.includes(fastingInfo.reason!))) {
     tooltipLines.push(`Fasting: ${fastingInfo.reason}`)
   }
+  if (isSpeculative) {
+    tooltipLines.push('Pending: moon sighting will determine if this day exists.')
+  }
   const hasTooltip = tooltipLines.length > 0
 
   // Determine if clickable
@@ -78,12 +83,17 @@ export function CalendarDay({
 
   const cellContent = (
     <div
-      className={`aspect-square p-1 flex flex-col relative transition-colors border-b border-border ${isClickable ? 'cursor-pointer hover:bg-muted/50' : ''} ${!isLastCol ? 'border-r border-border' : ''} ${cellBg} ${day.isToday ? 'ring-2 ring-primary ring-inset z-10' : ''}`}
+      className={`aspect-square p-1 flex flex-col relative transition-colors border-b border-border ${isClickable ? 'cursor-pointer hover:bg-muted/50' : ''} ${!isLastCol ? 'border-r border-border' : ''} ${cellBg} ${day.isToday ? 'ring-2 ring-primary ring-inset z-10' : ''} ${isSpeculative ? 'bg-amber-500/5' : ''}`}
       onClick={isClickable ? onDayClick : undefined}
     >
       {/* Internal border for events */}
       {eventStyle && (
         <div className={`absolute inset-0.5 border ${borderColor} rounded-sm pointer-events-none`} />
+      )}
+
+      {/* Speculative day overlay (e.g. day 30 of an unconfirmed month) */}
+      {isSpeculative && !eventStyle && (
+        <div className="absolute inset-0.5 border-2 border-dashed border-amber-500/50 rounded-sm pointer-events-none" />
       )}
 
       {/* Moon Phase - Top Right (Key days) */}
@@ -113,8 +123,19 @@ export function CalendarDay({
 
       {/* Hijri Day Number - CENTER */}
       <div className="flex-1 flex items-center justify-center z-0">
-        <span className={`text-2xl font-bold leading-none tracking-tight ${day.isToday ? 'text-primary' : textColor}`}>
+        <span
+          className={`text-2xl font-bold leading-none tracking-tight ${
+            day.isToday
+              ? 'text-primary'
+              : isSpeculative
+                ? 'text-amber-600/70 dark:text-amber-400/70 italic'
+                : textColor
+          }`}
+        >
           {day.hijriDay}
+          {isSpeculative && (
+            <span className="text-base align-top ml-0.5 text-amber-600/80 dark:text-amber-400/80">?</span>
+          )}
         </span>
       </div>
 
@@ -195,25 +216,3 @@ export function PreviousMonthDay({
   )
 }
 
-/**
- * Uncertain Day 30 cell for current month
- */
-export function UncertainDay30Cell() {
-  return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <div className="aspect-square p-1 flex flex-col items-center justify-center relative transition-colors border-b border-border bg-amber-500/10 ring-2 ring-dashed ring-amber-500 ring-inset cursor-help">
-          <span className="text-lg font-bold leading-none text-amber-600 dark:text-amber-400">
-            30?
-          </span>
-          <span className="text-[10px] text-amber-600/70 dark:text-amber-400/70 mt-1 leading-none">
-            Pending
-          </span>
-        </div>
-      </TooltipTrigger>
-      <TooltipContent>
-        <p className="text-sm">Moon sighting will determine if month has 30 days</p>
-      </TooltipContent>
-    </Tooltip>
-  )
-}

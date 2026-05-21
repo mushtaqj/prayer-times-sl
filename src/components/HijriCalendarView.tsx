@@ -14,7 +14,6 @@ import {
   CalendarDay,
   EmptyCalendarCell,
   PreviousMonthDay,
-  UncertainDay30Cell,
   getMonthTheme,
   WEEKDAY_LABELS,
 } from '@/components/calendar'
@@ -90,9 +89,12 @@ export function HijriCalendarView({ location }: HijriCalendarViewProps) {
     return currentMonthData?.status === 'ongoing'
   }, [currentMonthData])
 
-  const showDay30Uncertain = useMemo(() => {
-    return isCurrentMonth && currentMonthData?.days === 29
-  }, [isCurrentMonth, currentMonthData])
+  const isMonthSpeculative = useMemo(() => {
+    return (
+      currentMonthData?.status === 'ongoing' ||
+      currentMonthData?.status === 'upcoming'
+    )
+  }, [currentMonthData])
 
   const monthTheme = getMonthTheme(currentHijriMonth)
 
@@ -274,6 +276,7 @@ export function HijriCalendarView({ location }: HijriCalendarViewProps) {
                     currentHijriMonth={currentHijriMonth}
                     isLastCol={isLastCol}
                     isFriday={isFriday}
+                    isSpeculative={isMonthSpeculative && day.hijriDay === 30}
                     onDayClick={
                       isClickable
                         ? () => handleDayClick(day, isFriday)
@@ -282,9 +285,6 @@ export function HijriCalendarView({ location }: HijriCalendarViewProps) {
                   />
                 )
               })}
-
-              {/* Day 30 Uncertain Cell */}
-              {showDay30Uncertain && <UncertainDay30Cell />}
             </div>
           </CardContent>
         </Card>

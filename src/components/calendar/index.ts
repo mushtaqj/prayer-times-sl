@@ -1,7 +1,7 @@
 export { CalendarHeader } from './CalendarHeader'
 export { CalendarLegend } from './CalendarLegend'
 export { MonthEventsCard } from './MonthEventsCard'
-export { CalendarDay, EmptyCalendarCell, PreviousMonthDay, UncertainDay30Cell } from './CalendarDay'
+export { CalendarDay, EmptyCalendarCell, PreviousMonthDay } from './CalendarDay'
 export { JumpToDateDialog } from './JumpToDateDialog'
 export { SpecialMonthBanner } from './SpecialMonthBanner'
 export {
