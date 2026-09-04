@@ -24,6 +24,12 @@ interface ShownNotification {
   requireInteraction: boolean
 }
 
+interface PushResult {
+  notifications: ShownNotification[]
+  /** Value passed to navigator.setAppBadge by the worker, if any. */
+  appBadge: number | null
+}
+
 async function loadAppWithServiceWorker(context: BrowserContext, page: Page): Promise<Worker> {
   const swPromise = context.waitForEvent('serviceworker')
   await page.goto('/')
@@ -37,9 +43,17 @@ async function loadAppWithServiceWorker(context: BrowserContext, page: Page): Pr
  * Dispatch a synthetic FCM push inside the service worker and return the
  * notifications currently shown by its registration.
  */
-function dispatchPush(sw: Worker, data: PushData): Promise<ShownNotification[]> {
+function dispatchPush(sw: Worker, data: PushData): Promise<PushResult> {
   return sw.evaluate(async (data: PushData) => {
-    const scope = self as unknown as ServiceWorkerGlobalScope
+    const scope = self as unknown as ServiceWorkerGlobalScope & { __appBadge?: number | null }
+
+    // Headless Chromium has no visible badge; capture what the worker asks for.
+    scope.__appBadge = null
+    const nav = scope.navigator as unknown as { setAppBadge?: (n?: number) => Promise<void> }
+    nav.setAppBadge = async (n?: number) => {
+      scope.__appBadge = n ?? 0
+    }
+
     const fcmPayload = JSON.stringify({ data, fcmMessageId: `test-${data.prayer}`, from: 'e2e' })
     scope.dispatchEvent(new PushEvent('push', { data: fcmPayload }))
 
@@ -47,14 +61,17 @@ function dispatchPush(sw: Worker, data: PushData): Promise<ShownNotification[]> 
     await new Promise((resolve) => setTimeout(resolve, 1500))
 
     const shown = await scope.registration.getNotifications()
-    return shown.map((n) => ({
-      title: n.title,
-      body: n.body,
-      tag: n.tag,
-      icon: n.icon,
-      badge: n.badge,
-      requireInteraction: n.requireInteraction,
-    }))
+    return {
+      notifications: shown.map((n) => ({
+        title: n.title,
+        body: n.body,
+        tag: n.tag,
+        icon: n.icon,
+        badge: n.badge,
+        requireInteraction: n.requireInteraction,
+      })),
+      appBadge: scope.__appBadge ?? null,
+    }
   }, data)
 }
 
@@ -89,15 +106,17 @@ test.describe('service worker', () => {
       body: 'Fajr is in 10 minutes (5:02 AM)',
     })
 
-    expect(afterFajr).toHaveLength(1)
-    expect(afterFajr[0]).toMatchObject({
+    expect(afterFajr.notifications).toHaveLength(1)
+    expect(afterFajr.notifications[0]).toMatchObject({
       title: 'Fajr Prayer',
       body: 'Fajr is in 10 minutes (5:02 AM)',
       tag: 'prayer-reminder',
       requireInteraction: false,
     })
-    expect(new URL(afterFajr[0].icon).pathname).toBe('/icon-192x192.png')
-    expect(new URL(afterFajr[0].badge).pathname).toBe('/badge-96x96.png')
+    expect(new URL(afterFajr.notifications[0].icon).pathname).toBe('/icon-192x192.png')
+    expect(new URL(afterFajr.notifications[0].badge).pathname).toBe('/badge-96x96.png')
+    // The worker marks the app icon so the user sees a pending reminder.
+    expect(afterFajr.appBadge).toBe(1)
 
     const afterDhuhr = await dispatchPush(sw, {
       prayer: 'dhuhr',
@@ -108,8 +127,8 @@ test.describe('service worker', () => {
     })
 
     // Same tag: the Dhuhr reminder replaced Fajr instead of stacking.
-    expect(afterDhuhr).toHaveLength(1)
-    expect(afterDhuhr[0].title).toBe('Dhuhr Prayer')
+    expect(afterDhuhr.notifications).toHaveLength(1)
+    expect(afterDhuhr.notifications[0].title).toBe('Dhuhr Prayer')
   })
 })
 
@@ -131,6 +150,22 @@ test.describe('icons', () => {
       expect(body.subarray(0, 8).equals(PNG_SIGNATURE)).toBe(true)
     })
   }
+
+  test('manifest defines home screen shortcuts with PNG icons', async ({ request }) => {
+    const manifest = await (await request.get('/manifest.webmanifest')).json()
+    const shortcuts = manifest.shortcuts as Array<{ name: string; url: string; icons: Array<{ src: string }> }>
+
+    expect(shortcuts.map((s) => s.url)).toEqual(['/prayer', '/prayer/week', '/hijri'])
+
+    for (const shortcut of shortcuts) {
+      expect(shortcut.name).toBeTruthy()
+      expect(shortcut.icons).toHaveLength(1)
+      const response = await request.get(`/${shortcut.icons[0].src}`)
+      expect(response.status()).toBe(200)
+      const body = await response.body()
+      expect(body.subarray(0, 8).equals(PNG_SIGNATURE)).toBe(true)
+    }
+  })
 
   test('manifest lists any and maskable icons', async ({ request }) => {
     const response = await request.get('/manifest.webmanifest')

@@ -5,8 +5,10 @@ import { ThemeProvider, LocationProvider, PushNotificationProvider } from '@/con
 import './index.css'
 import App from './App.tsx'
 import { registerServiceWorker } from '@/lib/pwa/registerServiceWorker'
+import { clearAppBadgeOnOpen } from '@/lib/pwa/appBadge'
 
 registerServiceWorker()
+clearAppBadgeOnOpen()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

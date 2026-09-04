@@ -15,6 +15,12 @@ export default defineConfig({
     // the full Chromium build honours context.grantPermissions(['notifications']).
     channel: 'chromium',
   },
+  projects: [
+    // Functional checks; this is what CI runs (npm run test:e2e).
+    { name: 'e2e', testMatch: /notifications\.spec\.ts/ },
+    // Screenshot capture for docs; run on demand (npm run screenshots).
+    { name: 'screenshots', testMatch: /screenshots\.spec\.ts/ },
+  ],
   webServer: {
     command: `npm run build:e2e && npx vite preview --outDir dist-e2e --port ${PORT} --strictPort`,
     url: `http://localhost:${PORT}`,

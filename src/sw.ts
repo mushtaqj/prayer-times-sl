@@ -13,6 +13,7 @@ import { NavigationRoute, registerRoute } from 'workbox-routing'
 import { initializeApp } from 'firebase/app'
 import { getMessaging, onBackgroundMessage } from 'firebase/messaging/sw'
 import { buildPrayerNotification, NOTIFICATION_CLICK_URL } from './lib/notifications/prayerNotification'
+import { setAppBadge, clearAppBadge } from './lib/pwa/appBadge'
 
 declare let self: ServiceWorkerGlobalScope
 
@@ -57,9 +58,11 @@ function initMessaging(): void {
     // The Cloud Function sends data-only messages, so the SDK never displays
     // anything itself. This handler is the only place a push becomes a
     // notification, which is what prevents duplicates.
-    onBackgroundMessage(messaging, (payload) => {
+    onBackgroundMessage(messaging, async (payload) => {
       const { title, options } = buildPrayerNotification(payload.data)
-      return self.registration.showNotification(title, options)
+      await self.registration.showNotification(title, options)
+      // Mark the app icon until the user opens the app (cleared on open).
+      await setAppBadge()
     })
   } catch (error) {
     console.error('[sw] Failed to initialise Firebase messaging:', error)
@@ -70,6 +73,7 @@ initMessaging()
 
 self.addEventListener('notificationclick', (event) => {
   event.notification.close()
+  void clearAppBadge()
 
   const targetUrl = (event.notification.data?.url as string | undefined) || NOTIFICATION_CLICK_URL
 

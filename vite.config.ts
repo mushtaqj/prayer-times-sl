@@ -24,11 +24,16 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: [
         'favicon.svg',
+        'favicon-32x32.png',
+        'favicon-48x48.png',
         'icon-192x192.png',
         'icon-512x512.png',
         'icon-maskable-512x512.png',
         'apple-touch-icon.png',
         'badge-96x96.png',
+        'shortcut-today-96x96.png',
+        'shortcut-week-96x96.png',
+        'shortcut-hijri-96x96.png',
       ],
       manifest: {
         name: 'Prayer Times',
@@ -55,6 +60,31 @@ export default defineConfig({
             sizes: '512x512',
             type: 'image/png',
             purpose: 'maskable',
+          },
+        ],
+        // Long-press menu on the Android home screen icon; each entry can be
+        // dragged out as its own icon. Ignored on iOS.
+        shortcuts: [
+          {
+            name: "Today's Prayer Times",
+            short_name: 'Today',
+            description: 'Prayer times for today',
+            url: '/prayer',
+            icons: [{ src: 'shortcut-today-96x96.png', sizes: '96x96', type: 'image/png' }],
+          },
+          {
+            name: 'Weekly Schedule',
+            short_name: 'Week',
+            description: 'Prayer times for this week',
+            url: '/prayer/week',
+            icons: [{ src: 'shortcut-week-96x96.png', sizes: '96x96', type: 'image/png' }],
+          },
+          {
+            name: 'Hijri Calendar',
+            short_name: 'Hijri',
+            description: 'Islamic calendar and events',
+            url: '/hijri',
+            icons: [{ src: 'shortcut-hijri-96x96.png', sizes: '96x96', type: 'image/png' }],
           },
         ],
       },

@@ -175,8 +175,19 @@ Design rules that keep notifications from duplicating or piling up:
 
 Icons live in `public/`: `icon-192x192.png` and `icon-512x512.png` (purpose
 `any`), `icon-maskable-512x512.png` (full bleed, purpose `maskable`),
-`apple-touch-icon.png`, and `badge-96x96.png`, a white-on-transparent silhouette
-that Android uses as the status-bar icon.
+`apple-touch-icon.png`, `favicon.svg` with PNG fallbacks, and `badge-96x96.png`,
+a white-on-transparent silhouette that Android uses as the status-bar icon.
+Shortcut icons (`shortcut-*.png`) and the PNG favicons are rendered by
+`npm run icons:generate`.
+
+### Home Screen Shortcuts and App Badge
+
+- The manifest defines three **shortcuts** (Today, Week, Hijri) that appear when
+  the installed app's icon is long-pressed on Android; each can be dragged out
+  as its own home screen icon. iOS ignores this member.
+- The service worker sets the **app badge** when a prayer reminder arrives and
+  the page clears it whenever the app is opened or brought to the foreground.
+  Works on Android Chrome and iOS 16.4+ Home Screen web apps.
 
 ### Enabling Notifications
 
@@ -292,6 +303,12 @@ src/
 - [ACJU (All Ceylon Jamiyyathul Ulama)](https://www.acju.lk/prayer-times/) - Prayer times data
 - [ACJU Calendars](https://www.acju.lk/calenders-en/) - Official moon sighting announcements
 - [SLHub Hilaal Calendar](https://www.slhub.com/downloads/hilaal-calendar) - Monthly Hijri calendars
+
+## Screenshots
+
+Every screen on mobile and desktop, in light and dark themes, is captured in
+[docs/screenshots](./docs/screenshots/README.md). Regenerate with
+`npm run screenshots` (Playwright against the production build).
 
 ## Documentation
 
