@@ -2,6 +2,18 @@ import { Card, CardContent } from '@/components/ui/card'
 import { CircleProgress } from '@/components/common/CircleProgress'
 import { getPrayerIcon } from '@/lib/utils/prayerIcons'
 
+/**
+ * Warm glow only while the sky is actually changing: the window before
+ * sunrise (next prayer is Sunrise) and before sunset (next prayer is Maghrib).
+ * Every other time of day the card is plain primary, matching the prayer banner.
+ */
+function getSkyTint(nextPrayerName: string): 'dawn' | 'dusk' | null {
+  const key = nextPrayerName.toLowerCase()
+  if (key === 'sunrise') return 'dawn'
+  if (key === 'maghrib') return 'dusk'
+  return null
+}
+
 interface PrayerInfo {
   name: string
   time: string
@@ -22,12 +34,23 @@ export function NextPrayerCard({
   countdown,
   progress,
 }: NextPrayerCardProps) {
+  const skyTint = getSkyTint(nextPrayer.name)
+
   return (
-    <Card className="relative overflow-hidden border-none shadow-lg bg-gradient-to-br from-primary via-primary to-accent text-primary-foreground">
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-white rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-        <div className="absolute bottom-0 left-0 w-24 h-24 bg-white rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
-      </div>
+    <Card
+      className="relative overflow-hidden border-none shadow-lg bg-primary text-primary-foreground"
+      data-sky={skyTint ?? 'none'}
+    >
+      {/* Same subtle highlight as the prayer page banner */}
+      <div className="absolute inset-0 opacity-10 pointer-events-none bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white/20 via-transparent to-transparent scale-150" />
+
+      {/* Dawn: warmth rising from the bottom edge. Dusk: warmth settling into the lower corner. */}
+      {skyTint === 'dawn' && (
+        <div className="absolute -bottom-24 left-1/2 -translate-x-1/2 w-[28rem] h-48 rounded-full bg-amber-200/35 blur-3xl pointer-events-none" />
+      )}
+      {skyTint === 'dusk' && (
+        <div className="absolute -bottom-20 -right-16 w-72 h-72 rounded-full bg-orange-300/35 blur-3xl pointer-events-none" />
+      )}
 
       <CardContent className="relative z-10 p-3 sm:p-4 flex flex-col items-center">
         <div className="mb-1 sm:mb-2 text-white/90">

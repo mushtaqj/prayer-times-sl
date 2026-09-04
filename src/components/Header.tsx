@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { MapPin, Loader2, Clock, Calendar, HelpCircle, Bell, BellOff } from 'lucide-react'
+import { MapPin, Loader2, HelpCircle, Bell, BellOff } from 'lucide-react'
+import { MaterialSymbol } from '@/components/icons/MaterialSymbol'
 import { Button } from '@/components/ui/button'
 import { AppInfoModal } from './AppInfoModal'
 import { ThemeToggleButton, DistrictSelector } from '@/components/common'
@@ -57,7 +58,7 @@ export function Header() {
                 : 'text-muted-foreground hover:text-foreground'
             }`}
           >
-            <Clock className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+            <MaterialSymbol name="prayer_times" className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             <span>Prayer</span>
           </Link>
           <Link
@@ -68,7 +69,7 @@ export function Header() {
                 : 'text-muted-foreground hover:text-foreground'
             }`}
           >
-            <Calendar className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+            <MaterialSymbol name="calendar_month" className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             <span>Hijri</span>
           </Link>
         </div>

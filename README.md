@@ -173,12 +173,13 @@ Design rules that keep notifications from duplicating or piling up:
   `src/lib/notifications/prayerNotification.ts`, shared by the service worker,
   the foreground handler and local alarms.
 
-Icons live in `public/`: `icon-192x192.png` and `icon-512x512.png` (purpose
-`any`), `icon-maskable-512x512.png` (full bleed, purpose `maskable`),
-`apple-touch-icon.png`, `favicon.svg` with PNG fallbacks, and `badge-96x96.png`,
-a white-on-transparent silhouette that Android uses as the status-bar icon.
-Shortcut icons (`shortcut-*.png`) and the PNG favicons are rendered by
-`npm run icons:generate`.
+The app mark is a crescent whose hollow holds clock hands, drawn once in
+`scripts/assets/app-icon-glyph.svg`. `npm run icons:generate` renders every
+icon from it into `public/`: `icon-192x192.png` and `icon-512x512.png` (purpose
+`any`, also the in-app logo), `icon-maskable-512x512.png` (full bleed, purpose
+`maskable`), `apple-touch-icon.png`, `favicon.svg` with PNG fallbacks,
+`badge-96x96.png` (the white silhouette Android shows in the status bar), and
+the `shortcut-*.png` manifest shortcut icons.
 
 ### Home Screen Shortcuts and App Badge
 

@@ -1,12 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <!-- App mark: crescent dial on the brand green. Source: scripts/assets/app-icon-glyph.svg -->
-  <rect width="512" height="512" rx="112" fill="#19ad79"/>
-  <g fill="#fff" color="#fff">
+<!-- Prayer Times app mark: a crescent whose hollow holds clock hands ("Crescent Dial").
+     Drawn white on the brand green; this file is the single source for every icon size.
+     Regenerate icons with: npm run icons:generate -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor">
   <mask id="hollow"><rect width="512" height="512" fill="#fff"/><circle cx="318" cy="236" r="146" fill="#000"/></mask>
   <circle cx="256" cy="256" r="176" mask="url(#hollow)"/>
   <path d="M296 262 V176" stroke="currentColor" stroke-width="26" stroke-linecap="round"/>
   <path d="M296 262 L358 298" stroke="currentColor" stroke-width="26" stroke-linecap="round"/>
   <circle cx="296" cy="262" r="20"/>
-
-</g>
 </svg>

@@ -9,7 +9,8 @@ import { AYYAM_AL_BEED_DAYS } from '@/lib/constants/hijriConstants'
 import { LOCATION_SUFFIX } from '@/lib/constants/appConstants'
 import { formatDate } from '@/lib/utils/date'
 import { useCountdown } from '@/hooks/useCountdown'
-import { Moon, Sun } from 'lucide-react'
+import { Moon, Sun, Menu } from 'lucide-react'
+import { SettingsDrawer } from '@/components/SettingsDrawer'
 import {
   NextPrayerCard,
   TodayBlessingsCard,
@@ -52,6 +53,7 @@ export function LandingPage({
     content: '',
   })
   const [showMonthPicker, setShowMonthPicker] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
 
   const { countdown, progress } = useCountdown({
     targetTime: nextPrayer?.time || '00:00',
@@ -132,7 +134,7 @@ export function LandingPage({
   }
 
   return (
-    <div className="flex flex-col h-[100dvh] overflow-hidden">
+    <div className="flex flex-col h-[100dvh] overflow-hidden sm:h-auto sm:min-h-[100dvh] sm:overflow-visible">
       {/* Mini Header */}
       <div className="flex items-center justify-between px-3 py-2 bg-background/80 backdrop-blur-sm border-b border-border/30 shrink-0">
         <div className="flex items-center gap-2">
@@ -150,17 +152,32 @@ export function LandingPage({
             </p>
           </div>
         </div>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={onThemeToggle}
-          className="h-8 w-8 rounded-full bg-muted/50"
-        >
-          {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-        </Button>
+        <div className="flex items-center gap-1.5">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onThemeToggle}
+            className="h-8 w-8 rounded-full bg-muted/50"
+            aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+          >
+            {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setMenuOpen(true)}
+            className="h-8 w-8 rounded-full bg-muted/50"
+            aria-label="Open menu"
+            title="Settings & app info"
+          >
+            <Menu className="w-4 h-4" />
+          </Button>
+        </div>
       </div>
 
-      <div className="flex-1 px-3 py-2 space-y-2 sm:space-y-3 overflow-y-auto">
+      <SettingsDrawer open={menuOpen} onClose={() => setMenuOpen(false)} />
+
+      <div className="flex-1 px-3 py-2 space-y-2 sm:space-y-3 overflow-y-auto sm:overflow-visible sm:px-4 sm:py-4">
         {/* Date Header - Compact */}
         <div className="flex items-center justify-between">
           <div>

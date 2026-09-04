@@ -1,41 +1,18 @@
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Menu, X, Clock, Calendar, MapPin, Loader2, HelpCircle, Bell, BellOff } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { AppInfoModal } from './AppInfoModal'
-import { ThemeToggleButton, DistrictSelector } from '@/components/common'
-import { useLocation as useGeoLocation } from '@/hooks/useLocation'
-import { useLocationContext, useThemeContext, usePushNotificationContext } from '@/contexts'
+import { Menu, X } from 'lucide-react'
+import { MaterialSymbol } from '@/components/icons/MaterialSymbol'
+import { SettingsDrawer } from './SettingsDrawer'
 
 export function MobileNav() {
   const [menuOpen, setMenuOpen] = useState(false)
-  const [showInfo, setShowInfo] = useState(false)
-  const { detectLocation, isDetecting } = useGeoLocation()
   const location = useLocation()
-
-  // Use contexts
-  const { districts, selectedDistrict, setSelectedDistrict } = useLocationContext()
-  const { isDark, toggleTheme } = useThemeContext()
-  const {
-    isEnabled: pushEnabled,
-    isSupported: pushSupported,
-    openEnableModal,
-    disable: disablePush,
-  } = usePushNotificationContext()
-
-  const handleDetectLocation = async () => {
-    const district = await detectLocation()
-    if (district) {
-      setSelectedDistrict(district)
-      setMenuOpen(false)
-    }
-  }
 
   const isPrayerSection = location.pathname.startsWith('/prayer')
   const isHijriSection = location.pathname === '/hijri'
   const isHomePage = location.pathname === '/'
 
-  // Don't render anything on home page
+  // The landing page has its own header with the settings menu.
   if (isHomePage) {
     return null
   }
@@ -71,112 +48,7 @@ export function MobileNav() {
         </div>
       </header>
 
-      {/* Slide-out Menu Drawer */}
-      {menuOpen && (
-        <>
-          <div
-            className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
-            onClick={() => setMenuOpen(false)}
-          />
-
-          <div className="fixed top-0 right-0 bottom-0 z-50 w-72 bg-background border-l border-border shadow-xl animate-in slide-in-from-right duration-300">
-            <div className="flex items-center justify-between p-4 border-b border-border">
-              <h2 className="text-lg font-semibold">Settings</h2>
-              <button
-                onClick={() => setMenuOpen(false)}
-                className="p-2 rounded-lg hover:bg-muted transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="p-4 space-y-6">
-              {/* Location Section */}
-              <div className="space-y-3">
-                <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Location</h3>
-
-                <Button
-                  variant="outline"
-                  onClick={handleDetectLocation}
-                  disabled={isDetecting}
-                  className="w-full justify-start gap-2"
-                >
-                  {isDetecting ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    <MapPin className="w-4 h-4" />
-                  )}
-                  Detect My Location
-                </Button>
-
-                <DistrictSelector
-                  districts={districts}
-                  value={selectedDistrict}
-                  onChange={(value) => {
-                    setSelectedDistrict(value)
-                    setMenuOpen(false)
-                  }}
-                  size="full"
-                />
-              </div>
-
-              {/* Appearance Section */}
-              <div className="space-y-3">
-                <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Appearance</h3>
-                <ThemeToggleButton isDark={isDark} onToggle={toggleTheme} showLabel />
-              </div>
-
-              {/* Notifications Section */}
-              {pushSupported && (
-                <div className="space-y-3">
-                  <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Notifications</h3>
-                  <Button
-                    variant={pushEnabled ? 'default' : 'outline'}
-                    onClick={() => {
-                      if (pushEnabled) {
-                        disablePush()
-                      } else {
-                        openEnableModal()
-                        setMenuOpen(false)
-                      }
-                    }}
-                    className="w-full justify-start gap-2"
-                  >
-                    {pushEnabled ? (
-                      <>
-                        <Bell className="w-4 h-4" />
-                        Notifications Enabled
-                      </>
-                    ) : (
-                      <>
-                        <BellOff className="w-4 h-4" />
-                        Enable Notifications
-                      </>
-                    )}
-                  </Button>
-                </div>
-              )}
-
-              {/* Help Section */}
-              <div className="space-y-3">
-                <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">About</h3>
-
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setShowInfo(true)
-                    setMenuOpen(false)
-                  }}
-                  className="w-full justify-start gap-2"
-                >
-                  <HelpCircle className="w-4 h-4" />
-                  App Info & Sources
-                </Button>
-              </div>
-            </div>
-          </div>
-        </>
-      )}
+      <SettingsDrawer open={menuOpen} onClose={() => setMenuOpen(false)} />
 
       {/* Bottom Tab Bar */}
       <nav className="fixed bottom-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-xl border-t border-border shadow-lg pb-[env(safe-area-inset-bottom)]">
@@ -192,7 +64,7 @@ export function MobileNav() {
             {isPrayerSection && (
               <div className="absolute top-0 left-4 right-4 h-0.5 bg-primary rounded-full" />
             )}
-            <Clock className="w-5 h-5" />
+            <MaterialSymbol name="prayer_times" className="w-6 h-6" />
             <span className="text-xs font-medium">Prayer</span>
           </Link>
 
@@ -207,13 +79,11 @@ export function MobileNav() {
             {isHijriSection && (
               <div className="absolute top-0 left-4 right-4 h-0.5 bg-primary rounded-full" />
             )}
-            <Calendar className="w-5 h-5" />
+            <MaterialSymbol name="calendar_month" className="w-6 h-6" />
             <span className="text-xs font-medium">Hijri</span>
           </Link>
         </div>
       </nav>
-
-      <AppInfoModal isOpen={showInfo} onClose={() => setShowInfo(false)} />
     </div>
   )
 }
