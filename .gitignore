@@ -45,6 +45,8 @@ lerna-debug.log*
 
 # Testing
 coverage/
+test-results/
+playwright-report/
 .nyc_output/
 
 # TypeScript
@@ -52,6 +54,7 @@ coverage/
 
 # PWA
 dev-dist/
+dist-e2e/
 sw.js
 workbox-*.js
 
@@ -67,3 +70,6 @@ workbox-*.js
 *.seed
 *.pid.lock
 .env*.local
+
+# Local scratch (secrets, notes)
+.scratch/
