@@ -154,7 +154,10 @@ sequenceDiagram
 
 One service worker, built from `src/sw.ts` with the `injectManifest` strategy of
 `vite-plugin-pwa`, handles both offline precaching (Workbox) and Firebase Cloud
-Messaging. It is registered at scope `/`.
+Messaging. It is registered at scope `/` by `src/lib/pwa/registerServiceWorker.ts`,
+which also checks for a new version whenever the app comes to the foreground and
+once an hour, and reloads the page as soon as a new worker takes control. A
+release therefore reaches installed apps on their next open.
 
 Design rules that keep notifications from duplicating or piling up:
 
