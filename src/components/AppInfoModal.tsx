@@ -10,7 +10,8 @@ interface AppInfoModalProps {
     onClose: () => void
 }
 
-const APP_VERSION = '1.0.0'
+// Injected from package.json at build time (see vite.config.ts `define`).
+const APP_VERSION = __APP_VERSION__
 
 export function AppInfoModal({ isOpen, onClose }: AppInfoModalProps) {
     return (
