@@ -116,8 +116,11 @@ npm run dev
 # Build for production
 npm run build
 
-# Run tests
+# Run unit tests
 npm run test
+
+# Run end-to-end tests (service worker, push notifications, icons)
+npm run test:e2e
 
 # Preview production build
 npm run preview
@@ -142,10 +145,35 @@ sequenceDiagram
     
     Note over CloudFn: Runs every minute 4AM-8PM
     CloudFn->>CloudFn: Check if prayer time - 10min
-    CloudFn->>FCM: Send to zone topic
-    FCM->>PWA: Push notification
+    CloudFn->>FCM: Send data-only message to zone topic
+    FCM->>PWA: Push event (service worker)
     PWA->>User: Show prayer reminder
 ```
+
+### Service Worker
+
+One service worker, built from `src/sw.ts` with the `injectManifest` strategy of
+`vite-plugin-pwa`, handles both offline precaching (Workbox) and Firebase Cloud
+Messaging. It is registered at scope `/`.
+
+Design rules that keep notifications from duplicating or piling up:
+
+- The Cloud Function sends **data-only** messages. A `notification` block would
+  make the Firebase SDK display the message itself in addition to the service
+  worker handler.
+- Every prayer reminder uses the same notification `tag`, so the next reminder
+  replaces the previous one. The message `TTL` matches the 10-minute reminder
+  window so stale reminders expire instead of arriving late.
+- Local alarms (`useAlarms`) skip the 10-minute reminder when push is enabled and
+  only fire the at-prayer-time notification.
+- The notification text and options come from one builder,
+  `src/lib/notifications/prayerNotification.ts`, shared by the service worker,
+  the foreground handler and local alarms.
+
+Icons live in `public/`: `icon-192x192.png` and `icon-512x512.png` (purpose
+`any`), `icon-maskable-512x512.png` (full bleed, purpose `maskable`),
+`apple-touch-icon.png`, and `badge-96x96.png`, a white-on-transparent silhouette
+that Android uses as the status-bar icon.
 
 ### Enabling Notifications
 
@@ -166,10 +194,34 @@ To install on iOS:
 3. Tap "Add to Home Screen"
 4. Open the app from your home screen
 
+## Hijri Calendar Sync
+
+`src/data/hijriCalendar.json` always ends with three entries: the last
+**completed** month, the **ongoing** month (assumed 30 days) and the
+**upcoming** month (assumed 30 days). When ACJU announces a moon sighting the
+`sync-hijri-acju` workflow closes the ongoing month with its real length,
+promotes the upcoming month and appends a new upcoming month.
+
+The workflow runs on a schedule at 21:00 and 06:00 Sri Lanka time. Scheduled
+runs set `WHEN_DUE=true`, so the script only contacts ACJU from day 29 of the
+ongoing month onwards; the first check is the evening of the 29th, the next the
+30th. Runs that find nothing new make no commit. The workflow can also be
+dispatched manually (or from the admin page) with an optional `count` cap.
+
+```bash
+# Preview what a sync would change without writing
+DRY_RUN=true node scripts/sync-hijri-acju.js
+
+# Apply, but only if the ongoing month is on day 29 or later
+WHEN_DUE=true node scripts/sync-hijri-acju.js
+```
+
 ## Project Structure
 
 ```
+e2e/                     # Playwright end-to-end tests
 src/
+├── sw.ts                # Service worker (Workbox precache + FCM push)
 ├── components/          # React components
 │   ├── ui/             # shadcn/ui components
 │   ├── common/         # Shared components (LoadingSpinner, etc.)
@@ -194,6 +246,7 @@ src/
 ├── lib/                # Utilities and data access
 │   ├── data/          # Data access layer
 │   ├── firebase/      # Firebase SDK setup
+│   ├── notifications/ # Notification builder, push settings, display helpers
 │   ├── utils/         # Utility functions
 │   └── constants/     # App constants
 └── App.tsx            # Main app with routing
