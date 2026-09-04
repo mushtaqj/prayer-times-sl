@@ -6,7 +6,7 @@
 // repo, runs the ACJU sync loop in memory, and returns the list of planned
 // transitions without committing anything.
 
-import { validateSyncToken } from './lib/syncAcjuToken.js'
+import { validateSyncToken } from './_lib/syncAcjuToken.js'
 import { syncFromAcju } from '../scripts/lib/acjuSync.js'
 
 export default async function handler(req, res) {

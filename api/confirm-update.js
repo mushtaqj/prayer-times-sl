@@ -2,7 +2,7 @@
 // GET /api/confirm-update?token=xxx
 
 import crypto from 'crypto'
-import { successPage, errorPage } from './templates/pages.js'
+import { successPage, errorPage } from './_templates/pages.js'
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') {

@@ -3,7 +3,7 @@
 
 import crypto from 'crypto'
 import { Resend } from 'resend'
-import { rollbackEmail } from './templates/emails.js'
+import { rollbackEmail } from './_templates/emails.js'
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {

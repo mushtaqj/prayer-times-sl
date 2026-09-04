@@ -7,7 +7,7 @@
 // how many transitions the apply step will commit so the admin can approve a
 // prefix of the previewed plan; omit it to apply everything ACJU has.
 
-import { validateSyncToken } from './lib/syncAcjuToken.js'
+import { validateSyncToken } from './_lib/syncAcjuToken.js'
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {

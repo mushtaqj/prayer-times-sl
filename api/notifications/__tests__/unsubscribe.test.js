@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 
 // Mock firebase-admin
 vi.mock('firebase-admin', () => {
-  const mockSubscribeToTopic = vi.fn(() =>
+  const mockUnsubscribeFromTopic = vi.fn(() =>
     Promise.resolve({ successCount: 1, failureCount: 0 })
   )
 
@@ -14,16 +14,16 @@ vi.mock('firebase-admin', () => {
         cert: vi.fn(() => ({})),
       },
       messaging: vi.fn(() => ({
-        subscribeToTopic: mockSubscribeToTopic,
+        unsubscribeFromTopic: mockUnsubscribeFromTopic,
       })),
     },
   }
 })
 
 import admin from 'firebase-admin'
-import handler from './subscribe.js'
+import handler from '../unsubscribe.js'
 
-describe('POST /api/notifications/subscribe', () => {
+describe('POST /api/notifications/unsubscribe', () => {
   let mockReq
   let mockRes
 
@@ -108,11 +108,11 @@ describe('POST /api/notifications/subscribe', () => {
     })
   })
 
-  describe('successful subscription', () => {
-    it('subscribes to topic and returns success', async () => {
+  describe('successful unsubscription', () => {
+    it('unsubscribes from topic and returns success', async () => {
       await handler(mockReq, mockRes)
 
-      expect(admin.messaging().subscribeToTopic).toHaveBeenCalledWith(
+      expect(admin.messaging().unsubscribeFromTopic).toHaveBeenCalledWith(
         'test-fcm-token',
         'zone-01'
       )
@@ -141,14 +141,14 @@ describe('POST /api/notifications/subscribe', () => {
   })
 
   describe('error handling', () => {
-    it('returns 500 when subscription fails', async () => {
-      admin.messaging().subscribeToTopic.mockRejectedValue(new Error('FCM error'))
+    it('returns 500 when unsubscription fails', async () => {
+      admin.messaging().unsubscribeFromTopic.mockRejectedValue(new Error('FCM error'))
 
       await handler(mockReq, mockRes)
 
       expect(mockRes.status).toHaveBeenCalledWith(500)
       expect(mockRes.json).toHaveBeenCalledWith({
-        error: 'Failed to subscribe',
+        error: 'Failed to unsubscribe',
         message: 'FCM error',
       })
     })

@@ -3,7 +3,7 @@
 
 import crypto from 'crypto'
 import { Resend } from 'resend'
-import { confirmationEmail } from './templates/emails.js'
+import { confirmationEmail } from './_templates/emails.js'
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {

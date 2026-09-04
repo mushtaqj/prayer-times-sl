@@ -8,7 +8,7 @@
 
 import crypto from 'crypto'
 import { Resend } from 'resend'
-import { syncAcjuCodeEmail } from './templates/emails.js'
+import { syncAcjuCodeEmail } from './_templates/emails.js'
 
 const CODE_TTL_MS = 15 * 60 * 1000
 
