@@ -1,17 +1,29 @@
 import { join, dirname } from 'path'
 import { fileURLToPath } from 'url'
 import { JSONFilePreset } from 'lowdb/node'
-import { formatDateISO } from './lib/hijriTransition.js'
+import { formatDateISO, getOngoingDayNumber, isSyncDue } from './lib/hijriTransition.js'
 import { syncFromAcju } from './lib/acjuSync.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
-const dryRun = process.env.DRY_RUN === 'true' || process.env.DRY_RUN === '1'
+const isTruthy = (value) => value === 'true' || value === '1'
+const dryRun = isTruthy(process.env.DRY_RUN)
+// WHEN_DUE=true (scheduled runs): only contact ACJU from day 29 of the ongoing month.
+const onlyWhenDue = isTruthy(process.env.WHEN_DUE)
 const countEnv = process.env.COUNT ? parseInt(process.env.COUNT, 10) : undefined
 const maxCount = Number.isFinite(countEnv) && countEnv > 0 ? countEnv : undefined
 
 const dbPath = join(__dirname, '../src/data/hijriCalendar.json')
 const db = await JSONFilePreset(dbPath, { months: [], metadata: {}, hijriMonths: [] })
+
+// Evaluate "today" in Sri Lanka time so a UTC runner agrees with ACJU's calendar day.
+const todayColombo = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Colombo' }))
+
+if (onlyWhenDue && !isSyncDue(db.data, todayColombo)) {
+  const day = getOngoingDayNumber(db.data, todayColombo)
+  console.log(`Not due: today is day ${day ?? '?'} of the ongoing month. Skipping ACJU check.`)
+  process.exit(0)
+}
 
 const target = dryRun ? structuredClone(db.data) : db.data
 const transitions = await syncFromAcju(target, { maxCount })

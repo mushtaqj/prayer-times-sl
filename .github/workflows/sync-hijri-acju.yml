@@ -1,6 +1,14 @@
 name: Sync Hijri Calendar with ACJU
 
 on:
+  # Automatic: check ACJU at 21:00 and 06:00 Sri Lanka time (UTC+5:30).
+  # The script only contacts ACJU from day 29 of the ongoing month, so the
+  # evening of the 29th is the first check, the 30th the second, and the
+  # morning slots catch announcements made late at night. Runs where ACJU has
+  # nothing new make no commit.
+  schedule:
+    - cron: '30 15 * * *'
+    - cron: '30 0 * * *'
   workflow_dispatch:
     inputs:
       count:
@@ -8,6 +16,10 @@ on:
         required: false
         type: string
         default: ''
+
+concurrency:
+  group: hijri-calendar
+  cancel-in-progress: false
 
 jobs:
   sync-hijri:
@@ -31,6 +43,8 @@ jobs:
         run: node scripts/sync-hijri-acju.js
         env:
           COUNT: ${{ github.event.inputs.count }}
+          # Scheduled runs skip the ACJU request until day 29 of the ongoing month.
+          WHEN_DUE: ${{ github.event_name == 'schedule' }}
 
       - name: Commit and push changes
         run: |

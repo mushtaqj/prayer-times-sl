@@ -2,7 +2,7 @@
   "metadata": {
     "source": "ACJU Sri Lanka (All Ceylon Jamiyyathul Ulama)",
     "description": "Historical Hijri calendar data based on official moon sighting in Sri Lanka",
-    "lastUpdated": "2026-05-21"
+    "lastUpdated": "2026-09-04"
   },
   "hijriMonths": [
     {
@@ -2380,14 +2380,38 @@
       "hijriMonth": 12,
       "monthName": "Dhul Hijjah",
       "gregorianStart": "2026-05-19",
-      "days": 30,
-      "status": "ongoing"
+      "days": 29,
+      "status": "completed"
     },
     {
       "hijriYear": 1448,
       "hijriMonth": 1,
       "monthName": "Muharram",
-      "gregorianStart": "2026-06-18",
+      "gregorianStart": "2026-06-17",
+      "days": 30,
+      "status": "completed"
+    },
+    {
+      "hijriYear": 1448,
+      "hijriMonth": 2,
+      "monthName": "Safar",
+      "gregorianStart": "2026-07-17",
+      "days": 29,
+      "status": "completed"
+    },
+    {
+      "hijriYear": 1448,
+      "hijriMonth": 3,
+      "monthName": "Rabi al-Awwal",
+      "gregorianStart": "2026-08-15",
+      "days": 30,
+      "status": "ongoing"
+    },
+    {
+      "hijriYear": 1448,
+      "hijriMonth": 4,
+      "monthName": "Rabi al-Thani",
+      "gregorianStart": "2026-09-14",
       "days": 30,
       "status": "upcoming"
     }

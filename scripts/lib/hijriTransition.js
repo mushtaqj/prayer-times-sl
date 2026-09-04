@@ -131,3 +131,30 @@ export function revertTransition(data) {
 
   return { restored: previous, demoted: currentOngoing, removed: trailing }
 }
+
+/**
+ * Day number (1-based) of `today` within the ongoing month, per the calendar's
+ * own start date. Values above the assumed length mean the calendar is stale.
+ * Returns null when there is no ongoing month or today is before it starts.
+ */
+export function getOngoingDayNumber(data, today = new Date()) {
+  const ongoing = data.months.find((m) => m.status === 'ongoing')
+  if (!ongoing) return null
+
+  const start = parseDate(ongoing.gregorianStart)
+  const normalized = new Date(today.getFullYear(), today.getMonth(), today.getDate())
+  const day = Math.round((normalized.getTime() - start.getTime()) / 86_400_000) + 1
+  return day >= 1 ? day : null
+}
+
+/** Moon sighting happens on the evening of day 29; day 30 is the latest a month can end. */
+export const SYNC_DUE_FROM_DAY = 29
+
+/**
+ * Whether it is worth asking ACJU for the next month: true from the 29th of
+ * the ongoing month onwards (including when the calendar has gone stale).
+ */
+export function isSyncDue(data, today = new Date()) {
+  const day = getOngoingDayNumber(data, today)
+  return day !== null && day >= SYNC_DUE_FROM_DAY
+}
