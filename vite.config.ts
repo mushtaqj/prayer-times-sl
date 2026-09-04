@@ -10,8 +10,19 @@ export default defineConfig({
     react(),
     tailwindcss(),
     VitePWA({
+      // One service worker (src/sw.ts) handles both precaching and FCM push.
+      strategies: 'injectManifest',
+      srcDir: 'src',
+      filename: 'sw.ts',
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'icon-192x192.png', 'firebase-messaging-sw.js'],
+      includeAssets: [
+        'favicon.svg',
+        'icon-192x192.png',
+        'icon-512x512.png',
+        'icon-maskable-512x512.png',
+        'apple-touch-icon.png',
+        'badge-96x96.png',
+      ],
       manifest: {
         name: 'Prayer Times',
         short_name: 'Prayer',
@@ -23,31 +34,37 @@ export default defineConfig({
           {
             src: 'icon-192x192.png',
             sizes: '192x192',
-            type: 'image/png'
+            type: 'image/png',
+            purpose: 'any',
           },
           {
-            src: 'icon-192x192.png',
-            sizes: '512x512',
-            type: 'image/png'
-          },
-          {
-            src: 'icon-192x192.png',
+            src: 'icon-512x512.png',
             sizes: '512x512',
             type: 'image/png',
-            purpose: 'any maskable'
-          }
-        ]
+            purpose: 'any',
+          },
+          {
+            src: 'icon-maskable-512x512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'maskable',
+          },
+        ],
       },
-      workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,json}'],
-        // Don't precache the Firebase messaging service worker
-        navigateFallbackDenylist: [/^\/firebase-messaging-sw\.js$/]
-      }
-    })
+      injectManifest: {
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,json,webmanifest}'],
+      },
+      devOptions: {
+        // Serve the real service worker in `vite dev` so push can be tested locally.
+        enabled: true,
+        type: 'module',
+        navigateFallback: 'index.html',
+      },
+    }),
   ],
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src')
-    }
-  }
+      '@': path.resolve(__dirname, './src'),
+    },
+  },
 })

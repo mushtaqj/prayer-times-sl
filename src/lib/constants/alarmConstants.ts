@@ -21,8 +21,8 @@ export const REMINDER_BEFORE_MINUTES = 10
 /** Reminder time before prayer (in milliseconds) - derived from minutes */
 export const REMINDER_BEFORE_MS = REMINDER_BEFORE_MINUTES * 60 * 1000
 
-/** Notification icon path */
-export const NOTIFICATION_ICON = '/icon-192x192.png'
+/** Notification icon path (shared with push notifications) */
+export { NOTIFICATION_ICON } from '@/lib/notifications/prayerNotification'
 
 // ============================================================================
 // Default State

@@ -9,6 +9,13 @@ import {
   NOTIFICATION_ICON,
   DEFAULT_ALARMS,
 } from '@/lib/constants/alarmConstants'
+import {
+  NOTIFICATION_BADGE,
+  PRAYER_REMINDER_TAG,
+  PRAYER_TIME_TAG,
+} from '@/lib/notifications/prayerNotification'
+import { showNotificationFromPage } from '@/lib/notifications/showNotification'
+import { isPushEnabled } from '@/lib/notifications/pushSettings'
 import { prayerNames, prayerMetadata } from '@/lib/data/prayerTimes'
 import type { PrayerName } from '@/lib/data/types'
 
@@ -80,6 +87,10 @@ export function useAlarms(): UseAlarmsReturn {
       return () => {}
     }
 
+    // Server push already delivers the 10-minute reminder for this device.
+    // Scheduling it locally as well produced a duplicate at the same minute.
+    const reminderHandledByPush = isPushEnabled()
+
     const now = new Date()
 
     prayerNames.forEach((prayer) => {
@@ -94,13 +105,15 @@ export function useAlarms(): UseAlarmsReturn {
 
       // Schedule reminder before prayer
       const reminderDiff = diff - REMINDER_BEFORE_MS
-      if (reminderDiff > 0) {
+      if (reminderDiff > 0 && !reminderHandledByPush) {
         const reminderTimeout = setTimeout(() => {
           playNotificationSound()
-          new Notification(`${displayName} in ${REMINDER_BEFORE_MINUTES} minutes`, {
+          void showNotificationFromPage(`${displayName} in ${REMINDER_BEFORE_MINUTES} minutes`, {
             body: `${displayName} prayer will begin at ${time}`,
             icon: NOTIFICATION_ICON,
-            tag: `${prayer}-reminder`,
+            badge: NOTIFICATION_BADGE,
+            tag: PRAYER_REMINDER_TAG,
+            renotify: true,
             requireInteraction: false,
           })
           scheduledTimeouts.current.delete(`${prayer}-reminder`)
@@ -113,11 +126,13 @@ export function useAlarms(): UseAlarmsReturn {
       if (diff > 0) {
         const timeout = setTimeout(() => {
           playNotificationSound()
-          new Notification(`${displayName} Prayer Time`, {
+          void showNotificationFromPage(`${displayName} Prayer Time`, {
             body: `It's time for ${displayName} prayer (${time})`,
             icon: NOTIFICATION_ICON,
-            tag: prayer,
-            requireInteraction: true,
+            badge: NOTIFICATION_BADGE,
+            tag: PRAYER_TIME_TAG,
+            renotify: true,
+            requireInteraction: false,
           })
           scheduledTimeouts.current.delete(prayer)
         }, diff)

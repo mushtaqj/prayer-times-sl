@@ -116,30 +116,26 @@ async function sendNotification(zone, prayer, prayerTime) {
   const prayerName = PRAYER_DISPLAY_NAMES[prayer] || prayer
   const messaging = getMessaging()
 
+  // Data-only message. A `notification` block would make the browser SDK
+  // display the message itself in addition to the service worker handler,
+  // which is what produced two notifications per prayer. The service worker
+  // builds the visible notification from `data` and applies a shared tag so
+  // reminders replace each other instead of piling up.
   const message = {
     topic: `zone-${zone}`,
-    notification: {
-      title: `${prayerName} Prayer`,
-      body: `${prayerName} is in ${REMINDER_MINUTES} minutes (${prayerTime})`,
-    },
     data: {
       prayer: prayer,
       zone: zone,
       time: prayerTime,
+      title: `${prayerName} Prayer`,
+      body: `${prayerName} is in ${REMINDER_MINUTES} minutes (${prayerTime})`,
     },
-    android: {
-      priority: 'high',
-      notification: {
-        sound: 'default',
-        channelId: 'prayer_times',
-      },
-    },
-    apns: {
-      payload: {
-        aps: {
-          sound: 'default',
-          badge: 1,
-        },
+    webpush: {
+      headers: {
+        Urgency: 'high',
+        // A reminder older than the reminder window is useless; let it expire
+        // instead of being delivered late and stacking up.
+        TTL: String(REMINDER_MINUTES * 60),
       },
     },
   }

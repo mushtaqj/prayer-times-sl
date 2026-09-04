@@ -4,14 +4,17 @@
 
 import { getToken, onMessage } from 'firebase/messaging'
 import { getMessagingInstance, VAPID_KEY } from './config'
+import { buildPrayerNotification, type PrayerPushData } from '@/lib/notifications/prayerNotification'
+import { showNotificationFromPage, PUSH_SW_SCOPE } from '@/lib/notifications/showNotification'
+import { PUSH_STORAGE_KEYS, getPushSettings } from '@/lib/notifications/pushSettings'
 
-// Storage keys
-const STORAGE_KEYS = {
-  PUSH_ENABLED: 'pushEnabled',
-  NOTIFICATION_DISTRICT: 'notificationDistrict',
-  NOTIFICATION_ZONE: 'notificationZone',
-  FCM_TOKEN: 'fcmToken',
-} as const
+export { getPushSettings }
+
+const STORAGE_KEYS = PUSH_STORAGE_KEYS
+
+/** The app service worker (Workbox precache + FCM push), registered by vite-plugin-pwa. */
+const SW_URL = '/sw.js'
+const SW_READY_TIMEOUT_MS = 10000
 
 /**
  * Check if push notifications are supported
@@ -45,6 +48,28 @@ export async function requestNotificationPermission(): Promise<boolean> {
 }
 
 /**
+ * Resolve the active app service worker registration at scope "/".
+ *
+ * vite-plugin-pwa registers the worker on page load (as /sw.js in production,
+ * or a dev-only URL under `vite dev`), so an existing registration is reused.
+ * Registering /sw.js ourselves is only a fallback, and it also upgrades installs
+ * that still have the legacy firebase-messaging-sw.js at this scope. The push
+ * subscription lives on the registration, so tokens survive the upgrade.
+ */
+export async function getPushServiceWorkerRegistration(): Promise<ServiceWorkerRegistration> {
+  const existing = await navigator.serviceWorker.getRegistration(PUSH_SW_SCOPE)
+  if (!existing) {
+    await navigator.serviceWorker.register(SW_URL, { scope: PUSH_SW_SCOPE })
+  }
+
+  const timeout = new Promise<never>((_, reject) => {
+    setTimeout(() => reject(new Error('Service worker activation timeout')), SW_READY_TIMEOUT_MS)
+  })
+
+  return Promise.race([navigator.serviceWorker.ready, timeout])
+}
+
+/**
  * Get FCM token for this device
  */
 export async function getFCMToken(): Promise<string | null> {
@@ -52,57 +77,16 @@ export async function getFCMToken(): Promise<string | null> {
   if (!messaging) return null
 
   try {
-    console.log('Getting FCM token with VAPID key:', VAPID_KEY?.substring(0, 20) + '...')
+    const registration = await getPushServiceWorkerRegistration()
 
-    // First, ensure Firebase messaging service worker is registered
-    const registrations = await navigator.serviceWorker.getRegistrations()
-    console.log('Existing service worker registrations:', registrations.length)
-
-    let firebaseReg = registrations.find(r => r.active?.scriptURL.includes('firebase-messaging-sw.js'))
-
-    if (!firebaseReg) {
-      console.log('Registering Firebase messaging service worker...')
-      firebaseReg = await navigator.serviceWorker.register('/firebase-messaging-sw.js')
-
-      // Wait for it to be active
-      if (!firebaseReg.active) {
-        console.log('Waiting for Firebase SW to activate...')
-        await new Promise<void>((resolve, reject) => {
-          const timeout = setTimeout(() => reject(new Error('SW activation timeout')), 10000)
-
-          const checkState = () => {
-            if (firebaseReg!.active) {
-              clearTimeout(timeout)
-              resolve()
-            }
-          }
-
-          firebaseReg!.addEventListener('updatefound', () => {
-            const newWorker = firebaseReg!.installing
-            newWorker?.addEventListener('statechange', checkState)
-          })
-
-          // Check immediately in case it's already active
-          checkState()
-        })
-      }
-      console.log('Firebase SW registered and active')
-    } else {
-      console.log('Firebase SW already registered:', firebaseReg.active?.scriptURL)
-    }
-
-    console.log('Requesting FCM token...')
     const token = await getToken(messaging, {
       vapidKey: VAPID_KEY,
-      serviceWorkerRegistration: firebaseReg,
+      serviceWorkerRegistration: registration,
     })
 
-    console.log('FCM Token obtained successfully:', token?.substring(0, 20) + '...')
     return token
   } catch (error) {
     console.error('Error getting FCM token:', error)
-    console.error('VAPID_KEY present:', !!VAPID_KEY)
-    console.error('VAPID_KEY length:', VAPID_KEY?.length)
     return null
   }
 }
@@ -238,25 +222,6 @@ export async function changeNotificationZone(
 }
 
 /**
- * Get current push notification settings
- */
-export function getPushSettings(): {
-  enabled: boolean
-  district: string | null
-  zone: string | null
-} {
-  if (typeof window === 'undefined') {
-    return { enabled: false, district: null, zone: null }
-  }
-
-  return {
-    enabled: localStorage.getItem(STORAGE_KEYS.PUSH_ENABLED) === 'true',
-    district: localStorage.getItem(STORAGE_KEYS.NOTIFICATION_DISTRICT),
-    zone: localStorage.getItem(STORAGE_KEYS.NOTIFICATION_ZONE),
-  }
-}
-
-/**
  * Check if location change prompt should be shown
  */
 export function shouldShowLocationChangePrompt(
@@ -274,7 +239,19 @@ export function shouldShowLocationChangePrompt(
 }
 
 /**
- * Set up foreground message handler
+ * Show a prayer reminder from the page (used when a push arrives in the foreground).
+ */
+export async function showPrayerNotification(data?: PrayerPushData): Promise<boolean> {
+  const { title, options } = buildPrayerNotification(data)
+  return showNotificationFromPage(title, options)
+}
+
+/**
+ * Set up foreground message handler.
+ *
+ * FCM does not display anything while the app is in the foreground, so the
+ * page shows the reminder itself using the same builder and tag as the
+ * service worker.
  */
 export async function setupForegroundMessaging(
   onMessageReceived: (payload: { title?: string; body?: string; data?: Record<string, string> }) => void
@@ -283,11 +260,15 @@ export async function setupForegroundMessaging(
   if (!messaging) return null
 
   const unsubscribe = onMessage(messaging, (payload) => {
+    const data = payload.data as PrayerPushData | undefined
+
     onMessageReceived({
-      title: payload.notification?.title,
-      body: payload.notification?.body,
+      title: data?.title ?? payload.notification?.title,
+      body: data?.body ?? payload.notification?.body,
       data: payload.data,
     })
+
+    void showPrayerNotification(data)
   })
 
   return unsubscribe
