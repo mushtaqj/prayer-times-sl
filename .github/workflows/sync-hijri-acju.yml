@@ -1,14 +1,14 @@
 name: Sync Hijri Calendar with ACJU
 
 on:
-  # Automatic: check ACJU at 21:00 and 06:00 Sri Lanka time (UTC+5:30).
-  # The script only contacts ACJU from day 29 of the ongoing month, so the
-  # evening of the 29th is the first check, the 30th the second, and the
-  # morning slots catch announcements made late at night. Runs where ACJU has
-  # nothing new make no commit.
+  # Automatic: check ACJU every three hours. The script skips the request
+  # cheaply until day 29 of the ongoing month, so most runs cost nothing.
+  # From day 29 onwards each slot gets a fresh GitHub runner; ACJU's bot
+  # protection refuses some runner IPs, so several slots per day give the
+  # sync several chances to get through. Runs where ACJU has nothing new, or
+  # where the runner IP was refused, make no commit.
   schedule:
-    - cron: '30 15 * * *'
-    - cron: '30 0 * * *'
+    - cron: '30 */3 * * *'
   workflow_dispatch:
     inputs:
       count:

@@ -2,7 +2,7 @@ import { join, dirname } from 'path'
 import { fileURLToPath } from 'url'
 import { JSONFilePreset } from 'lowdb/node'
 import { formatDateISO, getOngoingDayNumber, isSyncDue } from './lib/hijriTransition.js'
-import { syncFromAcju } from './lib/acjuSync.js'
+import { syncFromAcju, isAcjuBlocked } from './lib/acjuSync.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
@@ -25,8 +25,27 @@ if (onlyWhenDue && !isSyncDue(db.data, todayColombo)) {
   process.exit(0)
 }
 
+const dayNumber = getOngoingDayNumber(db.data, todayColombo)
+if (dayNumber !== null && dayNumber > 30) {
+  console.log(
+    `Calendar is on day ${dayNumber} of the ongoing month; the app is showing the assumed upcoming month until ACJU publishes the new one.`
+  )
+}
+
 const target = dryRun ? structuredClone(db.data) : db.data
-const transitions = await syncFromAcju(target, { maxCount })
+let transitions
+try {
+  transitions = await syncFromAcju(target, { maxCount })
+} catch (error) {
+  if (onlyWhenDue && isAcjuBlocked(error)) {
+    // Scheduled runs get a fresh runner (and usually a different IP) every
+    // slot, so a refused IP is not worth failing the job over. Surface it as
+    // a warning annotation and let the next slot retry.
+    console.log(`::warning title=ACJU blocked this runner::${error.message}. The next scheduled slot will retry from a different runner.`)
+    process.exit(0)
+  }
+  throw error
+}
 
 if (dryRun) {
   console.log(JSON.stringify({ transitions }, null, 2))

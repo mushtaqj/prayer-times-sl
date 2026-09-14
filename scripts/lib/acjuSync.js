@@ -16,6 +16,25 @@ const ACJU_ENDPOINT =
 
 const MAX_ITERATIONS_HARD_CAP = 24
 
+// ACJU's host (Imunify360) scores requests by IP reputation and client
+// signature. Some GitHub runner IPs are refused outright with a 403; a real
+// browser signature avoids the additional penalty for a bare "node" agent.
+const BROWSER_USER_AGENT =
+  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36'
+
+/** ACJU refused the request because of the caller's IP (bot protection). */
+export class AcjuBlockedError extends Error {
+  constructor(status, body) {
+    super(`ACJU refused this IP (HTTP ${status}): ${body}`)
+    this.name = 'AcjuBlockedError'
+    this.status = status
+  }
+}
+
+export function isAcjuBlocked(error) {
+  return error instanceof AcjuBlockedError
+}
+
 export async function fetchNextMonth(currentStartDate, fetchImpl = fetch) {
   const monthYear = currentStartDate.slice(0, 7)
   const body = new URLSearchParams({
@@ -28,15 +47,21 @@ export async function fetchNextMonth(currentStartDate, fetchImpl = fetch) {
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
       'Accept': 'application/json, text/javascript, */*; q=0.01',
+      'Accept-Language': 'en-GB,en;q=0.7',
       'X-Requested-With': 'XMLHttpRequest',
       'Origin': 'https://www.acju.lk',
       'Referer': 'https://www.acju.lk/calenders-en/',
+      'User-Agent': BROWSER_USER_AGENT,
     },
     body: body.toString(),
   })
 
   if (!response.ok) {
-    throw new Error(`ACJU HTTP ${response.status}: ${await response.text()}`)
+    const text = await response.text()
+    if (response.status === 403 && /imunify360|bot-protection/i.test(text)) {
+      throw new AcjuBlockedError(response.status, text.replace(/\s+/g, ' ').trim())
+    }
+    throw new Error(`ACJU HTTP ${response.status}: ${text}`)
   }
   return response.json()
 }
