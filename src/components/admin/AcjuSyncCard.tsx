@@ -101,7 +101,7 @@ export function AcjuSyncCard() {
       const res = await fetch('/api/confirm-sync-acju', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, code, token, count: selectedCount }),
+        body: JSON.stringify({ email, code, token }),
       })
       const data = await res.json()
       if (!res.ok) {
@@ -135,7 +135,7 @@ export function AcjuSyncCard() {
         <h3 className="text-base font-semibold text-foreground">Sync with ACJU</h3>
       </div>
       <p className="text-xs text-muted-foreground mb-4">
-        Catch up the calendar by replaying ACJU's published month data. A one-time code will be emailed to the registered admin.
+        Ask ACJU for the month after the current one and apply it if published. A one-time code will be emailed to the registered admin.
       </p>
 
       {status === 'success' && (

@@ -10,8 +10,6 @@ const isTruthy = (value) => value === 'true' || value === '1'
 const dryRun = isTruthy(process.env.DRY_RUN)
 // WHEN_DUE=true (scheduled runs): only contact ACJU from day 29 of the ongoing month.
 const onlyWhenDue = isTruthy(process.env.WHEN_DUE)
-const countEnv = process.env.COUNT ? parseInt(process.env.COUNT, 10) : undefined
-const maxCount = Number.isFinite(countEnv) && countEnv > 0 ? countEnv : undefined
 
 const dbPath = join(__dirname, '../src/data/hijriCalendar.json')
 const db = await JSONFilePreset(dbPath, { months: [], metadata: {}, hijriMonths: [] })
@@ -35,7 +33,7 @@ if (dayNumber !== null && dayNumber > 30) {
 const target = dryRun ? structuredClone(db.data) : db.data
 let transitions
 try {
-  transitions = await syncFromAcju(target, { maxCount })
+  transitions = await syncFromAcju(target)
 } catch (error) {
   if (onlyWhenDue && isAcjuBlocked(error)) {
     // Scheduled runs get a fresh runner (and usually a different IP) every
@@ -53,16 +51,15 @@ if (dryRun) {
 }
 
 if (transitions.length === 0) {
-  console.log('Calendar already in sync with ACJU. No changes.')
+  console.log('ACJU has not published the next month yet. No changes.')
   process.exit(0)
 }
 
-for (const t of transitions) {
-  console.log(
-    `Synced: ${t.completed.monthName} ${t.completed.hijriYear} = ${t.completed.days} days; ongoing -> ${t.newOngoing.monthName} ${t.newOngoing.hijriYear} (${t.newOngoing.gregorianStart}); upcoming -> ${t.newUpcoming.monthName} ${t.newUpcoming.hijriYear} (${t.newUpcoming.gregorianStart})`
-  )
-}
+const [t] = transitions
+console.log(
+  `Synced: ${t.completed.monthName} ${t.completed.hijriYear} = ${t.completed.days} days; ongoing -> ${t.newOngoing.monthName} ${t.newOngoing.hijriYear} (${t.newOngoing.gregorianStart}); upcoming (assumed) -> ${t.newUpcoming.monthName} ${t.newUpcoming.hijriYear} (${t.newUpcoming.gregorianStart})`
+)
 
 db.data.metadata.lastUpdated = formatDateISO(new Date())
 await db.write()
-console.log(`Sync complete: ${transitions.length} month(s) advanced.`)
+console.log('Sync complete: 1 month advanced.')

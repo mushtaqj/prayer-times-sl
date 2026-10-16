@@ -1,9 +1,12 @@
-// ACJU sync loop, shared between the CLI script and the preview API endpoint.
+// ACJU sync, shared between the CLI script and the preview API endpoint.
 //
-// Given a calendar `data` object, repeatedly asks ACJU what comes after the
-// current ongoing month and applies a transition until ACJU has no more data
-// (or `maxCount` is reached). Mutates `data.months` in place; callers should
-// clone first if they want a dry run.
+// Given a calendar `data` object, asks ACJU once what comes after the current
+// ongoing month. If ACJU has published that start date, one transition is
+// applied: the ongoing month is closed with its real length, the upcoming
+// month becomes ongoing, and a new upcoming month is appended as a local
+// 30-day assumption. Nothing further is requested from ACJU; the months after
+// that are pure calculation until the next run. Mutates `data.months` in
+// place; callers should clone first if they want a dry run.
 
 import {
   applyTransition,
@@ -13,8 +16,6 @@ import {
 
 const ACJU_ENDPOINT =
   'https://www.acju.lk/wp-content/plugins/hijri-calendar-plugin/fetch_next_month.php'
-
-const MAX_ITERATIONS_HARD_CAP = 24
 
 // ACJU's host (Imunify360) scores requests by IP reputation and client
 // signature. Some GitHub runner IPs are refused outright with a 403; a real
@@ -72,56 +73,54 @@ function daysBetween(startISO, endISO) {
 }
 
 /**
- * Run the ACJU sync loop against `data` (mutating it). Returns an array of
- * applied transitions: { completed: {monthName, hijriYear, days}, newOngoing:
- * {monthName, hijriYear, gregorianStart}, newUpcoming: same }.
+ * Ask ACJU once for the month after the ongoing one and apply it if published.
+ * Returns an array with zero or one transition: { completed: {monthName,
+ * hijriYear, hijriMonth, gregorianStart, days}, newOngoing: {...}, newUpcoming:
+ * {...} }. The array shape is kept so the CLI and preview API can treat it as
+ * a plan.
  *
  * @param {object} data - calendar data { months, hijriMonths }
  * @param {object} [options]
- * @param {number} [options.maxCount] - hard cap on how many transitions to apply
  * @param {typeof fetch} [options.fetchImpl] - injected fetch (for tests)
  */
 export async function syncFromAcju(data, options = {}) {
-  const { maxCount, fetchImpl } = options
-  const cap = Math.min(maxCount ?? MAX_ITERATIONS_HARD_CAP, MAX_ITERATIONS_HARD_CAP)
+  const { fetchImpl } = options
 
-  const transitions = []
-  let iterations = 0
+  const ongoing = data.months.find((m) => m.status === 'ongoing')
+  if (!ongoing) {
+    throw new Error('No ongoing month found in calendar; cannot sync.')
+  }
 
-  while (iterations++ < cap) {
-    const ongoing = data.months.find((m) => m.status === 'ongoing')
-    if (!ongoing) {
-      throw new Error('No ongoing month found in calendar; cannot sync.')
-    }
+  const ongoingSnapshot = {
+    monthName: ongoing.monthName,
+    hijriYear: ongoing.hijriYear,
+    hijriMonth: ongoing.hijriMonth,
+    gregorianStart: ongoing.gregorianStart,
+  }
 
-    const ongoingSnapshot = {
-      monthName: ongoing.monthName,
-      hijriYear: ongoing.hijriYear,
-      hijriMonth: ongoing.hijriMonth,
-      gregorianStart: ongoing.gregorianStart,
-    }
+  const response = await fetchNextMonth(ongoing.gregorianStart, fetchImpl)
+  if (!response || response.success === false || !response.start_date) {
+    return []
+  }
 
-    const response = await fetchNextMonth(ongoing.gregorianStart, fetchImpl)
-    if (!response || response.success === false || !response.start_date) {
-      break
-    }
+  const actualDays = daysBetween(ongoing.gregorianStart, response.start_date)
+  if (actualDays <= 0) {
+    // When ACJU has nothing newer than the ongoing month it does not answer
+    // success:false; it echoes the ongoing month's own row back (same
+    // start_date, is_last_start_date varies). That is "nothing published yet",
+    // not a broken month length.
+    return []
+  }
+  if (!VALID_MONTH_DAYS.includes(actualDays)) {
+    throw new Error(
+      `Computed ${actualDays} days for ${ongoing.monthName} ${ongoing.hijriYear} (start ${ongoing.gregorianStart} -> next ${response.start_date}); expected 29 or 30.`
+    )
+  }
 
-    const actualDays = daysBetween(ongoing.gregorianStart, response.start_date)
-    if (!VALID_MONTH_DAYS.includes(actualDays)) {
-      throw new Error(
-        `Computed ${actualDays} days for ${ongoing.monthName} ${ongoing.hijriYear} (start ${ongoing.gregorianStart} -> next ${response.start_date}); expected 29 or 30.`
-      )
-    }
-
-    const result = applyTransition(data, actualDays)
-    transitions.push({
-      completed: {
-        monthName: ongoingSnapshot.monthName,
-        hijriYear: ongoingSnapshot.hijriYear,
-        hijriMonth: ongoingSnapshot.hijriMonth,
-        gregorianStart: ongoingSnapshot.gregorianStart,
-        days: actualDays,
-      },
+  const result = applyTransition(data, actualDays)
+  return [
+    {
+      completed: { ...ongoingSnapshot, days: actualDays },
       newOngoing: {
         monthName: result.newOngoing.monthName,
         hijriYear: result.newOngoing.hijriYear,
@@ -136,14 +135,6 @@ export async function syncFromAcju(data, options = {}) {
         gregorianStart: result.newUpcoming.gregorianStart,
         days: result.newUpcoming.days,
       },
-    })
-  }
-
-  if (iterations > MAX_ITERATIONS_HARD_CAP) {
-    throw new Error(
-      `Aborting: hit MAX_ITERATIONS_HARD_CAP (${MAX_ITERATIONS_HARD_CAP}). ACJU may be returning success without advancing.`
-    )
-  }
-
-  return transitions
+    },
+  ]
 }

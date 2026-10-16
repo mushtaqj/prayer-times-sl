@@ -1,11 +1,11 @@
 // Vercel Serverless Function - Confirm Hijri ACJU Sync (OTP step 2)
 // POST /api/confirm-sync-acju
 //
-// Body: { email, code, token, count }
+// Body: { email, code, token }
 // Validates the signed token issued by /api/request-sync-acju, then dispatches
-// the sync-hijri-acju GitHub workflow. `count` (optional, integer >= 1) caps
-// how many transitions the apply step will commit so the admin can approve a
-// prefix of the previewed plan; omit it to apply everything ACJU has.
+// the sync-hijri-acju GitHub workflow. The workflow makes one ACJU request and
+// applies at most one month transition, the same one /api/preview-sync-acju
+// showed.
 
 import { validateSyncToken } from './_lib/syncAcjuToken.js'
 
@@ -17,16 +17,6 @@ export default async function handler(req, res) {
   const auth = validateSyncToken(req.body || {})
   if (!auth.ok) {
     return res.status(auth.status).json({ error: auth.error })
-  }
-
-  const { count } = req.body || {}
-  let countInput = ''
-  if (count !== undefined && count !== null && count !== '') {
-    const parsed = parseInt(count, 10)
-    if (!Number.isFinite(parsed) || parsed < 1) {
-      return res.status(400).json({ error: 'count must be a positive integer' })
-    }
-    countInput = String(parsed)
   }
 
   const { GITHUB_TOKEN, GITHUB_REPO } = process.env
@@ -44,7 +34,7 @@ export default async function handler(req, res) {
           Accept: 'application/vnd.github.v3+json',
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ ref: 'main', inputs: { count: countInput } }),
+        body: JSON.stringify({ ref: 'main' }),
       }
     )
 

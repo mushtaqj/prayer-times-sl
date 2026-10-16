@@ -217,11 +217,17 @@ To install on iOS:
 `sync-hijri-acju` workflow closes the ongoing month with its real length,
 promotes the upcoming month and appends a new upcoming month.
 
-The workflow runs on a schedule at 21:00 and 06:00 Sri Lanka time. Scheduled
-runs set `WHEN_DUE=true`, so the script only contacts ACJU from day 29 of the
-ongoing month onwards; the first check is the evening of the 29th, the next the
-30th. Runs that find nothing new make no commit. The workflow can also be
-dispatched manually (or from the admin page) with an optional `count` cap.
+Each run makes exactly one ACJU request: "what month follows the ongoing one?"
+If ACJU has published that start date, one transition is applied; the new
+upcoming month is a local 30-day assumption and is never fetched. Everything
+beyond the ongoing month is pure calculation until the next sighting. When ACJU
+has nothing newer it echoes the ongoing month back, which the script treats as
+"not published yet".
+
+The workflow runs every three hours. Scheduled runs set `WHEN_DUE=true`, so the
+script only contacts ACJU from day 29 of the ongoing month onwards. Runs that
+find nothing new make no commit. The workflow can also be dispatched manually
+(or from the admin page).
 
 ```bash
 # Preview what a sync would change without writing

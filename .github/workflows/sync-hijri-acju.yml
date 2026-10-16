@@ -3,19 +3,15 @@ name: Sync Hijri Calendar with ACJU
 on:
   # Automatic: check ACJU every three hours. The script skips the request
   # cheaply until day 29 of the ongoing month, so most runs cost nothing.
-  # From day 29 onwards each slot gets a fresh GitHub runner; ACJU's bot
-  # protection refuses some runner IPs, so several slots per day give the
-  # sync several chances to get through. Runs where ACJU has nothing new, or
-  # where the runner IP was refused, make no commit.
+  # From day 29 onwards each slot makes exactly one ACJU request, asking for
+  # the month after the ongoing one, and applies at most one transition.
+  # Each slot gets a fresh GitHub runner; ACJU's bot protection refuses some
+  # runner IPs, so several slots per day give the sync several chances to get
+  # through. Runs where ACJU has nothing new, or where the runner IP was
+  # refused, make no commit.
   schedule:
     - cron: '30 */3 * * *'
   workflow_dispatch:
-    inputs:
-      count:
-        description: 'Max transitions to apply (leave blank to apply all ACJU has).'
-        required: false
-        type: string
-        default: ''
 
 concurrency:
   group: hijri-calendar
@@ -42,7 +38,6 @@ jobs:
       - name: Sync Hijri calendar with ACJU
         run: node scripts/sync-hijri-acju.js
         env:
-          COUNT: ${{ github.event.inputs.count }}
           # Scheduled runs skip the ACJU request until day 29 of the ongoing month.
           WHEN_DUE: ${{ github.event_name == 'schedule' }}
 
